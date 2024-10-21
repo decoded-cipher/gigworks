@@ -1,14 +1,21 @@
 {
-  "name": "server",
+  "name": "gigworks-server",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify"
+    "deploy": "wrangler deploy --minify",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@libsql/client": "^0.14.0",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.35.2",
     "hono": "^4.6.5"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240925.0",
+    "drizzle-kit": "^0.26.2",
     "wrangler": "^3.79.0"
   }
 }

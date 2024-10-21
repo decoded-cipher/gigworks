@@ -1,13 +1,16 @@
 import { Hono } from 'hono';
 import { errorHandler } from './middleware/errorHandler';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 import apiRouter from './routes/api';
 import authRouter from './routes/auth';
 
 const app = new Hono();
 
 
-app.route('/api', apiRouter);
+app.route('/api/v1', apiRouter);
 app.route('/auth', authRouter);
 
 

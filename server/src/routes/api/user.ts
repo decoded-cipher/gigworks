@@ -1,16 +1,15 @@
 import { Hono } from 'hono';
+import { getAllUsers } from '../../services/userService';
 
 const userRouter = new Hono();
 
-// Get all users
 userRouter.get('/', async (c) => {
-  try {
-    // Logic to fetch users
-    return c.json({ message: 'Get all users' });
-  } catch (error) {
-    return c.json({ message: 'Failed to get users', error: error.message }, 500);
-  }
+    const users = await getAllUsers();
+    return c.json({
+        status: 200,
+        message: 'All users fetched successfully',
+        data: users
+    });
 });
-
 
 export default userRouter;
