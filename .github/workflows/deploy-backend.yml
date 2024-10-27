@@ -24,6 +24,8 @@ jobs:
         working-directory: ./server
         env:
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_PROJECT_NAME: gigworks-server
         run: |
           npm install -g wrangler
           npm run deploy
