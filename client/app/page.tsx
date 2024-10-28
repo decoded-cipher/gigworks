@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
-import gigworks from '../public/gigworks.png';
+import gigworks from '../public/gigworks.svg';
 import man from '../public/man.svg';
 import whatsapp from '../public/whatsapp.png';
 import { ContactForm } from './components/ContactForm';
