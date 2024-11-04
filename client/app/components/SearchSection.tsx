@@ -3,6 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 
+// Define types for our data structures
+type LocationsType = {
+  [key: string]: string[];
+};
+
 const jobs = [
   "Plumber",
   "Electrician",
@@ -12,9 +17,9 @@ const jobs = [
   "Gardener",
   "Mechanic",
   "Cleaner"
-];
+] as const;
 
-const locations = {
+const locations: LocationsType = {
   "Kerala": [
     "Trivandrum",
     "Kochi",
@@ -29,7 +34,7 @@ export const SearchSection = () => {
   const [currentJobIndex, setCurrentJobIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showLocations, setShowLocations] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState("Kerala");
+  const [selectedLocation, setSelectedLocation] = useState<keyof LocationsType>("Kerala");
   const [selectedCity, setSelectedCity] = useState("");
 
   useEffect(() => {
@@ -73,7 +78,7 @@ export const SearchSection = () => {
           <div className="absolute top-full left-0 mt-2 w-64 bg-navbg border border-green-700 rounded-md shadow-lg z-50">
             <div className="p-2">
               <div className="font-semibold text-green-500 mb-2">{selectedLocation}</div>
-              {locations[selectedLocation].map((city) => (
+              {locations[selectedLocation]?.map((city) => (
                 <div
                   key={city}
                   className="px-2 py-1 hover:bg-green-500/20 rounded cursor-pointer text-white"
@@ -95,6 +100,7 @@ export const SearchSection = () => {
         <input
           type="text"
           className="w-full px-6 py-4 bg-transparent outline-none"
+          placeholder=""
         />
         <div className="absolute left-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
           <span>Search for </span>
