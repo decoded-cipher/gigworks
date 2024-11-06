@@ -44,7 +44,7 @@ const FeatureCardsWithImage = () => {
         {/* Desktop Layout - Cards around center image */}
         <div className="hidden md:flex justify-center items-center relative">
           {/* Center image container */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[800px]">
+          <div className="absolute  left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[800px]">
             <Image 
               src="/women.svg"
               alt="Women illustration"

@@ -49,7 +49,7 @@ export function NumberTicker({
   return (
     <span
       className={cn(
-        "text-7xl p-10 text-black font-extrabold mb-6 ",
+        "text-7xl p-5 text-black font-extrabold mb-6 ",
         className,
       )}
       ref={ref}

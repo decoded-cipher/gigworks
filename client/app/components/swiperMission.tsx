@@ -110,7 +110,7 @@ const MissionSwiper = () => {
     <div className="relative mx-auto select-none">
       {/* Main content area */}
       <div 
-        className="relative bg-green-600 p-6 rounded-lg mx-4 md:mx-52 min-h-[200px] cursor-grab active:cursor-grabbing"
+        className="relative bg-green-600 p-6 rounded-lg mx-4 md:mx-52 cursor-grab active:cursor-grabbing md:text-start text-center "
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -131,9 +131,9 @@ const MissionSwiper = () => {
                 key={index}
                 className="w-full flex-shrink-0"
               >
-                <div className="text-white">
+                <div className="text-white ">
                   <h3 className="text-xl font-bold mb-4">{slide.title}</h3>
-                  <p className="leading-relaxed">{slide.content}</p>
+                  <p className="leading-relaxed mb-4">{slide.content}</p>
                 </div>
               </div>
             ))}
@@ -150,7 +150,7 @@ const MissionSwiper = () => {
           className="absolute left-2 top-1/2 -translate-y-1/2 text-white opacity-70 hover:opacity-100"
           aria-label="Previous slide"
         >
-          ←
+          
         </button>
         <button
           onClick={() => {
@@ -161,7 +161,7 @@ const MissionSwiper = () => {
           className="absolute right-2 top-1/2 -translate-y-1/2 text-white opacity-70 hover:opacity-100"
           aria-label="Next slide"
         >
-          →
+          
         </button>
       </div>
 
