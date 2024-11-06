@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-// Define types for our data structures
 type LocationsType = {
   [key: string]: string[];
 };
@@ -50,16 +49,16 @@ export const SearchSection = () => {
   }, []);
 
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 w-full ">
       {/* Location Input */}
-      <div className="relative">
+      <div className="relative w-full md:w-64 px-1 md:px-0">
         <div 
-          className="flex items-center bg-navbg border border-green-700 text-white rounded-md px-4 py-2 w-64 h-14 cursor-pointer"
+          className="flex items-center bg-navbg border border-green-700 text-white rounded-md px-4 py-2 h-14 cursor-pointer w-full"
           onClick={() => setShowLocations(!showLocations)}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 text-green-500 mr-2"
+            className="h-5 w-5 text-green-500 mr-2 shrink-0"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -69,13 +68,13 @@ export const SearchSection = () => {
               clipRule="evenodd"
             />
           </svg>
-          <span className="flex-1">{selectedCity || selectedLocation}</span>
-          <ChevronDown className="h-4 w-4 text-green-500" />
+          <span className="flex-1 truncate">{selectedCity || selectedLocation}</span>
+          <ChevronDown className="h-4 w-4 text-green-500 shrink-0" />
         </div>
 
         {/* Location Dropdown */}
         {showLocations && (
-          <div className="absolute top-full left-0 mt-2 w-64 bg-navbg border border-green-700 rounded-md shadow-lg z-50">
+          <div className="absolute top-full left-0 mt-2 w-full bg-navbg border border-green-700 rounded-md shadow-lg z-50">
             <div className="p-2">
               <div className="font-semibold text-green-500 mb-2">{selectedLocation}</div>
               {locations[selectedLocation]?.map((city) => (
@@ -96,10 +95,10 @@ export const SearchSection = () => {
       </div>
 
       {/* Search Input */}
-      <div className="relative bg-navbg border border-green-700 text-white rounded-md w-96">
+      <div className="relative bg-navbg border border-green-700 text-white rounded-md md:w-96 mx-1 md:mx-0">
         <input
           type="text"
-          className="w-full px-6 py-4 bg-transparent outline-none"
+          className="w-full  px-6 py-4 bg-transparent outline-none"
           placeholder=""
         />
         <div className="absolute left-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
