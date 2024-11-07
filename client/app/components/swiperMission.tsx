@@ -110,7 +110,7 @@ const MissionSwiper = () => {
     <div className="relative mx-auto select-none">
       {/* Main content area */}
       <div 
-        className="relative bg-green-600 p-6 rounded-lg mx-4 cursor-grab active:cursor-grabbing md:text-start text-center "
+        className="relative bg-green-600 p-6 rounded-lg lg:mx-44 mx-4 cursor-grab active:cursor-grabbing md:text-start text-center "
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
