@@ -401,7 +401,7 @@ export default function GigWorkLandingPage() {
             designed to make discovering services, products, and businesses in
             your area easier than ever.
           </p>
-          <h2 className="text-4xl text-black font-bold mb-2 ">
+          <h2 className="text-4xl text-black font-bold mb-2 text-center ">
             Clients{" "}
             <span className="text-white bg-green-600 pr-3">Onboarded</span>
           </h2>
