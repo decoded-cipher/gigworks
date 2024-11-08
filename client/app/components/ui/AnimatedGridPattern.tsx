@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-
 import { cn } from "@/lib/utils";
 
 interface GridPatternProps {
@@ -19,8 +18,8 @@ interface GridPatternProps {
 }
 
 export function GridPattern({
-  width = 200,
-  height = 200,
+  width = 150,
+  height = 150,
   x = -1,
   y = -1,
   strokeDasharray = 0,
@@ -32,27 +31,27 @@ export function GridPattern({
   ...props
 }: GridPatternProps) {
   const id = useId();
-  const containerRef = useRef(null);
+  const containerRef = useRef<SVGSVGElement | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [squares, setSquares] = useState(() => generateSquares(numSquares));
 
-  function getPos() {
+  const getPos = useCallback(() => {
     return [
       Math.floor((Math.random() * dimensions.width) / width),
       Math.floor((Math.random() * dimensions.height) / height),
     ];
-  }
+  }, [dimensions.width, dimensions.height, width, height]);
 
-  // Adjust the generateSquares function to return objects with an id, x, and y
-  function generateSquares(count: number) {
+  const generateSquares = useCallback((count: number) => {
     return Array.from({ length: count }, (_, i) => ({
       id: i,
       pos: getPos(),
     }));
-  }
+  }, [getPos]);
 
-  // Function to update a single square's position
-  const updateSquarePosition = (id: number) => {
+  const [squares, setSquares] = useState(() => generateSquares(numSquares));
+
+  // Update the updateSquarePosition function
+  const updateSquarePosition = useCallback((id: number) => {
     setSquares((currentSquares) =>
       currentSquares.map((sq) =>
         sq.id === id
@@ -63,17 +62,19 @@ export function GridPattern({
           : sq,
       ),
     );
-  };
+  }, [getPos]);
 
-  // Update squares to animate in
+  // First useEffect - fixed by adding generateSquares to dependencies
   useEffect(() => {
     if (dimensions.width && dimensions.height) {
       setSquares(generateSquares(numSquares));
     }
-  }, [dimensions, numSquares]);
+  }, [dimensions, numSquares, generateSquares]); // Added generateSquares here
 
-  // Resize observer to update container dimensions
+  // Second useEffect - fixed by capturing ref value
   useEffect(() => {
+    const element = containerRef.current; // Capture the current value
+
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
         setDimensions({
@@ -83,16 +84,16 @@ export function GridPattern({
       }
     });
 
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
+    if (element) {
+      resizeObserver.observe(element);
     }
 
     return () => {
-      if (containerRef.current) {
-        resizeObserver.unobserve(containerRef.current);
+      if (element) { // Use captured value in cleanup
+        resizeObserver.unobserve(element);
       }
     };
-  }, [containerRef]);
+  }, []); // Empty dependency array since we're capturing the ref
 
   return (
     <svg

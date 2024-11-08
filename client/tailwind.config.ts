@@ -21,6 +21,7 @@ const config: Config = {
   				foreground: 'hsl(var(--secondary-foreground))'
   			},
   			tertiary: '#009A36',
+			cbg:'#0D0D0D',
   			navbg: '#111111',
 			grn: '#009A36',
   			background: 'hsl(var(--background))',
