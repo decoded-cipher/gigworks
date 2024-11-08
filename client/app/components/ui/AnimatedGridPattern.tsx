@@ -50,7 +50,7 @@ export function GridPattern({
 
   const [squares, setSquares] = useState(() => generateSquares(numSquares));
 
-  // Update the updateSquarePosition function
+
   const updateSquarePosition = useCallback((id: number) => {
     setSquares((currentSquares) =>
       currentSquares.map((sq) =>
@@ -64,17 +64,16 @@ export function GridPattern({
     );
   }, [getPos]);
 
-  // First useEffect - fixed by adding generateSquares to dependencies
+  // First useEffect 
   useEffect(() => {
     if (dimensions.width && dimensions.height) {
       setSquares(generateSquares(numSquares));
     }
-  }, [dimensions, numSquares, generateSquares]); // Added generateSquares here
+  }, [dimensions, numSquares, generateSquares]); 
 
-  // Second useEffect - fixed by capturing ref value
+  // Second useEffect
   useEffect(() => {
-    const element = containerRef.current; // Capture the current value
-
+    const element = containerRef.current; 
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
         setDimensions({
@@ -89,11 +88,11 @@ export function GridPattern({
     }
 
     return () => {
-      if (element) { // Use captured value in cleanup
+      if (element) { 
         resizeObserver.unobserve(element);
       }
     };
-  }, []); // Empty dependency array since we're capturing the ref
+  }, []); 
 
   return (
     <svg
