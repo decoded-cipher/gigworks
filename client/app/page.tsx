@@ -53,7 +53,7 @@ export default function GigWorkLandingPage() {
   ];
 
   return (
-    <div className=" min-h-screen bg-black text-white overflow-x-hidden">
+    <div className=" min-h-screen bg-black font-circular text-white overflow-x-hidden">
       {/* Navbar */}
       <nav
         className={`fixed top-0 left-0 right-0 z-30 py-2 transition-all duration-300 ${
@@ -113,8 +113,8 @@ export default function GigWorkLandingPage() {
                 // Initial menu items
                 <div className="flex items-center space-x-8">
                   <SearchSection />
-                  <button className="border border-green-500 hover:text-green-500 text-xl font-bold bg-tertiary text-white px-4 py-2 rounded-md transition duration-300 whitespace-nowrap">
-                    Login / Sign Up
+                  <button className="border border-green-500 hover:text-green-500 text-xl font-medium bg-tertiary text-white px-4 py-2 h-14 rounded-md transition duration-300 whitespace-nowrap">
+                    Login
                   </button>
                 </div>
               )}
@@ -178,8 +178,8 @@ export default function GigWorkLandingPage() {
                   <div className="w-full">
                     <SearchSection />
                   </div>
-                  <button className="w-full border border-green-500 hover:text-green-500 text-lg font-bold bg-tertiary text-white px-4 py-2 rounded-md transition duration-300">
-                    Login / Sign Up
+                  <button className="w-full border border-green-500 hover:text-green-500 text-lg font-medium bg-tertiary text-white px-4 py-2 rounded-md transition duration-300">
+                    Login
                   </button>
                 </div>
               )}
@@ -198,7 +198,7 @@ export default function GigWorkLandingPage() {
 
           {/* Hero Section */}
           <section className="container mx-auto md:px-16 py-16 flex h-screen flex-col md:flex-row items-center relative z-10 px-4">
-            <div className="lg:w-1/2 mb-8 lg:mb-0 xl:pl-16">      
+            <div className="lg:w-1/2 mb-8 lg:mb-0 xl:pl-16">
               <div className="lg:hidden block mb-[67px]">
                 <SearchSection />
               </div>
@@ -208,20 +208,20 @@ export default function GigWorkLandingPage() {
                   <span className="text-green-500 md:text-7xl ">WhatsApp!</span>
                 </div>
               </h1>
-              <p className="text-gray-400 mb-6 font-light text-justify">
+              <p className="text-gray-400 mb-2 font-light text-justify">
                 Connect, communicate, and grow your business with WhatsApp—on a
                 platform your customers already love.
               </p>
-              <div className="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4 pt-8">
+              <div className="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4 pt-8 ">
                 <button className="hidden lg:block w-full lg:w-[204px] bg-tertiary hover:bg-green-500 text-white px-8 py-3 lg:py-2 rounded-md  transition duration-300">
                   <span className="text-base lg:text-2xl font-bold flex items-center justify-center">
                     Explore <span className="ml-4">→</span>
                   </span>
                 </button>
 
-                <button className="lg:hidden h-[60px] w-full md:w-auto bg-tertiary hover:bg-green-600 text-white px-6 py-3 md:py-2 rounded-md hover:bg-white hover:text-gray-900 transition duration-300">
+                <button className="lg:hidden h-[60px] w-full md:w-auto bg-tertiary hover:bg-green-600 text-white px-6 py-3 md:py-2 rounded-md transition duration-300">
                   <span className="text-base md:text-2xl font-bold flex items-center justify-center">
-                    Login / Sign Up
+                    Sign up
                   </span>
                 </button>
 
@@ -369,8 +369,8 @@ export default function GigWorkLandingPage() {
       </div>
       {/* -------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
       {/* Features */}
-      <section className="hidden md:block bg-green-600 bg-opacity-80 md:relative z-20">
-        <section className="bg-green-600 py-8 relative z-50 -skew-y-[2deg]">
+      <section className="hidden md:block bg-green-600/85 md:relative z-20">
+        <section className="bg-green-600 lg:py-8 md:py-5 relative z-50 -skew-y-[2deg]">
           <div className="container mx-auto px-40 flex justify-between md:space-x-4">
             <div className="text-center text-2xl font-bold text-white flex items-center">
               <span className="mr-2">•</span> Customer engagement
@@ -445,117 +445,118 @@ export default function GigWorkLandingPage() {
       </section>
 
       {/* Contact Us */}
-      <section
-        id="contact"
-        className="container bg-cbg mx-auto px-3 md:px-[42px] py-16 flex flex-col items-center"
-      >
-        <h2 className="text-3xl font-bold mb-8 ">
-          Contact <span className="text-green-600">Us</span>
-        </h2>
-        <hr className="w-1/4 mb-4 h-1 border-0 opacity-100 bg-gradient-to-l from-transparent to-green-600 rounded-lg" />
-        <p className="text-gray-100 mb-8 text-center">
-          We&apos;re here to help! If you have any questions, concerns, or need
-          assistance, please feel free to reach <br /> out to us using any of
-          the methods below.
-        </p>
-        <div className="bg-white p-3 pb-12 md:p-5 flex flex-col md:flex-row gap-8 rounded-lg">
-          <div className="md:w-1/2 bg-green-600 p-6 rounded-lg relative overflow-hidden">
-            <h3 className="text-4xl font-bold mb-4">Contact Information</h3>
-            <div className="space-y-7">
-              <p className="text-1Xl">Say something to start a live chat!</p>
-              <p className="flex text-xl items-center">
-                <svg
-                  className="mb-2 mr-2"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="21"
-                  height="18"
-                  viewBox="0 0 21 18"
-                  fill="none"
-                >
-                  <path
-                    d="M11.7501 4.99999C14.0284 4.99999 15.0001 5.89699 15.0001 7.99999H17.1668C17.1668 4.77499 15.2439 2.99999 11.7501 2.99999V4.99999ZM15.4573 10.443C15.2491 10.2683 14.9756 10.1752 14.6944 10.1832C14.4133 10.1912 14.1465 10.2998 13.9504 10.486L11.358 12.947C10.734 12.837 9.47948 12.476 8.18814 11.287C6.89681 10.094 6.50573 8.93299 6.38981 8.361L9.05373 5.96699C9.25567 5.78612 9.37346 5.53982 9.38215 5.2802C9.39085 5.02059 9.28977 4.76804 9.10031 4.57599L5.09739 0.512995C4.90786 0.320352 4.64443 0.203499 4.36306 0.187255C4.08169 0.17101 3.80454 0.256653 3.59048 0.425995L1.23964 2.28699C1.05235 2.46051 0.940556 2.69145 0.925476 2.93599C0.909226 3.18599 0.599393 9.108 5.57406 13.702C9.91389 17.707 15.3501 18 16.8472 18C17.0661 18 17.2004 17.994 17.2361 17.992C17.501 17.9783 17.7511 17.8747 17.9381 17.701L19.9531 15.53C20.1367 15.3325 20.2297 15.0768 20.2123 14.817C20.1949 14.5573 20.0685 14.3141 19.86 14.139L15.4573 10.443Z"
-                    fill="white"
-                  />
-                </svg>
-                +1234 5678 910
-              </p>
-              <p className="flex items-center text-xl">
-                <svg
-                  className="w-6 h-6 text-white mr-2"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M2.038 5.61A2.01 2.01 0 0 0 2 6v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6c0-.12-.01-.238-.03-.352l-.866.65-7.89 6.032a2 2 0 0 1-2.429 0L2.884 6.288l-.846-.677Z" />
-                  <path d="M20.677 4.117A1.996 1.996 0 0 0 20 4H4c-.225 0-.44.037-.642.105l.758.607L12 10.742 19.9 4.7l.777-.583Z" />
-                </svg>
-                hello@gigwork.co.in
-              </p>
-              <p className="flex items-center text-xl">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="mr-2  "
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <path
-                    d="M12 1.5C9.81276 1.50258 7.71584 2.3726 6.16923 3.91922C4.62261 5.46584 3.75259 7.56276 3.75001 9.75C3.74739 11.5374 4.33124 13.2763 5.41201 14.7C5.41201 14.7 5.63701 14.9963 5.67376 15.039L12 22.5L18.3293 15.0353C18.3623 14.9955 18.588 14.7 18.588 14.7L18.5888 14.6978C19.669 13.2747 20.2526 11.5366 20.25 9.75C20.2474 7.56276 19.3774 5.46584 17.8308 3.91922C16.2842 2.3726 14.1873 1.50258 12 1.5ZM12 12.75C11.4067 12.75 10.8266 12.5741 10.3333 12.2444C9.83995 11.9148 9.45543 11.4462 9.22837 10.8981C9.00131 10.3499 8.9419 9.74667 9.05765 9.16473C9.17341 8.58279 9.45913 8.04824 9.87869 7.62868C10.2982 7.20912 10.8328 6.9234 11.4147 6.80764C11.9967 6.69189 12.5999 6.7513 13.1481 6.97836C13.6962 7.20542 14.1648 7.58994 14.4944 8.08329C14.8241 8.57664 15 9.15666 15 9.75C14.999 10.5453 14.6826 11.3078 14.1202 11.8702C13.5578 12.4326 12.7954 12.749 12 12.75Z"
-                    fill="white"
-                  />
-                </svg>
-                102 Street 2714 Don
-              </p>
-              <section className="hidden md:block">
-                <h1 className="text-center font-bold text-xl">
-                  Business Hours
-                </h1>
-                <p className="text-center font-light text-xl">
-                  Our business hours are 9 to 5 on weekdays. We&apos;re happy to
-                  respond to all inquiries within 24 hours.
+      <section className="bg-cbg w-full">
+        <section
+          id="contact"
+          className="container bg-cbg mx-auto px-3 md:px-[42px] py-16 flex flex-col items-center"
+        >
+          <h2 className="text-3xl font-bold mb-8 ">
+            Contact <span className="text-green-600">Us</span>
+          </h2>
+          <hr className="w-1/4 mb-4 h-1 border-0 opacity-100 bg-gradient-to-l from-transparent to-green-600 rounded-lg" />
+          <p className="text-gray-100 mb-8 text-center">
+            We&apos;re here to help! If you have any questions, concerns, or
+            need assistance, please feel free to reach <br /> out to us using
+            any of the methods below.
+          </p>
+          <div className="bg-white p-3 pb-12 md:p-5 flex flex-col md:flex-row gap-8 rounded-lg">
+            <div className="md:w-1/2 bg-green-600 p-6 rounded-lg relative overflow-hidden">
+              <h3 className="text-4xl font-bold mb-4">Contact Information</h3>
+              <div className="space-y-7">
+                <p className="text-1Xl">Say something to start a live chat!</p>
+                <p className="flex text-xl items-center">
+                  <svg
+                    className="mb-2 mr-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="21"
+                    height="18"
+                    viewBox="0 0 21 18"
+                    fill="none"
+                  >
+                    <path
+                      d="M11.7501 4.99999C14.0284 4.99999 15.0001 5.89699 15.0001 7.99999H17.1668C17.1668 4.77499 15.2439 2.99999 11.7501 2.99999V4.99999ZM15.4573 10.443C15.2491 10.2683 14.9756 10.1752 14.6944 10.1832C14.4133 10.1912 14.1465 10.2998 13.9504 10.486L11.358 12.947C10.734 12.837 9.47948 12.476 8.18814 11.287C6.89681 10.094 6.50573 8.93299 6.38981 8.361L9.05373 5.96699C9.25567 5.78612 9.37346 5.53982 9.38215 5.2802C9.39085 5.02059 9.28977 4.76804 9.10031 4.57599L5.09739 0.512995C4.90786 0.320352 4.64443 0.203499 4.36306 0.187255C4.08169 0.17101 3.80454 0.256653 3.59048 0.425995L1.23964 2.28699C1.05235 2.46051 0.940556 2.69145 0.925476 2.93599C0.909226 3.18599 0.599393 9.108 5.57406 13.702C9.91389 17.707 15.3501 18 16.8472 18C17.0661 18 17.2004 17.994 17.2361 17.992C17.501 17.9783 17.7511 17.8747 17.9381 17.701L19.9531 15.53C20.1367 15.3325 20.2297 15.0768 20.2123 14.817C20.1949 14.5573 20.0685 14.3141 19.86 14.139L15.4573 10.443Z"
+                      fill="white"
+                    />
+                  </svg>
+                  +1234 5678 910
                 </p>
-                <h1 className="text-center font-bold text-xl">Visit Us</h1>
-                <p className="text-center font-light text-xl">
-                  If you prefer face-to-face communication, feel free to visit
-                  us at our office during business hours. We’d love to meet you
-                  and discuss how we can help your business grow.
+                <p className="flex items-center text-xl">
+                  <svg
+                    className="w-6 h-6 text-white mr-2"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M2.038 5.61A2.01 2.01 0 0 0 2 6v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6c0-.12-.01-.238-.03-.352l-.866.65-7.89 6.032a2 2 0 0 1-2.429 0L2.884 6.288l-.846-.677Z" />
+                    <path d="M20.677 4.117A1.996 1.996 0 0 0 20 4H4c-.225 0-.44.037-.642.105l.758.607L12 10.742 19.9 4.7l.777-.583Z" />
+                  </svg>
+                  hello@gigwork.co.in
                 </p>
-                <div className="flex justify-center">
-                  <button className="text-white text-2xl font-medium underline text-center px-4 py-2 flex justify-center rounded-md transition duration-300">
-                    Find Us{" "}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="1em"
-                      height="1em"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="m16.289 7.208l-9.766 9.746q-.14.14-.344.13q-.204-.009-.345-.15t-.14-.334t.14-.334L15.582 6.5H6.789q-.213 0-.357-.144t-.143-.357t.143-.356t.357-.143h9.692q.343 0 .575.232t.233.576V16q0 .213-.145.356t-.356.144t-.356-.144t-.144-.356z"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </section>
-              <div className="absolute -bottom-16 -right-16 w-44 h-44  bg-white/20 rounded-full"></div>
-              <div className="absolute bottom-14 right-14 w-16 h-16 bg-white/10 rounded-full"></div>
+                <p className="flex items-center text-xl">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="mr-2  "
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      d="M12 1.5C9.81276 1.50258 7.71584 2.3726 6.16923 3.91922C4.62261 5.46584 3.75259 7.56276 3.75001 9.75C3.74739 11.5374 4.33124 13.2763 5.41201 14.7C5.41201 14.7 5.63701 14.9963 5.67376 15.039L12 22.5L18.3293 15.0353C18.3623 14.9955 18.588 14.7 18.588 14.7L18.5888 14.6978C19.669 13.2747 20.2526 11.5366 20.25 9.75C20.2474 7.56276 19.3774 5.46584 17.8308 3.91922C16.2842 2.3726 14.1873 1.50258 12 1.5ZM12 12.75C11.4067 12.75 10.8266 12.5741 10.3333 12.2444C9.83995 11.9148 9.45543 11.4462 9.22837 10.8981C9.00131 10.3499 8.9419 9.74667 9.05765 9.16473C9.17341 8.58279 9.45913 8.04824 9.87869 7.62868C10.2982 7.20912 10.8328 6.9234 11.4147 6.80764C11.9967 6.69189 12.5999 6.7513 13.1481 6.97836C13.6962 7.20542 14.1648 7.58994 14.4944 8.08329C14.8241 8.57664 15 9.15666 15 9.75C14.999 10.5453 14.6826 11.3078 14.1202 11.8702C13.5578 12.4326 12.7954 12.749 12 12.75Z"
+                      fill="white"
+                    />
+                  </svg>
+                  102 Street 2714 Don
+                </p>
+                <section className="hidden md:block space-y-8">
+                  <h1 className="text-center font-medium text-xl">
+                    Business Hours
+                  </h1>
+                  <p className="text-center font-light text-sm">
+                    Our business hours are 9 to 5 on weekdays. We&apos;re happy
+                    to respond to all inquiries within 24 hours.
+                  </p>
+                  <h1 className="text-center font-medium text-xl">Visit Us</h1>
+                  <p className="text-center font-light text-sm">
+                    If you prefer face-to-face communication, feel free to visit
+                    us at our office during business hours. We&apos;d love to
+                    meet you and discuss how we can help your business grow.
+                  </p>
+                  <div className="flex justify-center">
+                    <button className="text-white text-xl font-medium underline text-center px-4 py-2 flex justify-center rounded-md transition duration-300">
+                      Find Us{" "}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="1em"
+                        height="1em"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="m16.289 7.208l-9.766 9.746q-.14.14-.344.13q-.204-.009-.345-.15t-.14-.334t.14-.334L15.582 6.5H6.789q-.213 0-.357-.144t-.143-.357t.143-.356t.357-.143h9.692q.343 0 .575.232t.233.576V16q0 .213-.145.356t-.356.144t-.356-.144t-.144-.356z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </section>
+                <div className="absolute -bottom-16 -right-16 w-44 h-44  bg-white/20 rounded-full"></div>
+                <div className="absolute bottom-14 right-14 w-16 h-16 bg-white/10 rounded-full"></div>
+              </div>
+            </div>
+            <div className="md:w-1/2">
+              <ContactForm />
             </div>
           </div>
-          <div className="md:w-1/2">
-            <ContactForm />
-          </div>
-        </div>
+        </section>
       </section>
-
       {/* Footer */}
-      <footer className="p-4 bg-black sm:p-6 dark:bg-gray-800">
+      <footer className="p-4 bg-black sm:p-6 dark:bg-gray-800 md:pt-24">
         <div className="mx-auto max-w-screen-xl">
-          <div className="md:flex md:justify-between">
-            <div className="mb-6 mr-6 md:mb-0 ">
+          <div className="md:grid md:grid-cols-3 md:gap-8">
+            <div className="mb-6 mr-6 md:mb-0 md:col-span-1 -mt-2">
               <a
                 href="https://gigwork.co.in"
                 className="flex md:items-center justify-center"
@@ -569,13 +570,14 @@ export default function GigWorkLandingPage() {
                 />
               </a>
               <hr className="md:hidden block my-4" />
+
             </div>
-            <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3 md:col-span-2">
               <div>
-                <h2 className="mb-6 text-sm font-bold uppercase text-white">
+                <h2 className="mb-6 text-sm font-medium uppercase text-white">
                   Quick Links
                 </h2>
-                <ul className="text-white">
+                <ul className="text-white text-sm">
                   <li className="mb-4">
                     <a href="" className="hover:underline">
                       Home
@@ -627,7 +629,7 @@ export default function GigWorkLandingPage() {
                 <h2 className=" mb-6 text-sm font-bold uppercase text-white">
                   Follow us
                 </h2>
-                <ul className="text-white">
+                <ul className="text-white text-sm">
                   <li className="mb-4">
                     <a
                       href="https://github.com/themesberg/flowbite"
@@ -636,8 +638,8 @@ export default function GigWorkLandingPage() {
                       <svg
                         className="mr-2"
                         xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
+                        width="18"
+                        height="18"
                         viewBox="0 0 24 24"
                         fill="none"
                       >
@@ -657,8 +659,8 @@ export default function GigWorkLandingPage() {
                       <svg
                         className="mr-2"
                         xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
+                        width="18"
+                        height="18"
                         viewBox="0 0 24 24"
                         fill="none"
                       >
@@ -678,8 +680,8 @@ export default function GigWorkLandingPage() {
                       <svg
                         className="mr-2"
                         xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="22"
+                        width="18"
+                        height="18"
                         viewBox="0 0 24 22"
                         fill="none"
                       >
@@ -699,8 +701,8 @@ export default function GigWorkLandingPage() {
                       <svg
                         className="mr-2"
                         xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
+                        width="18"
+                        height="18"
                         viewBox="0 0 24 24"
                         fill="none"
                       >
@@ -720,8 +722,8 @@ export default function GigWorkLandingPage() {
                       <svg
                         className="mr-2"
                         xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
+                        width="18"
+                        height="18"
                         viewBox="0 0 24 24"
                         fill="none"
                       >
@@ -743,8 +745,8 @@ export default function GigWorkLandingPage() {
                       <svg
                         className="mr-2"
                         xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
+                        width="18"
+                        height="18"
                         viewBox="0 0 24 24"
                         fill="none"
                       >
@@ -764,12 +766,12 @@ export default function GigWorkLandingPage() {
                 <h2 className="mb-6 text-sm font-semibold uppercase text-white">
                   Contact US
                 </h2>
-                <ul className="text-white">
+                <ul className="text-white text-sm">
                   <li className="mb-2 md:flex">
                     <svg
                       className="mb-2 mr-2"
                       xmlns="http://www.w3.org/2000/svg"
-                      width="21"
+                      width="18"
                       height="18"
                       viewBox="0 0 21 18"
                       fill="none"
@@ -785,11 +787,11 @@ export default function GigWorkLandingPage() {
                   </li>
                   <li className="mb-2 md:flex">
                     <svg
-                      className="w-6 h-6 text-white mr-2 mb-2"
+                      className="text-white mr-2 mb-2"
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
+                      width="18"
+                      height="18"
                       fill="currentColor"
                       viewBox="0 0 24 24"
                     >
@@ -804,8 +806,8 @@ export default function GigWorkLandingPage() {
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="mr-2 mb-2"
-                      width="24"
-                      height="24"
+                      width="18"
+                      height="18"
                       viewBox="0 0 24 24"
                       fill="none"
                     >
@@ -815,7 +817,7 @@ export default function GigWorkLandingPage() {
                       />
                     </svg>
                     <a href="#" className="hover:underline">
-                      Kurusumood , Chethipuzha P.O, Chanaganassery
+                      Kurusumood ,  Chethipuzha P.O, Chanaganassery
                     </a>
                   </li>
                 </ul>
@@ -824,7 +826,7 @@ export default function GigWorkLandingPage() {
 
             {/* mobile view icons */}
             <div className="md:hidden flex justify-center my-3">
-              <ul className="text-white flex gap-4">
+              <ul className="text-white flex gap-4 text-sm">
                 <li className="rounded-full p-1">
                   {/* facebook */}
                   <a
@@ -954,7 +956,7 @@ export default function GigWorkLandingPage() {
           </div>
           <hr className="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
           <div className="sm:flex sm:items-center sm:justify-center text-center">
-            <span className="text-sm text-gray-500 ">
+            <span className="text-sm text-gray-500">
               © 2024{" "}
               <a href="https://gigworks.co.in" className="hover:underline">
                 Gigworks
