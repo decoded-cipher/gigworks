@@ -1,3 +1,4 @@
+
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
@@ -19,12 +20,119 @@ export const users = sqliteTable('users', {
     id: integer().primaryKey(),
     name: text().notNull(),
     phone: text().notNull(),
-    // role_id: integer().foreignKey(userRoles.id),
+    // role_id: integer().foreignKey(userRoles.id).notNull(),,
     role: text().$type('ENUM', ['admin', 'partner', 'business_owner', 'user']),
     status: integer().default(1),
     created_at: text().default(sql('CURRENT_TIMESTAMP')),
     updated_at: text().default(sql('CURRENT_TIMESTAMP')),
 });
+
+
+// Business table
+export const business = sqliteTable('business', {
+    id: integer().primaryKey(),
+    owner_id: integer().foreignKey(users.id).notNull(),
+    
+    // Basic Info
+    name: text().notNull(),
+    description: text().nullable(),
+    email: text().nullable(),
+    website: text().nullable(),
+    phone: text().nullable(), // Extra phone number other than owner phone number
+
+    // Registration Details
+    registration_number: text().nullable(),
+    gstin: text().nullable(),
+
+    // Business Category
+    category_id: integer().foreignKey(businessCategory.id).notNull(),
+    sub_category_id: integer().foreignKey(businessSubCategory.id).notNull(),
+    sub_category_option_id: integer().foreignKey(businessSubCategoryOptions.id).notNull(),
+
+    // Business Location
+    address: text().notNull(),
+    city: text().notNull(),
+    state: text().notNull(),
+    zip: text().notNull(),  // pin code
+    country: text().default('India'),
+
+    // Social Media
+    facebook: text().nullable(),
+    instagram: text().nullable(),
+    twitter: text().nullable(),
+    linkedin: text().nullable(),
+    youtube: text().nullable(),
+
+    // Additional details
+    business_logo: text().nullable(),
+    business_type: text().$type('ENUM', ['online', 'offline', 'hybrid']).notNull(),
+    additional_services: text().nullable(),
+
+    status: integer().default(1),
+    created_at: text().default(sql('CURRENT_TIMESTAMP')),
+    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+});
+
+
+// Profile Payment
+export const profilePayment = sqliteTable('profile_payment', {
+    id: integer().primaryKey(),
+    business_id: integer().foreignKey(business.id),
+
+    amount: integer().notNull(),
+    payment_mode: text().notNull().$type('ENUM', ['cash', 'debit_card', 'credit_card', 'net_banking', 'upi', 'wallet']),
+    payment_status: text().notNull().$type('ENUM', ['pending', 'success', 'failed']),
+    payment_id: text().nullable(),
+    payment_date: text().notNull(),
+    
+    status: integer().default(1),
+    created_at: text().default(sql('CURRENT_TIMESTAMP')),
+    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+});
+
+
+// Business Media
+export const businessMedia = sqliteTable('business_media', {
+    id: integer().primaryKey(),
+    business_id: integer().foreignKey(business.id),
+    url: text().notNull(),
+    description: text().nullable(),
+    status: integer().default(1),
+    created_at: text().default(sql('CURRENT_TIMESTAMP')),
+    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+});
+
+
+// Testimonial
+export const testimonial = sqliteTable('testimonial', {
+    id: integer().primaryKey(),
+    business_id: integer().foreignKey(business.id),
+    user_id: integer().foreignKey(users.id),
+    rating: integer().notNull(),
+    status: integer().default(1),
+    created_at: text().default(sql('CURRENT_TIMESTAMP')),
+    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+});
+
+
+// Business License
+export const businessLicense = sqliteTable('business_license', {
+    id: integer().primaryKey(),
+    business_id: integer().foreignKey(business.id),
+    name: text().notNull(),
+    description: text().nullable(),
+    license_number: text().notNull(),
+    issue_date: text().notNull(),
+    expiry_date: text().notNull(),
+    status: integer().default(1),
+    created_at: text().default(sql('CURRENT_TIMESTAMP')),
+    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+});
+
+
+
+// ------------------------------------------------------------------------------------------------------
+
 
 
 // Business Category
@@ -41,7 +149,7 @@ export const businessCategory = sqliteTable('business_category', {
 export const businessSubCategory = sqliteTable('business_sub_category', {
     id: integer().primaryKey(),
     name: text().notNull(),
-    category_id: integer().foreignKey(businessCategory.id),
+    category_id: integer().foreignKey(businessCategory.id).notNull(),,
     status: integer().default(1),
     created_at: text().default(sql('CURRENT_TIMESTAMP')),
     updated_at: text().default(sql('CURRENT_TIMESTAMP')),
@@ -52,99 +160,28 @@ export const businessSubCategory = sqliteTable('business_sub_category', {
 export const businessSubCategoryOptions = sqliteTable('business_sub_category_options', {
     id: integer().primaryKey(),
     name: text().notNull(),
-    sub_category_id: integer().foreignKey(businessSubCategory.id),
+    sub_category_id: integer().foreignKey(businessSubCategory.id).notNull(),
     status: integer().default(1),
     created_at: text().default(sql('CURRENT_TIMESTAMP')),
     updated_at: text().default(sql('CURRENT_TIMESTAMP')),
 });
 
 
-// Business table
-export const business = sqliteTable('business', {
+// Keywords
+export const keywords = sqliteTable('keywords', {
     id: integer().primaryKey(),
-    owner_id: integer().foreignKey(users.id),
-    
-    // basic details
-    name: text(),
-    description: text(),
-    email: text(),
-    website: text().nullable(),
-    phone: text(),
-
-    // business registration details
-    registration_number: text(),
-    gstin: text(),
-
-    // business category
-    category_id: integer().foreignKey(businessCategory.id),
-    sub_category_id: integer().foreignKey(businessSubCategory.id),
-    sub_category_option_id: integer().foreignKey(businessSubCategoryOptions.id),
-    
-    // business location
-    address: text(),
-    city: text(),
-    state: text(),
-    country: text(),
-    zip: text(),
-
-    // map location
-    latitude: text(),
-    longitude: text(),
-
-    // social media
-    facebook: text(),
-    instagram: text(),
-    twitter: text(),
-    linkedin: text(),
-    youtube: text(),
-
-    business_logo: text(),
-    business_type: text().$type('ENUM', ['online', 'offline', 'hybrid']).notNull(),
-
-    business_specialities: text(),
-    business_keywords: text(),
-    
-
-
+    name: text().notNull(),
     status: integer().default(1),
     created_at: text().default(sql('CURRENT_TIMESTAMP')),
     updated_at: text().default(sql('CURRENT_TIMESTAMP')),
 });
 
 
-// Business Media
-export const businessMedia = sqliteTable('business_media', {
+// Business Keywords
+export const businessKeywords = sqliteTable('business_keywords', {
     id: integer().primaryKey(),
     business_id: integer().foreignKey(business.id),
-    url: text(),
-    description: text(),
-    status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
-});
-
-
-// Testimonial
-export const testimonial = sqliteTable('testimonial', {
-    id: integer().primaryKey(),
-    business_id: integer().foreignKey(business.id),
-    user_id: integer().foreignKey(users.id),
-    rating: integer(),
-    status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
-});
-
-
-// Business License
-export const businessLicense = sqliteTable('business_license', {
-    id: integer().primaryKey(),
-    business_id: integer().foreignKey(business.id),
-    name: text(),
-    description: text(),
-    license_number: text(),
-    issue_date: text(),
-    expiry_date: text(),
+    keyword_id: integer().foreignKey(keywords.id),
     status: integer().default(1),
     created_at: text().default(sql('CURRENT_TIMESTAMP')),
     updated_at: text().default(sql('CURRENT_TIMESTAMP')),
