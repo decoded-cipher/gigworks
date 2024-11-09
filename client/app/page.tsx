@@ -186,21 +186,19 @@ export default function GigWorkLandingPage() {
             </div>
           )}
         </div>
-        {/* Add blur gradient effect */}
-        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-b from-transparent to-black/80 backdrop-blur-sm"></div>
       </nav>
 
       {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */}
 
       {/* Main Content with padding for fixed navbar */}
-      <div className="pt-16">
+      <div className="pt-20">
         <div className="relative">
           {/* Animated Background */}
           <AnimatedGridPattern className="absolute inset-0 w-full max-h-screen z-10 opacity-80" />
 
           {/* Hero Section */}
           <section className="container mx-auto md:px-16 py-16 flex h-screen flex-col md:flex-row items-center relative z-10 px-4">
-            <div className="lg:w-1/2 mb-8 lg:mb-0 lg:pl-16">      
+            <div className="lg:w-1/2 mb-8 lg:mb-0 xl:pl-16">      
               <div className="lg:hidden block mb-[67px]">
                 <SearchSection />
               </div>
@@ -215,7 +213,7 @@ export default function GigWorkLandingPage() {
                 platform your customers already love.
               </p>
               <div className="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4 pt-8">
-                <button className="hidden lg:block w-full lg:w-[204px] bg-tertiary hover:bg-green-600 text-white px-8 py-3 lg:py-2 rounded-md hover:bg-white hover:text-gray-900 transition duration-300">
+                <button className="hidden lg:block w-full lg:w-[204px] bg-tertiary hover:bg-green-500 text-white px-8 py-3 lg:py-2 rounded-md  transition duration-300">
                   <span className="text-base lg:text-2xl font-bold flex items-center justify-center">
                     Explore <span className="ml-4">→</span>
                   </span>
@@ -287,7 +285,7 @@ export default function GigWorkLandingPage() {
               </div>
               {/* happy div */}
               <div className="relative">
-                <div className="hidden lg:block  absolute -top-3/4 right-[31%] translate-y-full mt-96">
+                <div className="hidden xl:block  absolute -top-3/4 right-[31%] translate-y-full mt-96">
                   <div className="flex flex-row justify-start h-full bg-white rounded-md shadow-lg w-[350px] h-[100px] mt-20 p-3">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -321,7 +319,7 @@ export default function GigWorkLandingPage() {
                   </div>
                 </div>
               </div>
-              <div className="hidden lg:block absolute lg:right-5 xl:mr-10 md:mt-48 z-10 ">
+              <div className="hidden lg:block absolute lg:right-px xl:right-5 xl:mr-10 md:mt-48 z-10 ">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="10em"
@@ -413,7 +411,7 @@ export default function GigWorkLandingPage() {
 
         {/* Why Choose Us */}
         <section className="container bg-white mx-auto px-4 relative z-0">
-          <h2 className="text-3xl font-bold mb-8 text-center text-black">
+          <h2 className="text-3xl font-bold mb-20 text-center text-black">
             Why <span className="text-green-600">Choose Us?</span>
           </h2>
           {/* Features Card Section */}
