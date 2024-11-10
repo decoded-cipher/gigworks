@@ -7,8 +7,12 @@ dotenv.config();
 import apiRouter from './routes/api';
 import authRouter from './routes/auth';
 
-const app = new Hono();
+type Bindings = {
+    DATABASE_URL: process.env.DATABASE_URL;
+    DATABASE_AUTH_TOKEN: process.env.DATABASE_AUTH_TOKEN;
+};
 
+const app = new Hono<{ Bindings: Bindings }>();
 
 app.route('/api/v1', apiRouter);
 app.route('/auth', authRouter);
