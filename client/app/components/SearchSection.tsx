@@ -8,7 +8,6 @@ const jobs = [
   "Electrician",
   "Carpenter",
   "Painter",
-  "Chef",
   "Gardener",
   "Mechanic",
   "Cleaner"
