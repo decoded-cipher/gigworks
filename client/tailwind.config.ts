@@ -21,6 +21,7 @@ const config: Config = {
   				foreground: 'hsl(var(--secondary-foreground))'
   			},
   			tertiary: '#009A36',
+			cbg:'#0D0D0D',
   			navbg: '#111111',
 			grn: '#009A36',
   			background: 'hsl(var(--background))',
@@ -60,6 +61,9 @@ const config: Config = {
   			'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
   			'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))'
   		},
+		fontFamily: {
+			'circular': ['Circular Std', 'sans-serif'],
+		  }
   	}
   },
   plugins: [require("tailwindcss-animate")],
