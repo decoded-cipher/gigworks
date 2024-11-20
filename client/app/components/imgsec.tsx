@@ -113,7 +113,7 @@
     const [expandedImage, setExpandedImage] = useState<number | null>(null);
 
     return (
-        <section className={cn("w-full h-[400px] sm:h-[500px] sm:w-auto lg:h-[700px] p-4", className)}>
+        <section className={cn("w-full h-[400px] sm:h-[500px] sm:w-auto lg:h-[700px] p-3", className)}>
         <div className="h-full overflow-hidden">
             <div className="h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-[minmax(100px)] gap-2 overflow-y-auto pr-2">
             {images.map((image, index) => {
