@@ -141,7 +141,7 @@ const DevMorphixWebsite = () => {
           {/* <ImageGrid/> */}
           <section className="mt-7">
           <ImageGrid
-            images={galleryItems}
+            
             className="bg-white shadow-lg rounded-lg  overflow-hidden border my-2  rounded-3xl"
           />
           </section>
