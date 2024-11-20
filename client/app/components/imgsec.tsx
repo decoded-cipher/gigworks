@@ -14,32 +14,99 @@
     className?: string;
     }
 
-    const defaultImages = [
-    { 
-        src: "/2(1).png", 
+    const defaultImages: ImageSectionProps['images'] =    [
+      {
+        src: "/2 (1).png",
         alt: "Office Space 1",
-        size: 'small'
-    },
-    { 
-        src: "/2(2).png", 
+        size: "small",
+      },
+      {
+        src: "/2 (2).png",
         alt: "Office Space 2",
-        size: 'small'
-    },
-    { 
-        src: "/2(3).png", 
+        size: "small",
+      },
+      {
+        src: "/2 (2).png",
+        alt: "Office Space 2",
+        size: "small",
+      },
+      {
+        src: "/2 (3).png",
         alt: "Office Corridor",
-        size: 'medium'
-    },
-    { 
-        src: "/2(4).png", 
+        size: "medium",
+      },
+      {
+        src: "/2 (4).png",
         alt: "Lab Entrance",
-        size: 'small'
-    },
-    { 
-        src: "/2(5).png", 
-        alt: "Lab Space",
-        size: 'small'
-    }
+        size: "small",
+      },
+      {
+        src: "/2 (1).png",
+        alt: "Office Space 1",
+        size: "small",
+      },
+      {
+        src: "/2 (2).png",
+        alt: "Office Space 2",
+        size: "small",
+      },
+      {
+        src: "/2 (2).png",
+        alt: "Office Space 2",
+        size: "small",
+      },
+      {
+        src: "/2 (3).png",
+        alt: "Office Corridor",
+        size: "medium",
+      },
+      {
+        src: "/2 (4).png",
+        alt: "Lab Entrance",
+        size: "small",
+      },
+      {
+        src: "/2 (1).png",
+        alt: "Office Space 1",
+        size: "small",
+      },
+      {
+        src: "/2 (2).png",
+        alt: "Office Space 2",
+        size: "small",
+      },
+      {
+        src: "/2 (2).png",
+        alt: "Office Space 2",
+        size: "small",
+      },
+      {
+        src: "/2 (3).png",
+        alt: "Office Corridor",
+        size: "medium",
+      },
+      {
+        src: "/2 (4).png",
+        alt: "Lab Entrance",
+        size: "small",
+      },
+      {
+        src: "/2 (4).png",
+        alt: "Lab Entrance",
+        size: "small",
+      },
+      {
+        src: "/2 (5).png",
+        alt: "Lab Entrance",
+        size: "small",
+      },
+      // {
+      //   src: "/workspace.mp4",
+      //   alt: "Workspace Video",
+      //   isVideo: true,
+      //   size: 'large'
+      // },
+      // Add more images as needed
     ] as const;
 
     const ImageSection = ({ images = defaultImages, className }: ImageSectionProps) => {
