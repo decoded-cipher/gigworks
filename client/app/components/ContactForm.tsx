@@ -37,7 +37,7 @@ export function ContactForm() {
           name="firstName"
           value={formData.firstName}
           onChange={handleChange}
-          placeholder=""
+          placeholder="Nithin"
           className="w-full bg-transparent border-b border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
           />
         </div>
@@ -49,7 +49,7 @@ export function ContactForm() {
           name="lastName"
           value={formData.lastName}
           onChange={handleChange}
-          placeholder=""
+          placeholder="Daniel"
           className="w-full bg-transparent border-b border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
         />
         </div>
@@ -64,7 +64,7 @@ export function ContactForm() {
         name="email"
         value={formData.email}
         onChange={handleChange}
-        placeholder=""
+        placeholder="example@gmail.com"
         className="w-full bg-transparent border-b border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
         />
       </div>
@@ -76,7 +76,7 @@ export function ContactForm() {
         name="phone"
         value={formData.phone}
         onChange={handleChange}
-        placeholder=""
+        placeholder="+91 29292 39393"
         className="w-full bg-transparent border-b border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
       />
       </div>

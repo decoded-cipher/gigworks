@@ -59,7 +59,7 @@ export default function GigWorkLandingPage() {
       {/* Navbar */}
       <nav
         className={`fixed top-0 left-0 right-0 z-30 py-2 transition-all duration-300 ${
-          isScrolled ? "bg-black/90 backdrop-blur-sm" : "bg-navbg"
+          isScrolled ? "bg-black backdrop-blur-sm" : "bg-navbg"
         }`}
       >
         <div className="mx-auto max-w-7xl px-4 py-4 ">
@@ -115,7 +115,7 @@ export default function GigWorkLandingPage() {
                 // Initial menu items
                 <div className="flex items-center space-x-8">
                   <SearchSection />
-                  <button className="border border-green-500 hover:text-green-500 text-xl font-medium bg-tertiary text-white px-4 py-2 h-14 rounded-md transition duration-300 whitespace-nowrap">
+                  <button className="border border-green-500 hover:bg-green-500 text-xl font-medium bg-tertiary text-white px-4 py-2 h-14 rounded-md transition duration-300 whitespace-nowrap">
                     Login
                   </button>
                 </div>
@@ -180,7 +180,7 @@ export default function GigWorkLandingPage() {
                   <div className="w-full">
                     <SearchSection />
                   </div>
-                  <button className="w-full border border-green-500 hover:text-green-500 text-lg font-medium bg-tertiary text-white px-4 py-2 rounded-md transition duration-300">
+                  <button className="w-full border border-green-500 hover:bg-green-500 text-lg font-medium bg-tertiary text-white px-4 py-2 rounded-md transition duration-300">
                     Login
                   </button>
                 </div>
@@ -436,10 +436,10 @@ export default function GigWorkLandingPage() {
             enterprise, Gig Work offers the tools you need to succeed.
           </p>
           <div className="flex justify-center space-x-4">
-            <button className="bg-green-600 hover:bg-green-600 text-white px-6 py-2 rounded-md transition duration-300">
+            <button className="bg-tertiary hover:bg-green-500 text-white px-6 py-2 rounded-md transition duration-300">
               Join with us
             </button>
-            <button className="border border-green-600 text-white hover:bg-green-600 px-6 py-2 rounded-md transition duration-300">
+            <button className="border border-green-500 text-white hover:bg-green-600 px-6 py-2 rounded-md transition duration-300">
               Partner with us
             </button>
           </div>
