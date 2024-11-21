@@ -2,6 +2,7 @@
 
     import { ReactNode, useState } from "react";
     import { cn } from "@/lib/utils";
+    import Image from 'next/image'
 
     interface ImageSectionProps {
     images?: Array<{
@@ -16,87 +17,52 @@
 
     const defaultImages: ImageSectionProps['images'] =    [
       {
-        src: "/2 (1).png",
+        src: "/img/1.jpg",
         alt: "Office Space 1",
         size: "small",
       },
       {
-        src: "/2 (2).png",
+        src: "/img/2.jpg",
         alt: "Office Space 2",
         size: "small",
       },
       {
-        src: "/2 (2).png",
+        src: "/img/3.jpg",
         alt: "Office Space 2",
         size: "small",
       },
       {
-        src: "/2 (3).png",
+        src: "/img/4.jpg",
         alt: "Office Corridor",
         size: "medium",
       },
       {
-        src: "/2 (4).png",
+        src: "/img/5.jpg",
         alt: "Lab Entrance",
         size: "small",
       },
       {
-        src: "/2 (1).png",
+        src: "/img/6.jpg",
         alt: "Office Space 1",
         size: "small",
       },
       {
-        src: "/2 (2).png",
+        src: "/img/7.jpg",
         alt: "Office Space 2",
         size: "small",
       },
       {
-        src: "/2 (2).png",
+        src: "/img/8.jpg",
         alt: "Office Space 2",
         size: "small",
       },
       {
-        src: "/2 (3).png",
+        src: "/img/9.jpg",
         alt: "Office Corridor",
         size: "medium",
       },
       {
-        src: "/2 (4).png",
-        alt: "Lab Entrance",
-        size: "small",
-      },
-      {
-        src: "/2 (1).png",
-        alt: "Office Space 1",
-        size: "small",
-      },
-      {
-        src: "/2 (2).png",
-        alt: "Office Space 2",
-        size: "small",
-      },
-      {
-        src: "/2 (2).png",
-        alt: "Office Space 2",
-        size: "small",
-      },
-      {
-        src: "/2 (3).png",
-        alt: "Office Corridor",
-        size: "medium",
-      },
-      {
-        src: "/2 (4).png",
-        alt: "Lab Entrance",
-        size: "small",
-      },
-      {
-        src: "/2 (4).png",
-        alt: "Lab Entrance",
-        size: "small",
-      },
-      {
-        src: "/2 (5).png",
+        src: "/img/10.jpg",
         alt: "Lab Entrance",
         size: "small",
       },
@@ -144,14 +110,16 @@
                     </video>
                     ) : (
                     <div className="w-full h-full aspect-square sm:aspect-[4/3] flex items-center justify-center">
-                        <img 
+                        <Image 
                         src={image.src} 
                         alt={image.alt} 
+                        fill
                         className={cn(
                             "w-full h-full rounded-lg object-cover transition-transform duration-300",
                             isExpanded ? "object-contain" : "group-hover:scale-105"
                         )}
                         loading="lazy"
+                        
                         />
                     </div>
                     )}

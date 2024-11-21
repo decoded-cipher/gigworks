@@ -288,7 +288,7 @@ export default function GigWorkLandingPage() {
               </div>
               {/* happy div */}
               <div className="relative">
-                <div className="hidden xl:block  absolute -top-3/4 right-[31%] translate-y-full mt-96">
+                <div className="hidden xl:block  absolute -top-3/4 right-[31%] translate-y-full mt-[23rem]">
                   <div className="flex flex-row justify-start h-full bg-white rounded-md shadow-lg w-[350px] h-[100px] mt-20 p-3">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
