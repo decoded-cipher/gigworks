@@ -38,7 +38,7 @@ export function ContactForm() {
           value={formData.firstName}
           onChange={handleChange}
           placeholder="Nithin"
-          className="w-full bg-transparent border-b border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
+          className="w-full bg-transparent placeholder:font-light border-b border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
           />
         </div>
         
@@ -50,7 +50,7 @@ export function ContactForm() {
           value={formData.lastName}
           onChange={handleChange}
           placeholder="Daniel"
-          className="w-full bg-transparent border-b border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
+          className="w-full bg-transparent border-b placeholder:font-light border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
         />
         </div>
       </div>
@@ -58,14 +58,14 @@ export function ContactForm() {
 
       <div className='flex space-x-4 py-5'>
       <div className='w-full flex-col flex'>
-      <label htmlFor="email" className="text-black text-start ">Email</label>
+      <label htmlFor="email" className="text-black  text-start ">Email</label>
       <input
         type="email"
         name="email"
         value={formData.email}
         onChange={handleChange}
         placeholder="example@gmail.com"
-        className="w-full bg-transparent border-b border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
+        className="w-full bg-transparent border-b placeholder:font-light border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
         />
       </div>
 
@@ -77,7 +77,7 @@ export function ContactForm() {
         value={formData.phone}
         onChange={handleChange}
         placeholder="+91 29292 39393"
-        className="w-full bg-transparent border-b border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
+        className="w-full bg-transparent border-b placeholder:font-light border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
       />
       </div>
       </div>
@@ -89,7 +89,7 @@ export function ContactForm() {
         value={formData.message}
         onChange={handleChange}
         placeholder="Write your message..."
-        className="w-full bg-transparent border-b border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
+        className="w-full bg-transparent border-b placeholder:font-light border-gray-700 text-gray-800 px-3 py-2 focus:outline-none"
         rows={1}
       ></textarea>
       </div>

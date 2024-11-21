@@ -105,8 +105,8 @@ const DevMorphixWebsite = () => {
     <div className="font-circular">
       <div className="px-4 sm:px-6 lg:px-32">
         <main>
-          <ScrollToTopButton />
-          <section className="relative py-16 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
+        <ScrollToTopButton isProfilePage={true} />
+        <section className="relative py-16 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
             <div className="absolute top-0 left-0 right-0 h-80 overflow-hidden">
               <img
                 src="/15879.png"
@@ -122,12 +122,12 @@ const DevMorphixWebsite = () => {
             </div>
 
             <h2 className="sm:text-6xl text-4xl font-bold mb-4">DEVMORPHIX</h2>
-            <p className="sm:text-xl text-sm font-bold mb-8">
+            <p className="sm:text-xl text-sm font-medium mb-8">
               IT Consultancy and Solutions
             </p>
 
             <div className="flex gap-4 flex-wrap justify-center">
-              <button className="bg-white border-2 font-bold border-black rounded-full sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2">
+              <button className="bg-white border-2 font-medium border-black rounded-full transition hover:scale-110  sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2">
                 <div className="flex space-x-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -151,7 +151,7 @@ const DevMorphixWebsite = () => {
                   <span>Direction</span>
                 </div>
               </button>
-              <button className="bg-white border-2 font-bold border-black rounded-full sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2">
+              <button className="bg-white border-2 font-medium border-black rounded-full transition hover:scale-110 sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2">
                 <div className="flex space-x-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -168,7 +168,7 @@ const DevMorphixWebsite = () => {
                   <span>Share</span>
                 </div>
               </button>
-              <button className="bg-white border-2 font-bold border-black rounded-full sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2">
+              <button className="bg-white border-2 font-medium border-black rounded-full transition hover:scale-110 sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2">
                 <div className="flex space-x-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -195,7 +195,7 @@ const DevMorphixWebsite = () => {
           </section>
 
           <section className="border my-7  rounded-3xl ">
-            <section className="bg-white rounded-lg p-6 mb-8">
+            <section className="bg-white rounded-full p-6 mb-8">
               <h2 className="text-xl font-bold text-center mb-6">
                 Services Provides
               </h2>
@@ -243,15 +243,15 @@ const DevMorphixWebsite = () => {
 
               {/* Services Grid - Right Side */}
               <div className="md:w-1/2">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
+                <div className="gap-4 p-6 ">
                   {/* Company Info Card */}
                   <div className="bg-white rounded-lg mt-6 ">
                     <h3 className="text-xl font-light mb-4">DevMorphix</h3>
                     <div className="space-y-4">
                       <div>
-                        <span className="font-light text-lg text-black">
+                        <span className="font-light text-md text-black">
                           Located In:{" "}
-                          <span className="text-black text-md">
+                          <span >
                             Kristu Jyoti College of Management and Information
                             Technology
                           </span>
@@ -259,7 +259,7 @@ const DevMorphixWebsite = () => {
                       </div>
 
                       <div>
-                        <span className="font-light text-lg text-black">
+                        <span className="font-light text-md text-black">
                           Address:{" "}
                           <span className="text-black text-md">
                             Chethipuzha Kadavu, Changanassery, Kerala 686104
@@ -314,7 +314,7 @@ const DevMorphixWebsite = () => {
                 </svg>
               </div>
 
-              <p className="text-black text-md text-justify font-medium leading-relaxed">
+              <p className="text-[#111111] text-md text-justify font-medium leading-relaxed">
                 A Software Development Company specializes in creating custom
                 software, applications, and web solutions tailored to meet
                 unique business needs. By leveraging the latest technologies and
