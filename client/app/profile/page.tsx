@@ -4,6 +4,7 @@ import ImageGrid from "../components/imgsec";
 import { FooterSection } from "../components/FooterSection";
 import { div } from "framer-motion/client";
 import DynamicQRCode from "../components/QrSection";
+import ScrollToTopButton from "../components/ScrollToTop";
 const DevMorphixWebsite = () => {
   const galleryItems = [
     {
@@ -104,6 +105,7 @@ const DevMorphixWebsite = () => {
     <div className="font-circular">
       <div className="px-4 sm:px-6 lg:px-32">
         <main>
+          <ScrollToTopButton />
           <section className="relative py-16 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
             <div className="absolute top-0 left-0 right-0 h-80 overflow-hidden">
               <img

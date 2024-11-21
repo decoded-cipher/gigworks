@@ -16,6 +16,7 @@ import { NumberTicker } from "./components/ui/AnimatedNumberTicket";
 import { div } from "framer-motion/client";
 
 import { FooterSection } from "./components/FooterSection";
+import ScrollToTopButton from "./components/ScrollToTop";
 
 export default function GigWorkLandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -191,7 +192,7 @@ export default function GigWorkLandingPage() {
       </nav>
 
       {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */}
-
+          <ScrollToTopButton />
       {/* Main Content with padding for fixed navbar */}
       <div className="pt-20">
         <div className="relative">
