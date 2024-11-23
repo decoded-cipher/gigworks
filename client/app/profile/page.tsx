@@ -8,7 +8,7 @@ import ScrollToTopButton from "../components/ScrollToTop";
 const DevMorphixWebsite = () => {
   const galleryItems = [
     {
-      src: "/2 (1).png",
+      src: "/2-(1).png",
       alt: "Office Space 1",
       size: "small",
     },
@@ -58,7 +58,7 @@ const DevMorphixWebsite = () => {
       size: "small",
     },
     {
-      src: "/2 (1).png",
+      src: "@/2 (1).png",
       alt: "Office Space 1",
       size: "small",
     },
