@@ -146,9 +146,7 @@ export default function GigWorkLandingPage() {
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
-              <div className="lg:hidden mt-4 pb-4">
-                {isScrolled ? (
-                  // Scrolled mobile menu items
+              <div className="lg:hidden mt-4 pb-4">                
                   <div className="flex flex-col space-y-4">
                     <Link
                       href="#"
@@ -181,17 +179,7 @@ export default function GigWorkLandingPage() {
                       Contact
                     </Link>
                   </div>
-                ) : (
-                  // Initial mobile menu items
-                  <div className="hidden md:block flex flex-col space-y-4">
-                    <div className="w-full">
-                      <SearchSection />
-                    </div>
-                    <button className="w-full border border-green-500 hover:bg-green-500 text-lg font-medium bg-tertiary text-white px-4 py-2 rounded-md transition duration-300">
-                      Login
-                    </button>
-                  </div>
-                )}
+               
               </div>
             )}
           </div>
