@@ -176,8 +176,10 @@ const LocationDetails: React.FC = () => {
         </div>
       </nav>
 
+      <hr className="border-gray-200" />
+      
       {/* Responsive Form Container */}
-      <form onSubmit={handleSubmit} className="flex flex-col items-center w-full px-4 sm:px-8 md:px-16 lg:px-32 xl:px-64">
+      <form onSubmit={handleSubmit} className="flex flex-col items-center w-full px-4 sm:px-8 md:px-16 lg:px-32 xl:px-44">
         <div className="w-full bg-white rounded-md p-4 sm:p-6">
           {/* Header */}
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-800 mb-4 sm:mb-6">
@@ -231,7 +233,7 @@ const LocationDetails: React.FC = () => {
             {/* Location Picker */}
             <div className="relative w-full">
               <label className="block text-gray-700 mb-2">Pick Location</label>
-              <div className="relative w-full border border-gray-300 rounded-md">
+              <div className="relative w-full  rounded-md">
                 <LocationPicker onLocationSelect={handleLocationSelect} />
                 <button
                   type="button"
@@ -351,6 +353,15 @@ const LocationDetails: React.FC = () => {
           </div>
         </div>
       </form>
+      <div className="bottom-0 px-2 py-4 flex justify-between items-center">
+  <p className="text-sm text-gray-500 dark:text-gray-400"> 
+    © 2024 <a href="https://gigwork.co.in/" className="hover:underline" target="_blank">Gigwork</a>. All rights reserved. 
+  </p>
+  <div className="text-sm text-gray-500 space-x-2">
+    <a href="/privacy" className="hover:underline">Privacy Policy</a>
+    <a href="/terms" className="hover:underline">Terms of Service</a>
+  </div>
+</div>
     </div>
   );
 };

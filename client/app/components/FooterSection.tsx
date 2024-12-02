@@ -38,7 +38,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href="https://tailwindcss.com/"
+                      href=""
                       className="hover:underline"
                     >
                       About us
@@ -46,7 +46,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href="https://tailwindcss.com/"
+                      href=""
                       className="hover:underline"
                     >
                       Join with us
@@ -54,7 +54,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href="https://tailwindcss.com/"
+                      href=""
                       className="hover:underline"
                     >
                       Contact us
@@ -62,7 +62,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href="https://tailwindcss.com/"
+                      href=""
                       className="hover:underline"
                     >
                       Privacy and Policy
@@ -70,7 +70,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href="https://tailwindcss.com/"
+                      href=""
                       className="hover:underline"
                     >
                       Terms &amp; Conditions
