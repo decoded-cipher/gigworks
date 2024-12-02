@@ -20,7 +20,7 @@ const config: Config = {
   				DEFAULT: 'hsl(var(--secondary))',
   				foreground: 'hsl(var(--secondary-foreground))'
   			},
-  			tertiary: '#009A36',
+  			tertiary: '#303030',
 			cbg:'#0D0D0D',
   			navbg: '#111111',
 			grn: '#009A36',
