@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, ChangeEvent } from 'react';
-import logo from "../../../public/gigworksblk.svg";
+import Image from 'next/image';
 
 // Define the form data type
 interface FormData {
@@ -46,46 +46,61 @@ const MediaAndBranding = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <nav className="flex justify-between items-center p-4 flex-shrink-0">
-        <img src={logo} alt="Logo" className="h-24" />
-        <div className="flex items-center pr-4">
+    <div className="flex flex-col min-h-screen w-full">
+      {/* Navigation */}
+      <nav className="flex flex-col sm:flex-row justify-between items-center p-4 w-full">
+        <div className="flex justify-center sm:justify-start w-full sm:w-auto mb-4 sm:mb-0">
+          <Image
+            src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
+            alt="Logo"
+            width={150}
+            height={50}
+            className="max-w-[206px] max-h-[216px]"
+          />
+        </div>
+        <div className="flex items-center">
           <div className="flex justify-center items-center space-x-2">
-            <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center">
-              <h1 className='text-white text-center'>1</h1>
+            <div className="w-12 sm:w-16 h-12 sm:h-16 bg-black rounded-full flex items-center justify-center">
+              <h1 className='text-white text-center text-sm sm:text-base'>1</h1>
             </div>
-            <div className="flex items-center">
+            <div className="hidden sm:flex items-center">
+              <div className="w-4 h-1 rounded-full bg-black mr-1"></div>
+              <div className="w-8 h-1 rounded-full bg-black"></div>
+              <div className="w-4 h-1 rounded-full bg-black ml-1"></div>
+            </div>
+            <div className="w-12 sm:w-16 h-12 sm:h-16 bg-black rounded-full flex items-center justify-center">
+              <h1 className='text-white text-center text-sm sm:text-base'>2</h1>
+            </div>
+            <div className="hidden sm:flex items-center">
               <div className="w-4 h-1 rounded-full bg-gray-300 mr-1"></div>
               <div className="w-8 h-1 rounded-full bg-gray-300"></div>
               <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
             </div>
-            <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
-            <div className="flex items-center">
-              <div className="w-4 h-1 rounded-full bg-gray-300 mr-1"></div>
-              <div className="w-8 h-1 rounded-full bg-gray-300"></div>
-              <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
+            <div className="w-12 sm:w-16 h-12 sm:h-16 bg-gray-300 rounded-full flex items-center justify-center">
+              <h1 className='text-black text-center text-sm sm:text-base'>3</h1>
             </div>
-            <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
           </div>
         </div>
       </nav>
 
       <hr className="border-gray-200" />
 
-      <div className="flex-grow bg-white">
-        <h1 className='md:mx-28 md:p-2 md:py-4 font-bold text-4xl'>Media & Branding</h1>
+      {/* Main Content */}
+      <div className="flex-grow bg-white px-4 sm:px-8 md:px-20">
+        <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold py-4 text-center sm:text-left'>Media & Branding</h1>
         
-        <div className="flex flex-col md:mx-20 md:flex-row">
+        {/* Image Upload Section */}
+        <div className="flex flex-col sm:flex-row -mx-2">
           {['profileImage', 'coverImage'].map((imageType) => (
-            <div key={imageType} className='w-full md:w-1/2 p-6 px-10'>
+            <div key={imageType} className='w-full sm:w-1/2 px-2 mb-4'>
               <label 
                 htmlFor={imageType} 
-                className="block text-xl font-bold pb-2 text-gray-700 mb-2"
+                className="block text-base sm:text-xl font-bold pb-2 text-gray-700"
               >
                 Upload {imageType === 'profileImage' ? 'Profile' : 'Cover'} Image 
                 <span className='text-red-500'> *</span>
               </label>
-              <div className="border-2 md:h-20 bg-gray-200 rounded-sm p-4 hover:border-gray-500 transition flex items-center justify-center">
+              <div className="border-2 bg-gray-200 rounded-sm p-4 hover:border-gray-500 transition flex items-center justify-center h-20">
                 <input
                   type="file"
                   id={imageType}
@@ -94,17 +109,18 @@ const MediaAndBranding = () => {
                   className="hidden"
                   required
                 />
-                <p>Drag and drop or click to upload</p>
+                <p className="text-sm sm:text-base">Drag and drop or click to upload</p>
               </div>
             </div>
           ))}
         </div>
 
-        <h1 className='md:mx-28 md:p-2 md:py-4 font-bold text-4xl'>Business Overview</h1>
+        <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold py-4 text-center sm:text-left'>Business Overview</h1>
 
-        <div className="flex flex-col md:mx-20 md:flex-row">
-          <div className="w-full md:w-1/2 p-6 px-10">
-            <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="flex flex-col lg:flex-row -mx-2">
+          {/* Left Column */}
+          <div className="w-full lg:w-1/2 px-2">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {[
                 { name: 'businessName', label: 'Business Name', type: 'text', placeholder: 'Enter your business name' },
                 { name: 'businessDescription', label: 'Business Description', type: 'textarea', placeholder: 'Describe your business briefly' },
@@ -114,7 +130,7 @@ const MediaAndBranding = () => {
                 <div key={name}>
                   <label 
                     htmlFor={name} 
-                    className="block text-xl font-bold pb-2 text-gray-700 mb-2"
+                    className="block text-base sm:text-xl font-bold pb-2 text-gray-700"
                   >
                     {label} {required && <span className='text-red-500'>*</span>}
                   </label>
@@ -125,7 +141,7 @@ const MediaAndBranding = () => {
                       value={typeof formData[name] === 'string' ? formData[name] as string : ''}
                       onChange={handleInputChange}
                       placeholder={placeholder}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md md:h-10 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md min-h-[100px] focus:outline-none focus:ring-2 focus:ring-gray-500"
                       required={required}
                     />
                   ) : (
@@ -145,8 +161,9 @@ const MediaAndBranding = () => {
             </form>
           </div>
 
-          <div className="w-full md:w-1/2 p-6 relative">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Right Column */}
+          <div className="w-full lg:w-1/2 px-2 mt-4 lg:mt-0">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {[
                 { 
                   name: 'businessCategory', 
@@ -177,7 +194,7 @@ const MediaAndBranding = () => {
                 <div key={name}>
                   <label 
                     htmlFor={name} 
-                    className="block text-xl font-bold pb-2 text-gray-700 mb-2"
+                    className="block text-base sm:text-xl font-bold pb-2 text-gray-700"
                   >
                     {label} <span className='text-red-500'>*</span>
                   </label>
@@ -213,21 +230,14 @@ const MediaAndBranding = () => {
               ))}
             </form>
 
-            <div className="absolute p-6 right-0">
+            <div className="flex justify-center sm:justify-end mt-4">
               <button
                 type="submit"
                 onClick={() => window.location.href = "/signup/2"}
-                className="bg-gray-800 text-white px-10 py-3 rounded-md hover:bg-gray-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                className="bg-[#303030] text-white px-6 py-2 rounded-md w-full sm:w-auto"
               >
-                Next
+                Next &rarr;
               </button>
-              {/* <button
-                type="submit"
-                onClick={handleSubmit}
-                className="bg-gray-800 text-white px-10 py-3 rounded-md hover:bg-gray-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
-              >
-                Next
-              </button> */}
             </div>
           </div>
         </div>
