@@ -16,56 +16,102 @@
     }
 
     const defaultImages: ImageSectionProps['images'] =    [
-      {
-        src: "/img/1.jpg",
-        alt: "Office Space 1",
-        size: "small",
-      },
-      {
-        src: "/img/2.jpg",
-        alt: "Office Space 2",
-        size: "small",
-      },
-      {
-        src: "/img/3.jpg",
-        alt: "Office Space 2",
-        size: "small",
-      },
-      {
-        src: "/img/4.jpg",
-        alt: "Office Corridor",
-        size: "medium",
-      },
-      {
-        src: "/img/5.jpg",
-        alt: "Lab Entrance",
-        size: "small",
-      },
-      {
-        src: "/img/6.jpg",
-        alt: "Office Space 1",
-        size: "small",
-      },
-      {
-        src: "/img/7.jpg",
-        alt: "Office Space 2",
-        size: "small",
-      },
-      {
-        src: "/img/8.jpg",
-        alt: "Office Space 2",
-        size: "small",
-      },
-      {
-        src: "/img/9.jpg",
-        alt: "Office Corridor",
-        size: "medium",
-      },
-      {
-        src: "/img/10.jpg",
-        alt: "Lab Entrance",
-        size: "small",
-      },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/1.jpg",
+          alt: "Office Space 1",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/10.jpg",
+          alt: "Office Space 2",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/2.jpg",
+          alt: "Office Space 2",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/3.jpg",
+          alt: "Office Corridor",
+          size: "medium",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/4.jpg",
+          alt: "Lab Entrance",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/5.jpg",
+          alt: "Office Space 1",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/6.jpg",
+          alt: "Office Space 2",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/7.jpg",
+          alt: "Office Space 2",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/8.jpg",
+          alt: "Office Corridor",
+          size: "medium",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/9.jpg",
+          alt: "Lab Entrance",
+          size: "small",
+        },
+        
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/10.jpg",
+          alt: "Office Space 2",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/2.jpg",
+          alt: "Office Space 2",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/3.jpg",
+          alt: "Office Corridor",
+          size: "medium",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/4.jpg",
+          alt: "Lab Entrance",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/5.jpg",
+          alt: "Office Space 1",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/6.jpg",
+          alt: "Office Space 2",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/7.jpg",
+          alt: "Office Space 2",
+          size: "small",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/8.jpg",
+          alt: "Office Corridor",
+          size: "medium",
+        },
+        {
+          src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/9.jpg",
+          alt: "Lab Entrance",
+          size: "small",
+        },
       // {
       //   src: "/workspace.mp4",
       //   alt: "Workspace Video",
