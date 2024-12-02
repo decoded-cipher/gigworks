@@ -66,14 +66,14 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-8 rounded-xl shadow-2xl w-[500px] flex flex-col items-center text-center space-y-6">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-black transition"
-        >
-          <X size={28} />
-        </button>
+      <div className="bg-white p-8 rounded-xl shadow-2xl w-[500px] flex flex-col items-center text-center space-y-6 relative">
 
+          <button
+          onClick={onClose}
+          className="absolute top-0 right-0 m-4 text-gray-500 hover:text-black transition"
+          >
+          <X size={28} />
+          </button>
         {!isOtpVisible ? (
           <>
             <Image 
