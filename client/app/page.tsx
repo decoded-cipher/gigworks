@@ -192,7 +192,7 @@ export default function GigWorkLandingPage() {
       </nav>
 
       {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */}
-          <ScrollToTopButton />
+      <ScrollToTopButton />
       {/* Main Content with padding for fixed navbar */}
       <div className="pt-20">
         <div className="relative">
@@ -418,7 +418,7 @@ export default function GigWorkLandingPage() {
             Why <span className="text-green-600">Choose Us?</span>
           </h2>
           {/* Features Card Section */}
-          <div className="flex justify-center">
+          <div className="flex justify-center items-end bottom-0">
             <FeatureCardsWithImage />
           </div>
         </section>
@@ -557,7 +557,7 @@ export default function GigWorkLandingPage() {
       </section>
       {/* Footer */}
       <section>
-          <FooterSection/>
+        <FooterSection />
       </section>
     </div>
   );
