@@ -8,90 +8,102 @@ import ScrollToTopButton from "../components/ScrollToTop";
 const DevMorphixWebsite = () => {
   const galleryItems = [
     {
-      src: "/2-(1).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/1.jpg",
       alt: "Office Space 1",
       size: "small",
     },
     {
-      src: "/2 (2).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/10.jpg",
       alt: "Office Space 2",
       size: "small",
     },
     {
-      src: "/2 (2).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/2.jpg",
       alt: "Office Space 2",
       size: "small",
     },
     {
-      src: "/2 (3).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/3.jpg",
       alt: "Office Corridor",
       size: "medium",
     },
     {
-      src: "/2 (4).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/4.jpg",
       alt: "Lab Entrance",
       size: "small",
     },
     {
-      src: "/2 (1).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/5.jpg",
       alt: "Office Space 1",
       size: "small",
     },
     {
-      src: "/2 (2).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/6.jpg",
       alt: "Office Space 2",
       size: "small",
     },
     {
-      src: "/2 (2).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/7.jpg",
       alt: "Office Space 2",
       size: "small",
     },
     {
-      src: "/2 (3).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/8.jpg",
       alt: "Office Corridor",
       size: "medium",
     },
     {
-      src: "/2 (4).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/9.jpg",
+      alt: "Lab Entrance",
+      size: "small",
+    },
+    
+    {
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/10.jpg",
+      alt: "Office Space 2",
+      size: "small",
+    },
+    {
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/2.jpg",
+      alt: "Office Space 2",
+      size: "small",
+    },
+    {
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/3.jpg",
+      alt: "Office Corridor",
+      size: "medium",
+    },
+    {
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/4.jpg",
       alt: "Lab Entrance",
       size: "small",
     },
     {
-      src: "@/2 (1).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/5.jpg",
       alt: "Office Space 1",
       size: "small",
     },
     {
-      src: "/2 (2).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/6.jpg",
       alt: "Office Space 2",
       size: "small",
     },
     {
-      src: "/2 (2).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/7.jpg",
       alt: "Office Space 2",
       size: "small",
     },
     {
-      src: "/2 (3).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/8.jpg",
       alt: "Office Corridor",
       size: "medium",
     },
     {
-      src: "/2 (4).png",
+      src: "https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/9.jpg",
       alt: "Lab Entrance",
       size: "small",
     },
-    {
-      src: "/2 (4).png",
-      alt: "Lab Entrance",
-      size: "small",
-    },
-    {
-      src: "/2 (5).png",
-      alt: "Lab Entrance",
-      size: "small",
-    },
+
     // {
     //   src: "/workspace.mp4",
     //   alt: "Workspace Video",
@@ -136,7 +148,7 @@ const DevMorphixWebsite = () => {
                     viewBox="0 0 20 20"
                     fill="none"
                   >
-                    <g clip-path="url(#clip0_462_696)">
+                    <g clipPath="url(#clip0_462_696)">
                       <path
                         d="M10.0001 2.92919L2.92931 10L10.0001 17.0709L17.071 10L10.0001 2.92919ZM10.5893 1.16086L18.8393 9.41086C18.9955 9.56713 19.0833 9.77906 19.0833 10C19.0833 10.221 18.9955 10.4329 18.8393 10.5892L10.5893 18.8392C10.433 18.9954 10.2211 19.0832 10.0001 19.0832C9.77918 19.0832 9.56726 18.9954 9.41098 18.8392L1.16098 10.5892C1.00476 10.4329 0.916992 10.221 0.916992 10C0.916992 9.77906 1.00476 9.56713 1.16098 9.41086L9.41098 1.16086C9.56726 1.00463 9.77918 0.91687 10.0001 0.91687C10.2211 0.91687 10.433 1.00463 10.5893 1.16086ZM10.8335 8.33336V6.25003L13.7501 9.16669L10.8335 12.0834V10H8.33348V12.5H6.66681V9.16669C6.66681 8.94568 6.75461 8.73372 6.91089 8.57744C7.06717 8.42116 7.27913 8.33336 7.50015 8.33336H10.8335Z"
                         fill="black"
@@ -345,7 +357,7 @@ const DevMorphixWebsite = () => {
                       viewBox="0 0 40 40"
                       fill="none"
                     >
-                      <g clip-path="url(#clip0_462_793)">
+                      <g clipPath="url(#clip0_462_793)">
                         <mask
                           id="mask0_462_793"
                         
