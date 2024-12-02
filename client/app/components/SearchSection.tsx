@@ -34,6 +34,7 @@ export const SearchSection = () => {
   const [showLocations, setShowLocations] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<keyof LocationsType>("Kerala");
   const [selectedCity, setSelectedCity] = useState("");
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -97,19 +98,23 @@ export const SearchSection = () => {
       <div className="relative bg-navbg border border-green-700 text-white rounded-md md:w-96 mx-1 md:mx-0">
         <input
           type="text"
-          className="w-full  px-6 py-4 bg-transparent outline-none"
+          className="w-full px-6 py-4 bg-transparent outline-none"
           placeholder=""
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
         />
-        <div className="absolute left-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-          <span>Search for </span>
-          <span 
-            className={`inline-block transition-all duration-500 ${
-              isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
-            }`}
-          >
-            {jobs[currentJobIndex]}
-          </span>
-        </div>
+        {!searchText && (
+          <div className="absolute left-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+            <span>Search for </span>
+            <span 
+              className={`inline-block transition-all duration-500 ${
+                isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
+              }`}
+            >
+              {jobs[currentJobIndex]}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
