@@ -68,7 +68,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-8 rounded-xl w-[500px] flex flex-col items-center text-center space-y-6 relative" >
+      <div className="bg-white p-8 rounded-xl w-[500px] flex flex-col items-center text-center space-y-6 relative shadow-none" >
 
           <button
           onClick={onClose}
@@ -83,10 +83,10 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
               alt="Gigworks Logo" 
               width={306}
               height={336}
-              className="mx-auto  mb-4"
+              className="mx-auto mb-4"
             />
             <h2 className="text-3xl text-black font-bold">Verify your number</h2>
-            <p className="text-gray-500 md:w-2/3 mb-4">
+            <p className="text-gray-500  mb-4">
               Please enter your WhatsApp number for verification to proceed.
             </p>
             <div className="w-full space-y-4">

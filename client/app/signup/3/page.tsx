@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, ChangeEvent } from "react";
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface FormData {
   businessRegistrationNumber: string;
@@ -47,7 +47,11 @@ const MediaAndBranding: React.FC = () => {
     if (name === "otherLicenses" || name === "certifications") {
       const index = parseInt(e.target.dataset.index || "0");
       setFormData((prev) => {
-        const updated = [...prev[name as keyof Pick<FormData, "otherLicenses" | "certifications">]];
+        const updated = [
+          ...prev[
+            name as keyof Pick<FormData, "otherLicenses" | "certifications">
+          ],
+        ];
         updated[index] = value;
         return { ...prev, [name]: updated };
       });
@@ -56,7 +60,12 @@ const MediaAndBranding: React.FC = () => {
       setFormData((prev) => ({
         ...prev,
         [group]: {
-          ...prev[group as keyof Pick<FormData, "paymentMethods" | "additionalServices">],
+          ...prev[
+            group as keyof Pick<
+              FormData,
+              "paymentMethods" | "additionalServices"
+            >
+          ],
           [key]: checked,
         },
       }));
@@ -68,14 +77,19 @@ const MediaAndBranding: React.FC = () => {
     }
   };
 
-  const handleAddField = (fieldName: keyof Pick<FormData, "otherLicenses" | "certifications">) => {
+  const handleAddField = (
+    fieldName: keyof Pick<FormData, "otherLicenses" | "certifications">
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [fieldName]: [...(prev[fieldName] as string[]), ""],
     }));
   };
 
-  const handleRemoveField = (fieldName: keyof Pick<FormData, "otherLicenses" | "certifications">, index: number) => {
+  const handleRemoveField = (
+    fieldName: keyof Pick<FormData, "otherLicenses" | "certifications">,
+    index: number
+  ) => {
     setFormData((prev) => {
       const updated = [...(prev[fieldName] as string[])];
       updated.splice(index, 1);
@@ -89,7 +103,7 @@ const MediaAndBranding: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col min-h-screen">
       {/* Navigation */}
       <nav className="flex flex-col sm:flex-row justify-between items-center p-4 w-full">
         <div className="mb-4 sm:mb-0">
@@ -103,41 +117,47 @@ const MediaAndBranding: React.FC = () => {
         </div>
         <div className="flex items-center">
           <div className="flex justify-center items-center space-x-2">
-            <div className="w-10 h-10 sm:w-16 sm:h-16 bg-black rounded-full flex items-center justify-center">
-              <h1 className='text-white text-center text-sm sm:text-base'>1</h1>
+            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-black rounded-full flex items-center justify-center">
+              <h1 className="text-white text-center text-sm sm:text-base">1</h1>
             </div>
             <div className="hidden sm:flex items-center">
               <div className="w-4 h-1 rounded-full bg-black mr-1"></div>
               <div className="w-8 h-1 rounded-full bg-black"></div>
               <div className="w-4 h-1 rounded-full bg-black ml-1"></div>
             </div>
-            <div className="w-10 h-10 sm:w-16 sm:h-16 bg-black rounded-full flex items-center justify-center">
-              <h1 className='text-white text-center text-sm sm:text-base'>2</h1>
+            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-black rounded-full flex items-center justify-center">
+              <h1 className="text-white text-center text-sm sm:text-base">2</h1>
             </div>
             <div className="hidden sm:flex items-center">
-              <div className="w-4 h-1 rounded-full bg-gray-300 mr-1"></div>
-              <div className="w-8 h-1 rounded-full bg-gray-300"></div>
-              <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
+              <div className="w-4 h-1 rounded-full bg-black mr-1"></div>
+              <div className="w-8 h-1 rounded-full bg-black"></div>
+              <div className="w-4 h-1 rounded-full bg-black ml-1"></div>
             </div>
-            <div className="w-10 h-10 sm:w-16 sm:h-16 bg-gray-300 rounded-full flex items-center justify-center">
-              <h1 className='text-black text-center text-sm sm:text-base'>3</h1>
+            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-black rounded-full flex items-center justify-center">
+              <h1 className="text-white text-center text-sm sm:text-base">3</h1>
             </div>
           </div>
         </div>
       </nav>
 
       <hr className="border-gray-200" />
+      {/* Main */}
+      <div className="flex-grow bg-white py-6 px-4 sm:px-44">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-start mb-6">
+          Business Operations
+        </h1>
 
-      <div className="flex-grow bg-white py-6">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6">Business Operations</h1>
+        <h2 className="text-xl sm:text-2xl font-bold text-start mb-6">
+          Business Registration Details
+        </h2>
 
-        <h2 className="text-xl sm:text-2xl font-bold text-center mb-6">Business Registration Details</h2>
-
-        <div className="max-w-4xl mx-auto px-4">
-          {/* Business Registration and GSTIN - Responsive Layout */}
-          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mb-6">
-            <div className="w-full sm:w-1/2">
-              <label className="block text-lg font-bold mb-2">Business Registration Number</label>
+     
+          {/* Business Registration and GSTIN - Grid Layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="block text-lg font-bold mb-2">
+                Business Registration Number
+              </label>
               <input
                 type="text"
                 name="businessRegistrationNumber"
@@ -146,7 +166,7 @@ const MediaAndBranding: React.FC = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
               />
             </div>
-            <div className="w-full sm:w-1/2">
+            <div>
               <label className="block text-lg font-bold mb-2">GSTIN</label>
               <input
                 type="text"
@@ -158,16 +178,15 @@ const MediaAndBranding: React.FC = () => {
             </div>
           </div>
 
-          {/* Other Licenses and Certifications - Responsive Layout */}
-          <div className="flex flex-col sm:flex-row space-y-6 sm:space-y-0 sm:space-x-6">
-            {/* Other Licenses */}
-            <div className="w-full sm:w-1/2">
+          {/* Other Licenses and Certifications - Grid Layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg sm:text-xl font-bold">Other Licenses</h3>
                 <button
                   type="button"
                   onClick={() => handleAddField("otherLicenses")}
-                  className="text-black underline text-sm"
+                  className="text-[#303030] font-semibold"
                 >
                   + Add More
                 </button>
@@ -186,7 +205,7 @@ const MediaAndBranding: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleRemoveField("otherLicenses", index)}
-                      className="text-red-500 text-sm"
+                      className="text-red-500 px-2 py-1 rounded-md hover:bg-red-50"
                     >
                       Remove
                     </button>
@@ -194,15 +213,15 @@ const MediaAndBranding: React.FC = () => {
                 </div>
               ))}
             </div>
-
-            {/* Certifications */}
-            <div className="w-full sm:w-1/2">
+            <div>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg sm:text-xl font-bold">Certifications/Licenses</h3>
+                <h3 className="text-lg sm:text-xl font-bold">
+                  Certifications/Licenses
+                </h3>
                 <button
                   type="button"
                   onClick={() => handleAddField("certifications")}
-                  className="text-black underline text-sm"
+                  className="text-[#303030] font-semibold"
                 >
                   + Add More
                 </button>
@@ -221,7 +240,7 @@ const MediaAndBranding: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleRemoveField("certifications", index)}
-                      className="text-red-500 text-sm"
+                      className="text-red-500 px-2 py-1 rounded-md hover:bg-red-50"
                     >
                       Remove
                     </button>
@@ -231,9 +250,11 @@ const MediaAndBranding: React.FC = () => {
             </div>
           </div>
 
-          {/* Payment Methods - Responsive Layout */}
-          <h2 className="text-xl sm:text-2xl font-bold text-center my-6">Payment Methods Accepted</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+          {/* Payment Methods - Grid Layout */}
+          <h2 className="text-xl sm:text-2xl font-bold my-6">
+            Payment Methods Accepted
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
             {Object.keys(formData.paymentMethods).map((method) => (
               <div key={method} className="flex items-center">
                 <input
@@ -251,9 +272,11 @@ const MediaAndBranding: React.FC = () => {
             ))}
           </div>
 
-          {/* Additional Services - Responsive Layout */}
-          <h2 className="text-xl sm:text-2xl font-bold text-center my-6">Additional Services</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+          {/* Additional Services - Grid Layout */}
+          <h2 className="text-xl sm:text-2xl font-bold my-6">
+            Additional Services
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
             {Object.keys(formData.additionalServices).map((service) => (
               <div key={service} className="flex items-center">
                 <input
@@ -271,23 +294,44 @@ const MediaAndBranding: React.FC = () => {
             ))}
           </div>
 
-          {/* Navigation Buttons - Responsive */}
-          <div className="mt-8 flex justify-between max-w-md mx-auto">
+          {/* Navigation Buttons - Flex Layout */}
+          <div className="mt-8 flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0">
             <button
               type="button"
-              onClick={() => router.push('/signup/2')}
+              onClick={() => router.push("/signup/2")}
               className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
             >
               &larr; Previous
             </button>
             <button
               type="submit"
-              onClick={() => router.push('/profile')}
+              onClick={() => router.push("/profile")}
               className="bg-[#303030] text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors"
             >
               Next &rarr;
             </button>
           </div>
+      </div>
+      {/* Footer */}
+      <div className="bottom-0 px-4 py-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left"> 
+          © 2024{" "}
+          <a
+            href="https://gigwork.co.in/"
+            className="hover:underline"
+            target="_blank"
+          >
+            Gigwork
+          </a>
+          . All rights reserved.
+        </p>
+        <div className="text-sm text-gray-500 flex space-x-4">
+          <a href="/privacy" className="hover:underline">
+            Privacy Policy
+          </a>
+          <a href="/terms" className="hover:underline">
+            Terms of Service
+          </a>
         </div>
       </div>
     </div>

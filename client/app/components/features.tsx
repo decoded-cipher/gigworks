@@ -22,7 +22,7 @@ const FeatureCardsWithImage = () => {
   ];
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center py-16">
+    <div className="w-full min-h-screen flex items-center justify-center pt-16 pb-5 bottom-0">
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Mobile Layout - Stack cards vertically */}
         <div className="md:hidden flex flex-col gap-8">
@@ -44,7 +44,7 @@ const FeatureCardsWithImage = () => {
         {/* Desktop Layout - Cards around center image */}
         <div className="hidden md:flex justify-center items-center relative">
           {/* Center image container */}
-          <div className="absolute  left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[800px]">
+          <div className="absolute  left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[800px] bottom-0">
             <Image 
               src="/women.svg"
               alt="Women illustration"

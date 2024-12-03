@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import gigworks from "../public/gigworks.svg";
-import LoginPopup from './components/loginpopup';
+import LoginPopup from "./components/loginpopup";
 import man from "../public/man.svg";
 import whatsapp from "../public/whatsapp.png";
 import { ContactForm } from "./components/ContactForm";
@@ -32,8 +32,6 @@ export default function GigWorkLandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-
-
   const features = [
     {
       title: "Ease of Access",
@@ -56,15 +54,20 @@ export default function GigWorkLandingPage() {
         "Trust in our verified and regularly updated information, ensuring you always have access to accurate and dependable data.",
     },
   ];
-  const App = () => {
-    const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
-  };
+
   return (
     <div className=" min-h-screen bg-black font-circular text-white overflow-x-hidden">
+      {/* Single LoginPopup instance at the root level */}
+      <LoginPopup
+        isOpen={isLoginPopupOpen}
+        onClose={() => setIsLoginPopupOpen(false)}
+      />
+
       {/* Navbar */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-30 py-2 transition-all duration-300 ${isScrolled ? "bg-black backdrop-blur-sm" : "bg-navbg"
-          }`}
+        className={`fixed top-0 left-0 right-0 z-30 py-2 transition-all duration-300 ${
+          isScrolled ? "bg-black backdrop-blur-sm" : "bg-navbg"
+        }`}
       >
         <div className="mx-auto max-w-7xl px-4 py-4 ">
           <div className="flex items-center justify-between">
@@ -119,15 +122,12 @@ export default function GigWorkLandingPage() {
                 // Initial menu items
                 <div className="flex items-center space-x-8">
                   <SearchSection />
-                  {/* <button
-                onClick={() => setIsLoginPopupOpen(true)}
-                className="border border-green-500 hover:bg-green-500 text-xl font-medium bg-tertiary text-white px-4 py-2 h-14 rounded-md transition duration-300 whitespace-nowrap"
-              >
-                Login
-              </button> */}
-                  <button className="border border-green-500 hover:bg-green-500 text-xl font-medium bg-tertiary text-white px-4 py-2 h-14 rounded-md transition duration-300 whitespace-nowrap" onClick={() => setIsLoginPopupOpen(true)}> Login</button>
-                  <LoginPopup isOpen={isLoginPopupOpen} onClose={() => setIsLoginPopupOpen(false)} />
-
+                  <button
+                    className="border border-green-500 hover:bg-green-500 text-xl font-medium bg-tertiary text-white px-4 py-2 h-14 rounded-md transition duration-300 whitespace-nowrap"
+                    onClick={() => setIsLoginPopupOpen(true)}
+                  >
+                    Login
+                  </button>
                 </div>
               )}
             </div>
@@ -146,57 +146,42 @@ export default function GigWorkLandingPage() {
           {/* Mobile Menu */}
           {isMobileMenuOpen && (
             <div className="lg:hidden mt-4 pb-4">
-              {isScrolled ? (
-                // Scrolled mobile menu items
-                <div className="flex flex-col space-y-4">
-                  <Link
-                    href="#"
-                    className="text-white hover:text-green-500 transition"
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    href="#"
-                    className="text-white hover:text-green-500 transition"
-                  >
-                    About Us
-                  </Link>
-                  <Link
-                    href="#"
-                    className="text-white hover:text-green-500 transition"
-                  >
-                    Blog
-                  </Link>
-                  <Link
-                    href="#"
-                    className="text-white hover:text-green-500 transition"
-                  >
-                    Partner
-                  </Link>
-                  <Link
-                    href="#contact"
-                    className="text-white hover:text-green-500 transition"
-                  >
-                    Contact
-                  </Link>
-                </div>
-              ) : (
-                // Initial mobile menu items
-                <div className="hidden md:block flex flex-col space-y-4">
-                  <div className="w-full">
-                    <SearchSection />
-                  </div>
-                  <button className="w-full border border-green-500 hover:bg-green-500 text-lg font-medium bg-tertiary text-white px-4 py-2 rounded-md transition duration-300">
-                    Login
-                  </button>
-                </div>
-              )}
+              <div className="flex flex-col space-y-4">
+                <Link
+                  href="#"
+                  className="text-white hover:text-green-500 transition"
+                >
+                  Home
+                </Link>
+                <Link
+                  href="#"
+                  className="text-white hover:text-green-500 transition"
+                >
+                  About Us
+                </Link>
+                <Link
+                  href="#"
+                  className="text-white hover:text-green-500 transition"
+                >
+                  Blog
+                </Link>
+                <Link
+                  href="#"
+                  className="text-white hover:text-green-500 transition"
+                >
+                  Partner
+                </Link>
+                <Link
+                  href="#contact"
+                  className="text-white hover:text-green-500 transition"
+                >
+                  Contact
+                </Link>
+              </div>
             </div>
           )}
         </div>
       </nav>
-
-
 
       {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */}
       <ScrollToTopButton />
@@ -234,8 +219,6 @@ export default function GigWorkLandingPage() {
                     Sign up
                   </span>
                 </button>
-                <LoginPopup isOpen={isLoginPopupOpen} onClose={() => setIsLoginPopupOpen(false)} />
-
 
                 <button className="w-full lg:w-[204px] h-[60px] border border-grn text-white hover:bg-tertiary  px-4 py-3 md:px-8 md:py-4 rounded-md transition duration-300">
                   <div className="flex items-center justify-center">
@@ -568,8 +551,6 @@ export default function GigWorkLandingPage() {
       <section>
         <FooterSection />
       </section>
-
-
     </div>
   );
 }
