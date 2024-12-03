@@ -67,15 +67,14 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-8 rounded-xl w-[500px] flex flex-col items-center text-center space-y-6 relative shadow-none" >
-
-          <button
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4">
+      <div className="bg-white p-4 sm:p-8 rounded-xl w-full max-w-[500px] flex flex-col items-center text-center space-y-4 sm:space-y-6 relative shadow-none">
+        <button
           onClick={onClose}
           className="absolute top-0 right-0 m-4 text-gray-500 hover:text-black transition"
-          >
+        >
           <X size={28} />
-          </button>
+        </button>
         {!isOtpVisible ? (
           <>
             <Image 
@@ -83,20 +82,20 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
               alt="Gigworks Logo" 
               width={306}
               height={336}
-              className="mx-auto mb-4"
+              className="mx-auto mb-2 sm:mb-4 w-48 sm:w-auto"
             />
-            <h2 className="text-3xl text-black font-bold">Verify your number</h2>
+            <h2 className="text-2xl sm:text-3xl text-black font-bold">Verify your number</h2>
             <p className="text-gray-500  mb-4">
               Please enter your WhatsApp number for verification to proceed.
             </p>
-            <div className="w-full space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="bg-gray-100 rounded-full px-4 py-3 text-gray-600 text-lg">
+            <div className="w-full space-y-3 sm:space-y-4">
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <div className="bg-gray-100 rounded-full px-3 sm:px-4 py-2 sm:py-3 text-gray-600 text-base sm:text-lg">
                   +91
                 </div>
                 <input
                   type="tel"
-                  className="flex-1 text-black border border-gray-300 rounded-full px-5 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="flex-1 text-black border border-gray-300 rounded-full px-3 sm:px-5 py-2 sm:py-4 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="WhatsApp number"
                   maxLength={10}
                   value={phoneNumber}
@@ -127,13 +126,13 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
               alt="Gigworks Logo" 
               width={306}
               height={336}
-              className="mx-auto mb-4"
+              className="mx-auto mb-2 sm:mb-4 w-48 sm:w-auto"
             />
-            <h2 className="text-4xl text-black font-bold">Enter OTP</h2>
+            <h2 className="text-2xl sm:text-4xl text-black font-bold">Enter OTP</h2>
             <p className="text-gray-500 mb-4">
               Please enter the 6-digit OTP sent to your WhatsApp number.
             </p>
-            <div className="grid grid-cols-6 gap-3 w-full px-8">
+            <div className="grid grid-cols-6 gap-2 sm:gap-3 w-full px-2 sm:px-8">
               {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -143,7 +142,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
                     }
                   }}
                   type="tel"
-                  className="border border-gray-300 rounded-md text-black px-3 py-4 focus:outline-none focus:ring-2 focus:ring-green-500 w-full text-center text-2xl"
+                  className="border border-gray-300 rounded-md text-black px-1 sm:px-3 py-2 sm:py-4 focus:outline-none focus:ring-2 focus:ring-green-500 w-full text-center text-lg sm:text-2xl"
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleOtpChange(index, e.target.value)}

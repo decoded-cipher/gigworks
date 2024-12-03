@@ -357,7 +357,7 @@ export default function GigWorkLandingPage() {
                   />
                 </svg>
               </div>
-              <Image src={man} alt="" className="man md:mt-24 z-10" />
+              <Image src={man} alt="" className="man md:mt-24  z-10 w-full" />
             </div>
           </section>
         </div>
@@ -405,15 +405,18 @@ export default function GigWorkLandingPage() {
         </section>
 
         {/* Why Choose Us */}
-        <section className="container bg-white mx-auto px-4 relative z-0">
+        {/* <section className="container bg-white mx-auto px-4 relative z-0">
           <h2 className="text-3xl font-bold mb-20 text-center text-black">
             Why <span className="text-green-600">Choose Us?</span>
           </h2>
-          {/* Features Card Section */}
+          Features Card Section
           <div className="flex justify-center bottom-0">
             <FeatureCardsWithImage />
           </div>
-        </section>
+        </section> */}
+      <div className="container bg-white mx-auto px-4 relative z-0 bottom-0 flex justify-center items-end">
+            <FeatureCardsWithImage />
+          </div>
       </section>
 
       {/* Join Community */}
