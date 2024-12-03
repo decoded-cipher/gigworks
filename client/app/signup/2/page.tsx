@@ -138,6 +138,14 @@ const LocationDetails: React.FC = () => {
     }
   };
 
+  const removeOperatingHours = (indexToRemove: number) => {
+    setOperatingHours(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  const removeSocialMediaHandle = (indexToRemove: number) => {
+    setSocialMediaHandles(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Responsive Navigation */}
@@ -153,7 +161,7 @@ const LocationDetails: React.FC = () => {
         </div>
         <div className="flex items-center">
           <div className="flex justify-center items-center space-x-2">
-            <div className="w-10 h-10 sm:w-16 sm:h-16 bg-black rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-black rounded-full flex items-center justify-center">
               <h1 className='text-white text-center text-sm sm:text-base'>1</h1>
             </div>
             <div className="hidden sm:flex items-center">
@@ -161,7 +169,7 @@ const LocationDetails: React.FC = () => {
               <div className="w-8 h-1 rounded-full bg-black"></div>
               <div className="w-4 h-1 rounded-full bg-black ml-1"></div>
             </div>
-            <div className="w-10 h-10 sm:w-16 sm:h-16 bg-black rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-black rounded-full flex items-center justify-center">
               <h1 className='text-white text-center text-sm sm:text-base'>2</h1>
             </div>
             <div className="hidden sm:flex items-center">
@@ -169,7 +177,7 @@ const LocationDetails: React.FC = () => {
               <div className="w-8 h-1 rounded-full bg-gray-300"></div>
               <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
             </div>
-            <div className="w-10 h-10 sm:w-16 sm:h-16 bg-gray-300 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gray-300 rounded-full flex items-center justify-center">
               <h1 className='text-black text-center text-sm sm:text-base'>3</h1>
             </div>
           </div>
@@ -177,7 +185,7 @@ const LocationDetails: React.FC = () => {
       </nav>
 
       <hr className="border-gray-200" />
-      
+
       {/* Responsive Form Container */}
       <form onSubmit={handleSubmit} className="flex flex-col items-center w-full px-4 sm:px-8 md:px-16 lg:px-32 xl:px-44">
         <div className="w-full bg-white rounded-md p-4 sm:p-6">
@@ -260,8 +268,8 @@ const LocationDetails: React.FC = () => {
               </button>
             </div>
             {operatingHours.map((hours, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-2"
               >
                 <select
@@ -289,6 +297,15 @@ const LocationDetails: React.FC = () => {
                     onChange={(e) => handleOperatingHoursChange(index, e)}
                     className="w-full border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring focus:ring-[#303030]"
                   />
+                  {operatingHours.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeOperatingHours(index)}
+                      className="text-red-500 px-2 py-1 rounded-md hover:bg-red-50"
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -309,8 +326,8 @@ const LocationDetails: React.FC = () => {
               </button>
             </div>
             {socialMediaHandles.map((handle, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-2"
               >
                 <select
@@ -323,14 +340,25 @@ const LocationDetails: React.FC = () => {
                     <option key={platform} value={platform}>{platform}</option>
                   ))}
                 </select>
-                <input
-                  type="text"
-                  name="link"
-                  value={handle.link}
-                  onChange={(e) => handleSocialMediaChange(index, e)}
-                  placeholder="Profile link address"
-                  className="w-full sm:w-2/3 border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring focus:ring-[#303030]"
-                />
+                <div className="flex flex-1 gap-2">
+                  <input
+                    type="text"
+                    name="link"
+                    value={handle.link}
+                    onChange={(e) => handleSocialMediaChange(index, e)}
+                    placeholder="Profile link address"
+                    className="w-full border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring focus:ring-[#303030]"
+                  />
+                  {socialMediaHandles.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSocialMediaHandle(index)}
+                      className="text-red-500 px-2 py-1 rounded-md hover:bg-red-50"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -353,15 +381,18 @@ const LocationDetails: React.FC = () => {
           </div>
         </div>
       </form>
-      <div className="bottom-0 px-2 py-4 flex justify-between items-center">
-  <p className="text-sm text-gray-500 dark:text-gray-400"> 
-    © 2024 <a href="https://gigwork.co.in/" className="hover:underline" target="_blank">Gigwork</a>. All rights reserved. 
-  </p>
-  <div className="text-sm text-gray-500 space-x-2">
-    <a href="/privacy" className="hover:underline">Privacy Policy</a>
-    <a href="/terms" className="hover:underline">Terms of Service</a>
-  </div>
-</div>
+      {/* Footer */}
+      <div className="bottom-0 px-4 py-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
+            © 2024 <a href="https://gigwork.co.in/" className="hover:underline" target="_blank">Gigwork</a>. All rights reserved.
+          </p>
+          <div className="text-xs sm:text-sm text-gray-500 flex space-x-4">
+            <a href="/privacy" className="hover:underline">Privacy Policy</a>
+            <a href="/terms" className="hover:underline">Terms of Service</a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

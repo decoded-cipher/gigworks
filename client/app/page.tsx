@@ -54,11 +54,15 @@ export default function GigWorkLandingPage() {
         "Trust in our verified and regularly updated information, ensuring you always have access to accurate and dependable data.",
     },
   ];
-  const App = () => {
-    const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
-  };
+
   return (
     <div className=" min-h-screen bg-black font-circular text-white overflow-x-hidden">
+      {/* Single LoginPopup instance at the root level */}
+      <LoginPopup
+        isOpen={isLoginPopupOpen}
+        onClose={() => setIsLoginPopupOpen(false)}
+      />
+
       {/* Navbar */}
       <nav
         className={`fixed top-0 left-0 right-0 z-30 py-2 transition-all duration-300 ${
@@ -118,23 +122,12 @@ export default function GigWorkLandingPage() {
                 // Initial menu items
                 <div className="flex items-center space-x-8">
                   <SearchSection />
-                  {/* <button
-                onClick={() => setIsLoginPopupOpen(true)}
-                className="border border-green-500 hover:bg-green-500 text-xl font-medium bg-tertiary text-white px-4 py-2 h-14 rounded-md transition duration-300 whitespace-nowrap"
-              >
-                Login
-              </button> */}
                   <button
                     className="border border-green-500 hover:bg-green-500 text-xl font-medium bg-tertiary text-white px-4 py-2 h-14 rounded-md transition duration-300 whitespace-nowrap"
                     onClick={() => setIsLoginPopupOpen(true)}
                   >
-                    {" "}
                     Login
                   </button>
-                  <LoginPopup
-                    isOpen={isLoginPopupOpen}
-                    onClose={() => setIsLoginPopupOpen(false)}
-                  />
                 </div>
               )}
             </div>
@@ -226,7 +219,6 @@ export default function GigWorkLandingPage() {
                     Sign up
                   </span>
                 </button>
-                <LoginPopup isOpen={isLoginPopupOpen} onClose={() => setIsLoginPopupOpen(false)} />
 
                 <button className="w-full lg:w-[204px] h-[60px] border border-grn text-white hover:bg-tertiary  px-4 py-3 md:px-8 md:py-4 rounded-md transition duration-300">
                   <div className="flex items-center justify-center">

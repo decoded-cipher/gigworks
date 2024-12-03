@@ -117,7 +117,7 @@ const MediaAndBranding: React.FC = () => {
         </div>
         <div className="flex items-center">
           <div className="flex justify-center items-center space-x-2">
-            <div className="w-10 h-10 sm:w-16 sm:h-16 bg-black rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-black rounded-full flex items-center justify-center">
               <h1 className="text-white text-center text-sm sm:text-base">1</h1>
             </div>
             <div className="hidden sm:flex items-center">
@@ -125,7 +125,7 @@ const MediaAndBranding: React.FC = () => {
               <div className="w-8 h-1 rounded-full bg-black"></div>
               <div className="w-4 h-1 rounded-full bg-black ml-1"></div>
             </div>
-            <div className="w-10 h-10 sm:w-16 sm:h-16 bg-black rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-black rounded-full flex items-center justify-center">
               <h1 className="text-white text-center text-sm sm:text-base">2</h1>
             </div>
             <div className="hidden sm:flex items-center">
@@ -133,7 +133,7 @@ const MediaAndBranding: React.FC = () => {
               <div className="w-8 h-1 rounded-full bg-black"></div>
               <div className="w-4 h-1 rounded-full bg-black ml-1"></div>
             </div>
-            <div className="w-10 h-10 sm:w-16 sm:h-16 bg-black rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-black rounded-full flex items-center justify-center">
               <h1 className="text-white text-center text-sm sm:text-base">3</h1>
             </div>
           </div>
@@ -186,7 +186,7 @@ const MediaAndBranding: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleAddField("otherLicenses")}
-                  className="text-black underline text-sm"
+                  className="text-[#303030] font-semibold"
                 >
                   + Add More
                 </button>
@@ -205,7 +205,7 @@ const MediaAndBranding: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleRemoveField("otherLicenses", index)}
-                      className="text-red-500 text-sm"
+                      className="text-red-500 px-2 py-1 rounded-md hover:bg-red-50"
                     >
                       Remove
                     </button>
@@ -221,7 +221,7 @@ const MediaAndBranding: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleAddField("certifications")}
-                  className="text-black underline text-sm"
+                  className="text-[#303030] font-semibold"
                 >
                   + Add More
                 </button>
@@ -240,7 +240,7 @@ const MediaAndBranding: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleRemoveField("certifications", index)}
-                      className="text-red-500 text-sm"
+                      className="text-red-500 px-2 py-1 rounded-md hover:bg-red-50"
                     >
                       Remove
                     </button>
@@ -312,8 +312,9 @@ const MediaAndBranding: React.FC = () => {
             </button>
           </div>
       </div>
-      <div className="bottom-0 px-2 py-4 flex justify-between items-center">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+      {/* Footer */}
+      <div className="bottom-0 px-4 py-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left"> 
           © 2024{" "}
           <a
             href="https://gigwork.co.in/"
@@ -324,7 +325,7 @@ const MediaAndBranding: React.FC = () => {
           </a>
           . All rights reserved.
         </p>
-        <div className="text-sm text-gray-500 space-x-2">
+        <div className="text-sm text-gray-500 flex space-x-4">
           <a href="/privacy" className="hover:underline">
             Privacy Policy
           </a>

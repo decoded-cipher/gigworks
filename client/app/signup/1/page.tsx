@@ -7,7 +7,7 @@ import { Textarea } from "@nextui-org/input";
 // Define the form data type
 interface FormData {
   profileImage: File | null;
-  coverImage: File | null;
+  coverImage: File | null;  
   businessName: string;
   businessDescription: string;
   whatsAppNumber: string;
@@ -126,7 +126,7 @@ const MediaAndBranding = () => {
         </div>
         <div className="flex items-center">
           <div className="flex justify-center items-center space-x-2">
-            <div className="w-12 sm:w-16 h-12 sm:h-16 bg-black rounded-full flex items-center justify-center">
+            <div className="w-12 sm:w-14 h-12 sm:h-14 bg-black rounded-full flex items-center justify-center">
               <h1 className="text-white text-center text-sm sm:text-base">1</h1>
             </div>
             <div className="hidden sm:flex items-center">
@@ -134,7 +134,7 @@ const MediaAndBranding = () => {
               <div className="w-8 h-1 rounded-full bg-gray-300"></div>
               <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
             </div>
-            <div className="w-12 sm:w-16 h-12 sm:h-16 bg-gray-300 rounded-full flex items-center justify-center">
+              <div className="w-12 sm:w-14 h-12 sm:h-14 bg-gray-300 rounded-full flex items-center justify-center">
               <h1 className="text-black text-center text-sm sm:text-base">2</h1>
             </div>
             <div className="hidden sm:flex items-center">
@@ -142,7 +142,7 @@ const MediaAndBranding = () => {
               <div className="w-8 h-1 rounded-full bg-gray-300"></div>
               <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
             </div>
-            <div className="w-12 sm:w-16 h-12 sm:h-16 bg-gray-300 rounded-full flex items-center justify-center">
+            <div className="w-12 sm:w-14 h-12 sm:h-14 bg-gray-300 rounded-full flex items-center justify-center">
               <h1 className="text-black text-center text-sm sm:text-base">3</h1>
             </div>
           </div>
@@ -186,45 +186,23 @@ const MediaAndBranding = () => {
           ))}
         </div>
 
+        {/* Business Overview Section */}
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold py-4 text-center sm:text-left">
           Business Overview
         </h1>
 
-        <div className="flex flex-col lg:flex-row -mx-2">
-          {/* Left Column */}
-          <div className="w-full lg:w-1/2 px-2">
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Business Name and Category Row */}
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="w-full lg:w-1/2">
               {renderFormField(
                 "businessName",
                 "Business Name",
                 "text",
                 "Enter your business name"
               )}
-              {renderFormField(
-                "businessDescription",
-                "Business Description",
-                "textarea",
-                "Describe your business briefly"
-              )}
-              {renderFormField(
-                "whatsAppNumber",
-                "WhatsApp Number",
-                "tel",
-                "Enter your WhatsApp number"
-              )}
-              {renderFormField(
-                "websiteURL",
-                "Website Link",
-                "url",
-                "Enter your website URL (optional)",
-                false
-              )}
-            </form>
-          </div>
-
-          {/* Right Column */}
-          <div className="w-full lg:w-1/2 px-2 mt-4 lg:mt-0">
-            <form onSubmit={handleSubmit} className="space-y-4">
+            </div>
+            <div className="w-full lg:w-1/2">
               {renderFormField(
                 "businessCategory",
                 "Business Category",
@@ -239,67 +217,94 @@ const MediaAndBranding = () => {
                   { value: "consulting", label: "Consulting" },
                 ]
               )}
+            </div>
+          </div>
+
+          {/* Description and Business Type Row */}
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="w-full lg:w-1/2">
+              <textarea
+                name="businessDescription"
+                placeholder="Describe your business briefly"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+              />
+            </div>
+            <div className="w-full lg:w-1/2">
+              <select
+                name="businessType"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                <option value="">Select Business Type</option>
+                <option value="soleProprietorship">Sole Proprietorship</option>
+                <option value="partnership">Partnership</option>
+                <option value="corporation">Corporation</option>
+                <option value="limitedLiabilityCompany">Limited Liability Company</option>
+              </select>
+            </div>
+          </div>
+
+          {/* WhatsApp and Owner Name Row */}
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="w-full lg:w-1/2">
               {renderFormField(
-                "businessType",
-                "Business Type",
-                "select",
-                undefined,
-                true,
-                [
-                  { value: "soleProprietorship", label: "Sole Proprietorship" },
-                  { value: "partnership", label: "Partnership" },
-                  { value: "corporation", label: "Corporation" },
-                  {
-                    value: "limitedLiabilityCompany",
-                    label: "Limited Liability Company",
-                  },
-                ]
+                "whatsAppNumber",
+                "WhatsApp Number",
+                "tel",
+                "Enter your WhatsApp number"
               )}
+            </div>
+            <div className="w-full lg:w-1/2">
               {renderFormField(
                 "ownerName",
                 "Owner's/Manager's Name",
                 "text",
                 "Enter owner or manager name"
               )}
+            </div>
+          </div>
+
+          {/* Website and Email Row */}
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="w-full lg:w-1/2">
+              {renderFormField(
+                "websiteURL",
+                "Website Link",
+                "url",
+                "Enter your website URL (optional)",
+                false
+              )}
+            </div>
+            <div className="w-full lg:w-1/2">
               {renderFormField(
                 "emailAddress",
                 "Email Address",
                 "email",
                 "Enter your email address"
               )}
-            </form>
-
-            <div className="flex justify-center sm:justify-end mt-4">
-              <button
-                type="submit"
-                onClick={() => (window.location.href = "/signup/2")}
-                className="bg-[#303030] text-white px-6 py-2 rounded-md w-full sm:w-auto"
-              >
-                Next &rarr;
-              </button>
             </div>
           </div>
-        </div>
+
+          <div className="flex justify-end mt-4">
+            <button
+              type="submit"
+              onClick={() => (window.location.href = "/signup/2")}
+              className="bg-[#303030] text-white px-6 py-2 rounded-md w-full sm:w-auto"
+            >
+              Next &rarr;
+            </button>
+          </div>
+        </form>
       </div>
-      <div className="bottom-0 px-2 py-4 flex justify-between items-center">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          © 2024{" "}
-          <a
-            href="https://gigwork.co.in/"
-            className="hover:underline"
-            target="_blank"
-          >
-            Gigwork
-          </a>
-          . All rights reserved.
-        </p>
-        <div className="text-sm text-gray-500 space-x-2">
-          <a href="/privacy" className="hover:underline">
-            Privacy Policy
-          </a>
-          <a href="/terms" className="hover:underline">
-            Terms of Service
-          </a>
+       {/* Footer */}
+       <div className="bottom-0 px-4 py-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
+            © 2024 <a href="https://gigwork.co.in/" className="hover:underline" target="_blank">Gigwork</a>. All rights reserved.
+          </p>
+          <div className="text-xs sm:text-sm text-gray-500 flex space-x-4">
+            <a href="/privacy" className="hover:underline">Privacy Policy</a>
+            <a href="/terms" className="hover:underline">Terms of Service</a>
+          </div>
         </div>
       </div>
     </div>
