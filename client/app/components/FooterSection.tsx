@@ -62,7 +62,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href=""
+                      href="/privacy"
                       className="hover:underline"
                     >
                       Privacy and Policy
@@ -70,7 +70,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href=""
+                      href="/terms"
                       className="hover:underline"
                     >
                       Terms &amp; Conditions
