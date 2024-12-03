@@ -62,11 +62,13 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
     console.log('Verifying OTP:', otp.join(''));
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-8 rounded-xl shadow-2xl w-[500px] flex flex-col items-center text-center space-y-6 relative">
+      <div className="bg-white p-8 rounded-xl w-[500px] flex flex-col items-center text-center space-y-6 relative" >
 
           <button
           onClick={onClose}
