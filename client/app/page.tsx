@@ -197,7 +197,7 @@ export default function GigWorkLandingPage() {
               <div className="lg:hidden block mb-[67px]">
                 <SearchSection />
               </div>
-              <h1 className="text-3xl lg:text-7xl font-bold mb-4">
+              <h1 className="text-3xl lg:text-6xl font-bold mb-4">
                 Take Your Business to the Next Level with <br></br>
                 <div className="mt-2">
                   <span className="text-green-500 md:text-7xl ">WhatsApp!</span>

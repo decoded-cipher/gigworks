@@ -83,6 +83,7 @@ const Navbar = () => {
           </div>
         )}
       </nav>
+      <hr className="border-gray-200" />
     </div>
   );
 };
