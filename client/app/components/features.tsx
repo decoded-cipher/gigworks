@@ -22,8 +22,13 @@ const FeatureCardsWithImage = () => {
   ];
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center py-16">
+    <div className="w-full flex items-center justify-center">
       <div className="container mx-auto px-4 max-w-6xl">
+        {/* Why Choose Us */}
+        <h2 className="text-3xl font-bold mb-20 text-center text-black">
+          Why <span className="text-green-600">Choose Us?</span>
+        </h2>
+
         {/* Mobile Layout - Stack cards vertically */}
         <div className="md:hidden flex flex-col gap-8">
           {features.map((feature, index) => (
@@ -42,9 +47,9 @@ const FeatureCardsWithImage = () => {
         </div>
 
         {/* Desktop Layout - Cards around center image */}
-        <div className="hidden md:flex justify-center items-center relative">
+        <div className="hidden md:flex justify-center items-center relative h-[800px]">
           {/* Center image container */}
-          <div className="absolute  left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[800px]">
+          <div className="absolute left-1/2 -translate-x-1/2 w-[600px] h-full flex items-end">
             <Image 
               src="/women.svg"
               alt="Women illustration"
