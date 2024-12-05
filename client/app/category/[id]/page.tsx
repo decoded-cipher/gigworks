@@ -20,6 +20,8 @@ interface employ {
   type?: string;
 }
 
+export const runtime = 'edge';
+
 export default function CategoryPage({ params }: CategoryPageProps) {
   const { id } = params;
   const [visibleEmploys, setVisibleEmploys] = useState(16);
