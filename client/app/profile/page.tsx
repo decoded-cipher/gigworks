@@ -6,14 +6,12 @@ import { div } from "framer-motion/client";
 import DynamicQRCode from "../components/QrSection";
 import ScrollToTopButton from "../components/ScrollToTop";
 const DevMorphixWebsite = () => {
-
-
   return (
     <div className="font-circular">
       <div className="px-4 sm:px-6 lg:px-32">
         <main>
-        <ScrollToTopButton isProfilePage={true} />
-        <section className="relative py-16 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
+          <ScrollToTopButton isProfilePage={true} />
+          <section className="relative py-16 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
             <div className="absolute top-0 left-0 right-0 h-80 overflow-hidden">
               <img
                 src="/15879.png"
@@ -158,7 +156,7 @@ const DevMorphixWebsite = () => {
                       <div>
                         <span className="font-light text-md text-black">
                           Located In:{" "}
-                          <span >
+                          <span>
                             Kristu Jyoti College of Management and Information
                             Technology
                           </span>
@@ -202,23 +200,25 @@ const DevMorphixWebsite = () => {
             <hr className="my-4 mx-10 "></hr>
 
             <section className="bg-white  rounded-lg p-6 mb-8 text-center">
-              <h2 className="text-xl font-medium mb-2">Contact Info</h2>
-              <p className="text-4xl font-mediu mb-2">+91 9876543210</p>
-              <div className="flex justify-center pb-11">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="538"
-                  height="39"
-                  viewBox="0 0 538 39"
-                  fill="none"
-                >
-                  <path
-                    d="M1 36.9999C90.6667 10.9999 323.3 -25.4001 536.5 36.9999C439.667 17.8332 197 -9.00014 1 36.9999Z"
-                    fill="#009A36"
-                    stroke="#009A36"
-                    stroke-width="4"
-                  />
-                </svg>
+                <h2 className="text-xl font-medium mb-2">About Us</h2>
+              <div className="hidden md:block flex flex-col items-center justify-center">
+                <p className="text-4xl font-mediu mb-2">+91 9876543210</p>
+                <div className="flex justify-center pb-11">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="538"
+                    height="39"
+                    viewBox="0 0 538 39"
+                    fill="none"
+                  >
+                    <path
+                      d="M1 36.9999C90.6667 10.9999 323.3 -25.4001 536.5 36.9999C439.667 17.8332 197 -9.00014 1 36.9999Z"
+                      fill="#009A36"
+                      stroke="#009A36"
+                      stroke-width="4"
+                    />
+                  </svg>
+                </div>
               </div>
 
               <p className="text-[#111111] text-md text-justify font-medium leading-relaxed">
@@ -255,7 +255,6 @@ const DevMorphixWebsite = () => {
                       <g clipPath="url(#clip0_462_793)">
                         <mask
                           id="mask0_462_793"
-                        
                           maskUnits="userSpaceOnUse"
                           x="0"
                           y="0"
