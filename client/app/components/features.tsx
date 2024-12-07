@@ -13,7 +13,7 @@ const FeatureCardsWithImage = () => {
     },
     {
       title: "Comprehensive Listings",
-      description: "We are committed to supporting local businesses, giving them a platform to grow and succeed within their communities."
+      description: "Our directory includes businesses across a wide range of categories, ensuring that you can find everything you're looking for in one place."
     },
     {
       title: "Reliable Information",
