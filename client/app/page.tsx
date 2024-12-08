@@ -425,7 +425,7 @@ export default function GigWorkLandingPage() {
             <FeatureCardsWithImage />
           </div>
         </section> */}
-        <div className="container bg-white mx-auto px-4 relative z-0 bottom-0 flex justify-center items-end">
+        <div className="container bg-white mx-auto px-4 py-4 md:py-0 relative z-0 bottom-0 flex justify-center items-end">
           <FeatureCardsWithImage />
         </div>
       </section>
