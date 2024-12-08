@@ -1,13 +1,91 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { MapPin, Clock, Phone, Briefcase, Dribbble } from "lucide-react";
 import ImageGrid from "../components/imgsec";
 import { FooterSection } from "../components/FooterSection";
 import { div } from "framer-motion/client";
 import DynamicQRCode from "../components/QrSection";
 import ScrollToTopButton from "../components/ScrollToTop";
+
 const DevMorphixWebsite = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const navItems = [
+    { label: "Home", href: "#" },
+    { label: "About", href: "#about" },
+    { label: "Services", href: "#service" },
+    { label: "Contact", href: "#contact" },
+    { label: "QR", href: "#qr" },
+  ];
+
   return (
     <div className="font-circular">
+      <nav className="bg-white border-gray-200 dark:bg-gray-900 fixed top-0 left-0 right-0 z-50 shadow-md">
+        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+          <a
+            href=""
+            className="flex items-center space-x-3 rtl:space-x-reverse"
+          >
+            <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+              DevMorphix
+            </span>
+          </a>
+
+          {/* Hamburger button */}
+          <button
+            onClick={toggleMenu}
+            type="button"
+            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+            aria-controls="navbar-default"
+            aria-expanded={isMenuOpen}
+          >
+            <span className="sr-only">Open main menu</span>
+            <svg
+              className="w-5 h-5"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 17 14"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M1 1h15M1 7h15M1 13h15"
+              />
+            </svg>
+          </button>
+
+          {/* Navigation menu */}
+          <div
+            className={`w-full md:block md:w-auto ${
+              isMenuOpen ? "block" : "hidden"
+            }`}
+            id="navbar-default"
+          >
+            <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+              {navItems.map((item, index) => (
+                <li key={index}>
+                  <a
+                    href={item.href}
+                    className="block py-2 px-3 rounded text-gray-900 hover:bg-gray-400 md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0 dark:text-white md:dark:hover:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                    aria-current={item.label === "Home" ? "page" : undefined}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </nav>
+
       <div className="px-4 sm:px-6 lg:px-32">
         <main>
           <ScrollToTopButton isProfilePage={true} />
@@ -99,7 +177,7 @@ const DevMorphixWebsite = () => {
             <ImageGrid className="bg-white shadow-lg rounded-lg  overflow-hidden border my-2  rounded-3xl" />
           </section>
 
-          <section className="border my-7  rounded-3xl ">
+          <section className="border my-7  rounded-3xl " id="service" style={{ scrollMarginTop: '100px' }}>
             <section className="bg-white rounded-full p-6 mb-8">
               <h2 className="text-xl font-bold text-center mb-6">
                 Services Provides
@@ -128,7 +206,7 @@ const DevMorphixWebsite = () => {
 
             <hr className="my-4 mx-10 "></hr>
 
-            <section className="flex flex-col md:flex-row gap-6 mb-8">
+            <section className="flex flex-col md:flex-row gap-6 mb-8" id="contact" style={{ scrollMarginTop: '100px' }}>
               {/* Map Section - Left Side */}
               <div className="md:w-1/2">
                 <div className="bg-white  rounded-lg p-6 h-full">
@@ -199,9 +277,10 @@ const DevMorphixWebsite = () => {
 
             <hr className="my-4 mx-10 "></hr>
 
-            <section className="bg-white  rounded-lg p-6 mb-8 text-center">
-                <h2 className="text-xl font-medium mb-2">About Us</h2>
+            <section className="bg-white  rounded-lg p-6 mb-8 text-center" id="about" style={{ scrollMarginTop: '100px' }}  >
+              <h2 className="text-xl font-medium mb-2">About Us</h2>
               <div className="hidden md:block flex flex-col items-center justify-center">
+              {/* <h2 className="text-xl font-medium mb-2">Contact us</h2> */}
                 <p className="text-4xl font-mediu mb-2">+91 9876543210</p>
                 <div className="flex justify-center pb-11">
                   <svg
@@ -360,7 +439,7 @@ const DevMorphixWebsite = () => {
             </div>
           </section> */}
 
-          <section className="my-7">
+          <section className="my-7" id="qr" style={{ scrollMarginTop: '100px' }}>
             <DynamicQRCode />
           </section>
         </main>
