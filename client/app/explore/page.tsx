@@ -111,12 +111,12 @@ function ExplorePage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-  3 lg:grid-cols-5 gap-1 w-full md:px-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-1 w-full md:px-24">
           {filteredCategories.slice(0, visibleCategories).map((category, index) => (
             <Link 
               href={`/category/${category.title.toLowerCase().replace(/\s+/g, '-')}`} 
               key={index}
-              className="flex flex-col items-center justify-center p-8 md:py-16 border border-green-500 rounded-sm hover:shadow-md hover:bg-green-500/10 transition-all duration-300 ease-in-out"
+              className="flex flex-col items-center justify-center p-8 py-16 md:py-16 border border-green-500 rounded-sm hover:shadow-md hover:bg-green-500/10 transition-all duration-300 ease-in-out"
             >
               <span className="text-center text-sm font-medium">{category.title}</span>
             </Link>
