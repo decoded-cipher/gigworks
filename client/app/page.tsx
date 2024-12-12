@@ -56,7 +56,7 @@ export default function GigWorkLandingPage() {
   ];
 
   return (
-    <div className=" min-h-screen bg-black font-circular text-white overflow-x-hidden">
+    <div className=" min-h-screen bg-black text-white overflow-x-hidden">
       {/* Single LoginPopup instance at the root level */}
       <LoginPopup
         isOpen={isLoginPopupOpen}
@@ -94,22 +94,22 @@ export default function GigWorkLandingPage() {
                     Home
                   </Link>
                   <Link
-                    href="#"
+                    href="#about"
                     className="text-white hover:text-green-500 transition"
                   >
                     About Us
                   </Link>
                   <Link
-                    href="#"
-                    className="text-white hover:text-green-500 transition"
-                  >
-                    Blog
-                  </Link>
-                  <Link
-                    href="#"
+                    href="#partner"
                     className="text-white hover:text-green-500 transition"
                   >
                     Partner
+                  </Link>
+                  <Link
+                    href="https://www.gigwork.co.in/"
+                    className="text-white hover:text-green-500 transition"
+                  >
+                    Blog
                   </Link>
                   <Link
                     href="#contact"
@@ -123,7 +123,7 @@ export default function GigWorkLandingPage() {
                 <div className="flex items-center space-x-8">
                   <SearchSection />
                   <button
-                    className="border border-green-500 hover:bg-green-500 text-xl font-medium bg-tertiary text-white px-4 py-2 h-14 rounded-md transition duration-300 whitespace-nowrap"
+                    className="border border-green-500 hover:bg-green-500 text-xl font-medium bg-tertiary text-white px-10 py-2 h-14 rounded-md transition duration-300 whitespace-nowrap"
                     onClick={() => setIsLoginPopupOpen(true)}
                   >
                     Login
@@ -154,19 +154,19 @@ export default function GigWorkLandingPage() {
                   Home
                 </Link>
                 <Link
-                  href="#"
+                  href="#about"
                   className="text-white hover:text-green-500 transition"
                 >
                   About Us
                 </Link>
                 <Link
-                  href="#"
+                  href="https://www.gigwork.co.in/"
                   className="text-white hover:text-green-500 transition"
                 >
                   Blog
                 </Link>
                 <Link
-                  href="#"
+                  href="#partner"
                   className="text-white hover:text-green-500 transition"
                 >
                   Partner
@@ -375,7 +375,7 @@ export default function GigWorkLandingPage() {
       </div>
       {/* -------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
       {/* Features */}
-      <section className="hidden md:block bg-green-600/85 md:relative z-20">
+      <section className="hidden md:block bg-[#31C668] md:relative z-20">
         <section className="bg-green-600 lg:py-8 md:py-5 relative z-50 -skew-y-[2deg]">
           <div className="container mx-auto px-40 flex justify-between md:space-x-4">
             <div className="text-center text-2xl font-bold text-white flex items-center">
@@ -392,7 +392,7 @@ export default function GigWorkLandingPage() {
       </section>
       <section className="bg-white  relative z-10">
         {/* About GigWork */}
-        <section className=" container mx-auto px-4 py-16 flex flex-col items-center justify-center">
+        <section className=" container mx-auto px-4 py-16 flex flex-col items-center justify-center" id="about" style={{ scrollMarginTop: '100px' }}>
           <h2 className="text-4xl text-center text-black font-bold mb-2 ">
             Get to Know<span className="text-green-600"> GigWork</span>
           </h2>
@@ -431,7 +431,7 @@ export default function GigWorkLandingPage() {
       </section>
 
       {/* Join Community */}
-      <section className="bg-black py-16 relative z-10">
+      <section className="bg-black py-16 relative z-10"id="partner" style={{ scrollMarginTop: '80px' }}>
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-8">
             Join Our <span className="text-green-600">Community</span>
@@ -457,7 +457,7 @@ export default function GigWorkLandingPage() {
       <section className="bg-cbg w-full">
         <section
           id="contact"
-          className="container bg-cbg mx-auto px-3 md:px-[42px] py-16 flex flex-col items-center"
+          className="container bg-cbg mx-auto px-3 md:px-[42px] py-16 flex flex-col items-center" style={{ scrollMarginTop: '100px' }}
         >
           <h2 className="text-3xl font-bold mb-8 ">
             Contact <span className="text-green-600">Us</span>

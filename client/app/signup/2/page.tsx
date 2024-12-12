@@ -1,12 +1,15 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
-import Image from 'next/image';
-import dynamic from 'next/dynamic';
+import Image from "next/image";
+import dynamic from "next/dynamic";
 
 // Replace static import with dynamic import
-const LocationPicker = dynamic(() => import('../../components/LocationPicker'), {
-  ssr: false
-});
+const LocationPicker = dynamic(
+  () => import("../../components/LocationPicker"),
+  {
+    ssr: false,
+  }
+);
 
 // Define interfaces (unchanged)
 interface LocationData {
@@ -42,108 +45,119 @@ interface SocialMediaHandle {
 const LocationDetails: React.FC = () => {
   // State management (unchanged)
   const [address, setAddress] = useState<AddressState>({
-    streetAddress: '',
-    city: '',
-    state: '',
-    pinCode: ''
+    streetAddress: "",
+    city: "",
+    state: "",
+    pinCode: "",
   });
 
-  const [selectedLocation, setSelectedLocation] = useState<SelectedLocation | null>(null);
+  const [selectedLocation, setSelectedLocation] =
+    useState<SelectedLocation | null>(null);
 
   const [operatingHours, setOperatingHours] = useState<OperatingHours[]>([
-    { day: 'Monday', startTime: '', endTime: '' }
+    { day: "Monday", startTime: "", endTime: "" },
   ]);
 
-  const [socialMediaHandles, setSocialMediaHandles] = useState<SocialMediaHandle[]>([
-    { platform: 'Instagram', link: '' }
-  ]);
+  const [socialMediaHandles, setSocialMediaHandles] = useState<
+    SocialMediaHandle[]
+  >([{ platform: "Instagram", link: "" }]);
 
   // All previous handler methods remain the same
 
   const handleLocationSelect = (locationData: LocationData) => {
-    const addressParts = locationData.address.split(',');
+    const addressParts = locationData.address.split(",");
 
     setAddress({
-      streetAddress: addressParts[0] || '',
-      city: addressParts[1] || '',
-      state: addressParts[2] || '',
-      pinCode: addressParts[3] || ''
+      streetAddress: addressParts[0] || "",
+      city: addressParts[1] || "",
+      state: addressParts[2] || "",
+      pinCode: addressParts[3] || "",
     });
 
     setSelectedLocation({
       latitude: locationData.lat,
       longitude: locationData.lng,
-      fullAddress: locationData.address
+      fullAddress: locationData.address,
     });
   };
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setAddress(prev => ({
+    setAddress((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const addOperatingHours = () => {
-    setOperatingHours(prev => [
+    setOperatingHours((prev) => [
       ...prev,
-      { day: 'Monday', startTime: '', endTime: '' }
+      { day: "Monday", startTime: "", endTime: "" },
     ]);
   };
 
-  const handleOperatingHoursChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleOperatingHoursChange = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     const newOperatingHours = [...operatingHours];
     newOperatingHours[index] = {
       ...newOperatingHours[index],
-      [name]: value
+      [name]: value,
     };
     setOperatingHours(newOperatingHours);
   };
 
   const addSocialMediaHandle = () => {
-    setSocialMediaHandles(prev => [
+    setSocialMediaHandles((prev) => [
       ...prev,
-      { platform: 'Instagram', link: '' }
+      { platform: "Instagram", link: "" },
     ]);
   };
 
-  const handleSocialMediaChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleSocialMediaChange = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     const newSocialMediaHandles = [...socialMediaHandles];
     newSocialMediaHandles[index] = {
       ...newSocialMediaHandles[index],
-      [name]: value
+      [name]: value,
     };
     setSocialMediaHandles(newSocialMediaHandles);
   };
 
   const handleNavigation = (url: string) => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       window.location.href = url;
     }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Submitted Data:', {
+    console.log("Submitted Data:", {
       address,
       operatingHours,
-      socialMediaHandles
+      socialMediaHandles,
     });
 
-    if (typeof window !== 'undefined') {
-      window.location.href = '/signup/3';
+    if (typeof window !== "undefined") {
+      window.location.href = "/signup/3";
     }
   };
 
   const removeOperatingHours = (indexToRemove: number) => {
-    setOperatingHours(prev => prev.filter((_, index) => index !== indexToRemove));
+    setOperatingHours((prev) =>
+      prev.filter((_, index) => index !== indexToRemove)
+    );
   };
 
   const removeSocialMediaHandle = (indexToRemove: number) => {
-    setSocialMediaHandles(prev => prev.filter((_, index) => index !== indexToRemove));
+    setSocialMediaHandles((prev) =>
+      prev.filter((_, index) => index !== indexToRemove)
+    );
   };
 
   return (
@@ -161,24 +175,24 @@ const LocationDetails: React.FC = () => {
         </div>
         <div className="flex items-center">
           <div className="flex justify-center items-center space-x-2">
-            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-black rounded-full flex items-center justify-center">
-              <h1 className='text-white text-center text-sm sm:text-base'>1</h1>
+            <div className="w-9 sm:w-10 h-9 sm:h-10 bg-black rounded-full flex items-center justify-center">
+              <h1 className="text-white text-center text-sm sm:text-base">1</h1>
             </div>
             <div className="hidden sm:flex items-center">
               <div className="w-4 h-1 rounded-full bg-black mr-1"></div>
               <div className="w-8 h-1 rounded-full bg-black"></div>
               <div className="w-4 h-1 rounded-full bg-black ml-1"></div>
             </div>
-            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-black rounded-full flex items-center justify-center">
-              <h1 className='text-white text-center text-sm sm:text-base'>2</h1>
+            <div className="w-9 sm:w-10 h-9 sm:h-10 bg-black rounded-full flex items-center justify-center">
+              <h1 className="text-white text-center text-sm sm:text-base">2</h1>
             </div>
             <div className="hidden sm:flex items-center">
               <div className="w-4 h-1 rounded-full bg-gray-300 mr-1"></div>
               <div className="w-8 h-1 rounded-full bg-gray-300"></div>
               <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
             </div>
-            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gray-300 rounded-full flex items-center justify-center">
-              <h1 className='text-black text-center text-sm sm:text-base'>3</h1>
+            <div className="w-9 sm:w-10 h-9 sm:h-10 bg-gray-300 rounded-full flex items-center justify-center">
+              <h1 className="text-black text-center text-sm sm:text-base">3</h1>
             </div>
           </div>
         </div>
@@ -187,7 +201,10 @@ const LocationDetails: React.FC = () => {
       <hr className="border-gray-200" />
 
       {/* Responsive Form Container */}
-      <form onSubmit={handleSubmit} className="flex flex-col items-center w-full px-4 sm:px-8 md:px-16 lg:px-32 xl:px-44">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col items-center w-full px-4 sm:px-8 md:px-16 lg:px-32 xl:px-44"
+      >
         <div className="w-full bg-white rounded-md p-4 sm:p-6">
           {/* Header */}
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-800 mb-4 sm:mb-6">
@@ -208,7 +225,7 @@ const LocationDetails: React.FC = () => {
                 value={address.streetAddress}
                 onChange={handleAddressChange}
                 placeholder="Street Address"
-                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-[#303030]"
+                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
               />
               <input
                 type="text"
@@ -216,7 +233,7 @@ const LocationDetails: React.FC = () => {
                 value={address.city}
                 onChange={handleAddressChange}
                 placeholder="City/Town"
-                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-[#303030]"
+                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
               />
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -226,7 +243,7 @@ const LocationDetails: React.FC = () => {
                 value={address.state}
                 onChange={handleAddressChange}
                 placeholder="State"
-                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-[#303030]"
+                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
               />
               <input
                 type="text"
@@ -234,7 +251,7 @@ const LocationDetails: React.FC = () => {
                 value={address.pinCode}
                 onChange={handleAddressChange}
                 placeholder="Pin Code"
-                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-[#303030]"
+                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
               />
             </div>
 
@@ -276,10 +293,20 @@ const LocationDetails: React.FC = () => {
                   name="day"
                   value={hours.day}
                   onChange={(e) => handleOperatingHoursChange(index, e)}
-                  className="w-full sm:w-1/3 border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring focus:ring-[#303030]"
+                  className="w-full sm:w-1/3 border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring-1 focus:ring-[#303030]"
                 >
-                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
-                    <option key={day} value={day}>{day}</option>
+                  {[
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                    "Sunday",
+                  ].map((day) => (
+                    <option key={day} value={day}>
+                      {day}
+                    </option>
                   ))}
                 </select>
                 <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full">
@@ -288,14 +315,14 @@ const LocationDetails: React.FC = () => {
                     name="startTime"
                     value={hours.startTime}
                     onChange={(e) => handleOperatingHoursChange(index, e)}
-                    className="w-full border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring focus:ring-[#303030]"
+                    className="w-full border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring-1 focus:ring-[#303030]"
                   />
                   <input
                     type="time"
                     name="endTime"
                     value={hours.endTime}
                     onChange={(e) => handleOperatingHoursChange(index, e)}
-                    className="w-full border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring focus:ring-[#303030]"
+                    className="w-full border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring-1 focus:ring-[#303030]"
                   />
                   {operatingHours.length > 1 && (
                     <button
@@ -327,39 +354,47 @@ const LocationDetails: React.FC = () => {
             </div>
             {socialMediaHandles.map((handle, index) => (
               <div
-                key={index}
-                className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-2"
+              key={index}
+              className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-2"
+            >
+              <select
+                name="platform"
+                value={handle.platform}
+                onChange={(e) => handleSocialMediaChange(index, e)}
+                className="w-full sm:w-1/3 border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring-1 focus:ring-[#303030]"
               >
-                <select
-                  name="platform"
-                  value={handle.platform}
+                {[
+                  "Instagram",
+                  "Facebook",
+                  "Twitter",
+                  "LinkedIn",
+                  "Website",
+                ].map((platform) => (
+                  <option key={platform} value={platform}>
+                    {platform}
+                  </option>
+                ))}
+              </select>
+              <div className="flex items-center gap-2 w-full">
+                <input
+                  type="text"
+                  name="link"
+                  value={handle.link}
                   onChange={(e) => handleSocialMediaChange(index, e)}
-                  className="w-full sm:w-1/3 border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring focus:ring-[#303030]"
-                >
-                  {['Instagram', 'Facebook', 'Twitter', 'LinkedIn'].map(platform => (
-                    <option key={platform} value={platform}>{platform}</option>
-                  ))}
-                </select>
-                <div className="flex flex-1 gap-2">
-                  <input
-                    type="text"
-                    name="link"
-                    value={handle.link}
-                    onChange={(e) => handleSocialMediaChange(index, e)}
-                    placeholder="Profile link address"
-                    className="w-full border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring focus:ring-[#303030]"
-                  />
-                  {socialMediaHandles.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeSocialMediaHandle(index)}
-                      className="text-red-500 px-2 py-1 rounded-md hover:bg-red-50"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
+                  placeholder="Profile link address"
+                  className="flex-1 border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                />
+                {socialMediaHandles.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeSocialMediaHandle(index)}
+                    className="text-red-500 px-2 py-1 rounded-md hover:bg-red-50 flex-shrink-0"
+                  >
+                    Remove
+                  </button>
+                )}
               </div>
+            </div>
             ))}
           </div>
 
@@ -367,14 +402,14 @@ const LocationDetails: React.FC = () => {
           <div className="mt-8 flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0">
             <button
               type="button"
-              onClick={() => handleNavigation('/signup/1')}
-              className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md w-full sm:w-auto"
+              onClick={() => handleNavigation("/signup/1")}
+              className="w-full md:w-40 bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
             >
               &larr; Previous
             </button>
             <button
               type="submit"
-              className="bg-[#303030] text-white px-4 py-2 rounded-md w-full sm:w-auto"
+              className="w-full md:w-40 bg-[#303030] text-white font-bold px-4 py-2 rounded-md hover:bg-gray-800 transition-colors"
             >
               Next &rarr;
             </button>
@@ -385,11 +420,23 @@ const LocationDetails: React.FC = () => {
       <div className="bottom-0 px-4 py-4">
         <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
-            © 2024 <a href="https://gigwork.co.in/" className="hover:underline" target="_blank">Gigwork</a>. All rights reserved.
+            © 2024{" "}
+            <a
+              href="https://gigwork.co.in/"
+              className="hover:underline"
+              target="_blank"
+            >
+              Gigwork
+            </a>
+            . All rights reserved.
           </p>
           <div className="text-xs sm:text-sm text-gray-500 flex space-x-4">
-            <a href="/privacy" className="hover:underline">Privacy Policy</a>
-            <a href="/terms" className="hover:underline">Terms of Service</a>
+            <a href="/privacy" className="hover:underline">
+              Privacy Policy
+            </a>
+            <a href="/terms" className="hover:underline">
+              Terms of Service
+            </a>
           </div>
         </div>
       </div>
