@@ -126,7 +126,7 @@ const MediaAndBranding = () => {
         </div>
         <div className="flex items-center">
           <div className="flex justify-center items-center space-x-2">
-            <div className="w-12 sm:w-14 h-12 sm:h-14 bg-black rounded-full flex items-center justify-center">
+            <div className="w-9 sm:w-10 h-9 sm:h-10 bg-black rounded-full flex items-center justify-center">
               <h1 className="text-white text-center text-sm sm:text-base">1</h1>
             </div>
             <div className="hidden sm:flex items-center">
@@ -134,7 +134,7 @@ const MediaAndBranding = () => {
               <div className="w-8 h-1 rounded-full bg-gray-300"></div>
               <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
             </div>
-              <div className="w-12 sm:w-14 h-12 sm:h-14 bg-gray-300 rounded-full flex items-center justify-center">
+              <div className="w-9 sm:w-10 h-9 sm:h-10 bg-gray-300 rounded-full flex items-center justify-center">
               <h1 className="text-black text-center text-sm sm:text-base">2</h1>
             </div>
             <div className="hidden sm:flex items-center">
@@ -142,7 +142,7 @@ const MediaAndBranding = () => {
               <div className="w-8 h-1 rounded-full bg-gray-300"></div>
               <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
             </div>
-            <div className="w-12 sm:w-14 h-12 sm:h-14 bg-gray-300 rounded-full flex items-center justify-center">
+            <div className="w-9 sm:w-10 h-9 sm:h-10 bg-gray-300 rounded-full flex items-center justify-center">
               <h1 className="text-black text-center text-sm sm:text-base">3</h1>
             </div>
           </div>
@@ -223,6 +223,7 @@ const MediaAndBranding = () => {
           {/* Description and Business Type Row */}
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="w-full lg:w-1/2">
+              <label className="block text-base sm:text-xl font-bold pb-2 text-gray-700">Bussiness Description</label>
               <textarea
                 name="businessDescription"
                 placeholder="Describe your business briefly"
@@ -230,6 +231,7 @@ const MediaAndBranding = () => {
               />
             </div>
             <div className="w-full lg:w-1/2">
+            <label className="block text-base sm:text-xl font-bold pb-2 text-gray-700">Bussiness Type</label>
               <select
                 name="businessType"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
@@ -265,7 +267,7 @@ const MediaAndBranding = () => {
 
           {/* Website and Email Row */}
           <div className="flex flex-col lg:flex-row gap-4">
-            <div className="w-full lg:w-1/2">
+            {/* <div className="w-full lg:w-1/2">
               {renderFormField(
                 "websiteURL",
                 "Website Link",
@@ -273,8 +275,8 @@ const MediaAndBranding = () => {
                 "Enter your website URL (optional)",
                 false
               )}
-            </div>
-            <div className="w-full lg:w-1/2">
+            </div> */}
+            <div className="w-full lg:w-1/2 lg:pr-2">
               {renderFormField(
                 "emailAddress",
                 "Email Address",
@@ -288,7 +290,7 @@ const MediaAndBranding = () => {
             <button
               type="submit"
               onClick={() => (window.location.href = "/signup/2")}
-              className="bg-[#303030] text-white px-6 py-2 rounded-md w-full sm:w-auto"
+              className="w-full md:w-40 bg-[#303030] text-white font-bold px-4 py-2 rounded-md hover:bg-gray-800 transition-colors"
             >
               Next &rarr;
             </button>
