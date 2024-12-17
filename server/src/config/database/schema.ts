@@ -1,4 +1,5 @@
 
+import { nanoid } from 'nanoid'
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
@@ -17,52 +18,52 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 // Users
 export const users = sqliteTable('users', {
-    id: integer().primaryKey(),
+    id: text().primaryKey().$default(nanoid),
     name: text().notNull(),
     phone: text().notNull(),
     // role_id: integer().notNull().references(() => userRoles.id),
     role: text().$type('ENUM', ['admin', 'partner', 'business_owner', 'user']),
     status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
 // Business Category
 export const businessCategory = sqliteTable('business_category', {
-    id: integer().primaryKey(),
+    id: text().primaryKey().$default(nanoid),
     name: text().notNull(),
     status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
 // Business Sub Category
 export const businessSubCategory = sqliteTable('business_sub_category', {
-    id: integer().primaryKey(),
+    id: text().primaryKey().$default(nanoid),
     name: text().notNull(),
     category_id: integer().notNull().references(() => businessCategory.id),
     status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
 // Business Sub Category Options
 export const businessSubCategoryOptions = sqliteTable('business_sub_category_options', {
-    id: integer().primaryKey(),
+    id: text().primaryKey().$default(nanoid),
     name: text().notNull(),
     sub_category_id: integer().notNull().references(() => businessSubCategory.id),
     status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
 // Business table
 export const business = sqliteTable('business', {
-    id: integer().primaryKey(),
+    id: text().primaryKey().$default(nanoid),
     owner_id: integer().notNull().references(() => users.id),
     
     // Basic Info
@@ -101,14 +102,14 @@ export const business = sqliteTable('business', {
     additional_services: text(),
 
     status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
 // Profile Payment
 export const profilePayment = sqliteTable('profile_payment', {
-    id: integer().primaryKey(),
+    id: text().primaryKey().$default(nanoid),
     business_id: integer().notNull().references(() => business.id),
 
     amount: integer().notNull(),
@@ -118,38 +119,38 @@ export const profilePayment = sqliteTable('profile_payment', {
     payment_date: text().notNull(),
     
     status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
 // Business Media
 export const businessMedia = sqliteTable('business_media', {
-    id: integer().primaryKey(),
+    id: text().primaryKey().$default(nanoid),
     business_id: integer().notNull().references(() => business.id),
     url: text().notNull(),
     description: text(),
     status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
 // Testimonial
 export const testimonial = sqliteTable('testimonial', {
-    id: integer().primaryKey(),
+    id: text().primaryKey().$default(nanoid),
     business_id: integer().notNull().references(() => business.id),
     user_id: integer().notNull().references(() => users.id),
     rating: integer().notNull(),
     status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
 // Business License
 export const businessLicense = sqliteTable('business_license', {
-    id: integer().primaryKey(),
+    id: text().primaryKey().$default(nanoid),
     business_id: integer().notNull().references(() => business.id),
     name: text().notNull(),
     description: text(),
@@ -157,8 +158,8 @@ export const businessLicense = sqliteTable('business_license', {
     issue_date: text().notNull(),
     expiry_date: text().notNull(),
     status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
@@ -169,20 +170,20 @@ export const businessLicense = sqliteTable('business_license', {
 
 // Keywords
 export const keywords = sqliteTable('keywords', {
-    id: integer().primaryKey(),
+    id: text().primaryKey().$default(nanoid),
     name: text().notNull(),
     status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
 // Business Keywords
 export const businessKeywords = sqliteTable('business_keywords', {
-    id: integer().primaryKey(),
+    id: text().primaryKey().$default(nanoid),
     business_id: integer().notNull().references(() => business.id),
     keyword_id: integer().notNull().references(() => keywords.id),
     status: integer().default(1),
-    created_at: text().default(sql('CURRENT_TIMESTAMP')),
-    updated_at: text().default(sql('CURRENT_TIMESTAMP')),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });

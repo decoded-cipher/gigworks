@@ -8,8 +8,8 @@ import apiRouter from './routes/api';
 import authRouter from './routes/auth';
 
 type Bindings = {
-    DATABASE_URL: process.env.DATABASE_URL;
-    DATABASE_AUTH_TOKEN: process.env.DATABASE_AUTH_TOKEN;
+    DATABASE_URL : string,
+    DATABASE_AUTH_TOKEN : string
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
