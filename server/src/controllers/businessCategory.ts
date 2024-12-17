@@ -1,5 +1,5 @@
 
-import { count, sql } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import { db } from '../config/database/connection';
 import { businessCategory } from '../config/database/schema';
 
@@ -87,11 +87,13 @@ export const updateBusinessCategory = async (id: string, name: string) => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            // SQL Query : UPDATE business_category SET name = name WHERE id = id RETURNING *
+            // SQL Query : UPDATE business_category SET name = name, updated_at = NOW() WHERE id = id RETURNING *
 
-            const result = await db.update(businessCategory).set({ name }).where({ id }).returning();
-            console.log('result', result);
-            debugger
+            const result = await db
+                .update(businessCategory)
+                .set({ name, updated_at: sql`(CURRENT_TIMESTAMP)` })
+                .where(eq(businessCategory.id, id))
+                .returning();
             
             const category = result[0];
 
@@ -111,7 +113,10 @@ export const deleteBusinessCategory = async (id: string) => {
 
             // SQL Query : UPDATE business_category SET status = 0 WHERE id = id
 
-            await db.update(businessCategory).set({ status: 0 }).where({ id });
+            await db
+                .update(businessCategory)
+                .set({ status: 0, updated_at: sql`(CURRENT_TIMESTAMP)` })
+                .where(eq(businessCategory.id, id));
 
             // Todo : After deleting the category, we need to soft delete all the sub categories and sub category options associated with this category
 

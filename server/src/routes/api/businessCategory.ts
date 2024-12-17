@@ -6,7 +6,8 @@ import {
     createBusinessCategory,
     getBusinessCategories,
     getBusinessCategoryById,
-    updateBusinessCategory
+    updateBusinessCategory,
+    deleteBusinessCategory
 } from '../../controllers/businessCategory';
 
 
@@ -74,22 +75,29 @@ router.get('/', async (c) => {
 
         const result = await getBusinessCategories(page, limit, search);
 
-        return c.json({
-            status: 200,
-            message: 'Business categories fetched successfully',
-            data: {
-                categories: result.data,
-                meta: {
-                    page: page,
-                    limit: limit,
-                    search: search,
-                    total_count: result.count,
-                    total_pages: Math.ceil(result.count / limit),
-                    previous: page > 1 ? `/api/v1/business_category?page=${page - 1}&limit=${limit}` : null,
-                    next: result.data.length === limit ? `/api/v1/business_category?page=${page + 1}&limit=${limit}` : null
+        if (result.data.length > 0) {
+            return c.json({
+                status: 200,
+                message: 'Business categories fetched successfully',
+                data: {
+                    categories: result.data,
+                    meta: {
+                        page: page,
+                        limit: limit,
+                        search: search,
+                        total_count: result.count,
+                        total_pages: Math.ceil(result.count / limit),
+                        previous: page > 1 ? `/api/v1/business_category?page=${page - 1}&limit=${limit}` : null,
+                        next: result.data.length === limit ? `/api/v1/business_category?page=${page + 1}&limit=${limit}` : null
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            return c.json({
+                status: 404,
+                message: 'Business categories not found'
+            });
+        }
 
     } catch (error) {
         return c.json({
@@ -119,11 +127,19 @@ router.get('/:id', async (c) => {
 
     try {
         const category = await getBusinessCategoryById(id);
-        return c.json({
-            status: 200,
-            message: 'Business category fetched successfully',
-            data: category
-        });
+
+        if (category) {
+            return c.json({
+                status: 200,
+                message: 'Business category fetched successfully',
+                data: category
+            });
+        } else {
+            return c.json({
+                status: 404,
+                message: 'Business category not found'
+            });
+        }
 
     } catch (error) {
         return c.json({
@@ -161,10 +177,51 @@ router.patch('/:id', async (c) => {
 
     try {
         const category = await updateBusinessCategory(id, name);
+
+        if (category) {
+            return c.json({
+                status: 200,
+                message: 'Business category updated successfully',
+                data: category
+            });
+        } else {
+            return c.json({
+                status: 404,
+                message: 'Business category not found'
+            });
+        }
+
+    } catch (error) {
+        return c.json({
+            status: 500,
+            message: 'Internal Server Error',
+            error: error.message
+        });
+    }
+});
+
+
+
+/**
+ * @route   DELETE /api/v1/business_category/:id
+ * @desc    Delete a business_category
+ * @access  Public
+ * @params  id
+ * @return  message, data
+ * @error   400, { error }
+ * @status  200, 400
+ * 
+ * @example /api/v1/business_category/1
+ **/
+
+router.delete('/:id', async (c) => {
+    const { id } = c.req.param();
+
+    try {
+        await deleteBusinessCategory(id);
         return c.json({
             status: 200,
-            message: 'Business category updated successfully',
-            data: category
+            message: 'Business category deleted successfully',
         });
 
     } catch (error) {
