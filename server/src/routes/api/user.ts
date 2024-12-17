@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
 import { db } from '../../config/database/connection';
-import { users } from '../../config/database/schema';
+import { user } from '../../config/database/schema';
 
 const userRouter = new Hono();
 
 userRouter.get('/', async (c) => {
-    const allUsers = await db.select().from(users);
+    const allUsers = await db.select().from(user);
     return c.json({
         status: 200,
         message: 'All users fetched successfully',

@@ -1,13 +1,13 @@
 import { Hono } from 'hono';
 
 import userRouter from './user';
-import businessRouter from './business';
-import businessCategoryRouter from './businessCategory';
+import categoryRouter from './category';
+import subCategoryRouter from './subCategory';
 
 const apiRouter = new Hono();
 
 apiRouter.route('/user', userRouter);
-apiRouter.route('/business', businessRouter);
-apiRouter.route('/business_category', businessCategoryRouter);
+apiRouter.route('/category', categoryRouter);
+apiRouter.route('/sub_category', subCategoryRouter);
 
 export default apiRouter;

@@ -16,21 +16,26 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 // });
 
 
-// Users
-export const users = sqliteTable('users', {
+// User
+export const user = sqliteTable('user', {
     id: text().primaryKey().$default(nanoid),
     name: text().notNull(),
     phone: text().notNull(),
     // role_id: integer().notNull().references(() => userRoles.id),
-    role: text().$type('ENUM', ['admin', 'partner', 'business_owner', 'user']),
+    role: text().$type('ENUM', ['admin', 'partner', 'user']).default('user'),
     status: integer().default(1),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
-// Business Category
-export const businessCategory = sqliteTable('business_category', {
+
+// ------------------------------------------------------------------------------------------------------
+
+
+
+// Category
+export const category = sqliteTable('category', {
     id: text().primaryKey().$default(nanoid),
     name: text().notNull(),
     status: integer().default(1),
@@ -39,32 +44,37 @@ export const businessCategory = sqliteTable('business_category', {
 });
 
 
-// Business Sub Category
-export const businessSubCategory = sqliteTable('business_sub_category', {
+// Sub Category
+export const subCategory = sqliteTable('sub_category', {
     id: text().primaryKey().$default(nanoid),
     name: text().notNull(),
-    category_id: integer().notNull().references(() => businessCategory.id),
+    category_id: integer().notNull().references(() => category.id),
     status: integer().default(1),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
-// Business Sub Category Options
-export const businessSubCategoryOptions = sqliteTable('business_sub_category_options', {
+// Sub Category Option
+export const subCategoryOption = sqliteTable('sub_category_option', {
     id: text().primaryKey().$default(nanoid),
     name: text().notNull(),
-    sub_category_id: integer().notNull().references(() => businessSubCategory.id),
+    sub_category_id: integer().notNull().references(() => subCategory.id),
     status: integer().default(1),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
-// Business table
-export const business = sqliteTable('business', {
+
+// ------------------------------------------------------------------------------------------------------
+
+
+
+// Profile
+export const profile = sqliteTable('profile', {
     id: text().primaryKey().$default(nanoid),
-    owner_id: integer().notNull().references(() => users.id),
+    owner_id: integer().notNull().references(() => user.id),
     
     // Basic Info
     name: text().notNull(),
@@ -77,12 +87,12 @@ export const business = sqliteTable('business', {
     registration_number: text(),
     gstin: text(),
 
-    // Business Category
-    category_id: integer().notNull().references(() => businessCategory.id),
-    sub_category_id: integer().notNull().references(() => businessSubCategory.id),
-    sub_category_option_id: integer().notNull().references(() => businessSubCategoryOptions.id),
+    // Category
+    category_id: integer().notNull().references(() => category.id),
+    sub_category_id: integer().notNull().references(() => subCategory.id),
+    sub_category_option_id: integer().notNull().references(() => subCategoryOption.id),
 
-    // Business Location
+    // Location
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
@@ -97,8 +107,8 @@ export const business = sqliteTable('business', {
     youtube: text(),
 
     // Additional details
-    business_logo: text(),
-    business_type: text().$type('ENUM', ['online', 'offline', 'hybrid']).notNull(),
+    logo: text(),
+    type: text().$type('ENUM', ['online', 'offline', 'hybrid']).notNull(),
     additional_services: text(),
 
     status: integer().default(1),
@@ -110,7 +120,7 @@ export const business = sqliteTable('business', {
 // Profile Payment
 export const profilePayment = sqliteTable('profile_payment', {
     id: text().primaryKey().$default(nanoid),
-    business_id: integer().notNull().references(() => business.id),
+    profile_id: integer().notNull().references(() => profile.id),
 
     amount: integer().notNull(),
     payment_mode: text().notNull().$type('ENUM', ['cash', 'debit_card', 'credit_card', 'net_banking', 'upi', 'wallet']),
@@ -124,10 +134,10 @@ export const profilePayment = sqliteTable('profile_payment', {
 });
 
 
-// Business Media
-export const businessMedia = sqliteTable('business_media', {
+// Profile Media
+export const profileMedia = sqliteTable('profile_media', {
     id: text().primaryKey().$default(nanoid),
-    business_id: integer().notNull().references(() => business.id),
+    profile_id: integer().notNull().references(() => profile.id),
     url: text().notNull(),
     description: text(),
     status: integer().default(1),
@@ -136,24 +146,27 @@ export const businessMedia = sqliteTable('business_media', {
 });
 
 
-// Testimonial
-export const testimonial = sqliteTable('testimonial', {
+
+// ------------------------------------------------------------------------------------------------------
+
+
+
+// License Type
+export const licenseType = sqliteTable('license_type', {
     id: text().primaryKey().$default(nanoid),
-    business_id: integer().notNull().references(() => business.id),
-    user_id: integer().notNull().references(() => users.id),
-    rating: integer().notNull(),
+    name: text().notNull(),
+    description: text(),
     status: integer().default(1),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 
-// Business License
-export const businessLicense = sqliteTable('business_license', {
+// Profile License
+export const profileLicense = sqliteTable('profile_license', {
     id: text().primaryKey().$default(nanoid),
-    business_id: integer().notNull().references(() => business.id),
-    name: text().notNull(),
-    description: text(),
+    profile_id: integer().notNull().references(() => profile.id),
+    license_type_id: integer().notNull().references(() => licenseType.id),
     license_number: text().notNull(),
     issue_date: text().notNull(),
     expiry_date: text().notNull(),
@@ -168,8 +181,8 @@ export const businessLicense = sqliteTable('business_license', {
 
 
 
-// Keywords
-export const keywords = sqliteTable('keywords', {
+// Tags
+export const tags = sqliteTable('tag', {
     id: text().primaryKey().$default(nanoid),
     name: text().notNull(),
     status: integer().default(1),
@@ -178,11 +191,27 @@ export const keywords = sqliteTable('keywords', {
 });
 
 
-// Business Keywords
-export const businessKeywords = sqliteTable('business_keywords', {
+// Profile Tags
+export const profileTags = sqliteTable('profile_tag', {
     id: text().primaryKey().$default(nanoid),
-    business_id: integer().notNull().references(() => business.id),
-    keyword_id: integer().notNull().references(() => keywords.id),
+    profile_id: integer().notNull().references(() => profile.id),
+    tag_id: integer().notNull().references(() => tags.id),
+    status: integer().default(1),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
+});
+
+
+
+// ------------------------------------------------------------------------------------------------------
+
+
+// Testimonial
+export const testimonial = sqliteTable('testimonial', {
+    id: text().primaryKey().$default(nanoid),
+    profile_id: integer().notNull().references(() => profile.id),
+    user_id: integer().notNull().references(() => user.id),
+    rating: integer().notNull(),
     status: integer().default(1),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)

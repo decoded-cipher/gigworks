@@ -3,43 +3,43 @@ import { Hono } from 'hono';
 const router = new Hono();
 
 import {
-    createBusinessCategory,
-    getBusinessCategories,
-    getBusinessCategoryById,
-    updateBusinessCategory,
-    deleteBusinessCategory
-} from '../../controllers/businessCategory';
+    createSubCategory,
+    getCategories,
+    getSubCategoryById,
+    updateSubCategory,
+    deleteSubCategory
+} from '../../controllers/subCategory';
 
 
 
 /**
- * @route   POST /api/v1/business_category
- * @desc    Create a new business_category
+ * @route   POST /api/v1/sub_category
+ * @desc    Create a new sub_category
  * @access  Public
  * @params  name
  * @return  message, data
  * @error   400, { error }
  * @status  200, 400
  *
- * @example /api/v1/business_category
+ * @example /api/v1/sub_category
  **/
 
 router.post('/', async (c) => {
-    const { name } = await c.req.json();
+    const { name, category_id } = await c.req.json();
 
-    if (!name) {
+    if (!name || !category_id) {
         return c.json({
             status: 400,
-            message: 'All fields are required'
+            message: 'Name and Category ID are required'
         });
     }
 
     try {
-        const category = await createBusinessCategory(name);
+        const sub_category = await createSubCategory(name, category_id);
         return c.json({
             status: 201,
-            message: 'Business category created successfully',
-            data: category
+            message: 'Sub category created successfully',
+            // data: sub_category
         });
 
     } catch (error) {
@@ -54,15 +54,15 @@ router.post('/', async (c) => {
 
 
 /**
- * @route   GET /api/v1/business_category
- * @desc    Get all business_category with pagination
+ * @route   GET /api/v1/sub_category
+ * @desc    Get all sub_category with pagination
  * @access  Public
  * @params  void
  * @return  message, data
  * @error   400, { error }
  * @status  200, 400
  *
- * @example /api/v1/business_category?page=1&limit=10
+ * @example /api/v1/sub_category?page=1&limit=10
  **/
 
 router.get('/', async (c) => {
@@ -73,29 +73,29 @@ router.get('/', async (c) => {
 
     try {
 
-        const result = await getBusinessCategories(page, limit, search);
+        const result = await getCategories(page, limit, search);
 
         if (result.data.length > 0) {
             return c.json({
                 status: 200,
-                message: 'Business categories fetched successfully',
+                message: 'Sub categories fetched successfully',
                 data: {
-                    categories: result.data,
+                    sub_categories: result.data,
                     meta: {
                         page: page,
                         limit: limit,
                         search: search,
                         total_count: result.count,
                         total_pages: Math.ceil(result.count / limit),
-                        previous: page > 1 ? `/api/v1/business_category?page=${page - 1}&limit=${limit}` : null,
-                        next: result.data.length === limit ? `/api/v1/business_category?page=${page + 1}&limit=${limit}` : null
+                        previous: page > 1 ? `/api/v1/sub_category?page=${page - 1}&limit=${limit}` : null,
+                        next: result.data.length === limit ? `/api/v1/sub_category?page=${page + 1}&limit=${limit}` : null
                     }
                 }
             });
         } else {
             return c.json({
                 status: 404,
-                message: 'Business categories not found'
+                message: 'Sub categories not found'
             });
         }
 
@@ -111,33 +111,33 @@ router.get('/', async (c) => {
 
 
 /**
- * @route   GET /api/v1/business_category/:id
- * @desc    Get a business_category by id
+ * @route   GET /api/v1/sub_category/:id
+ * @desc    Get a sub_category by id
  * @access  Public
  * @params  id
  * @return  message, data
  * @error   400, { error }
  * @status  200, 400
  * 
- * @example /api/v1/business_category/1
+ * @example /api/v1/sub_category/1
  **/
 
 router.get('/:id', async (c) => {
     const { id } = c.req.param();
 
     try {
-        const category = await getBusinessCategoryById(id);
+        const sub_category = await getSubCategoryById(id);
 
-        if (category) {
+        if (sub_category) {
             return c.json({
                 status: 200,
-                message: 'Business category fetched successfully',
-                data: category
+                message: 'Sub category fetched successfully',
+                data: sub_category
             });
         } else {
             return c.json({
                 status: 404,
-                message: 'Business category not found'
+                message: 'Sub category not found'
             });
         }
 
@@ -153,15 +153,15 @@ router.get('/:id', async (c) => {
 
 
 /**
- * @route   PATCH /api/v1/business_category/:id
- * @desc    Update a business_category
+ * @route   PATCH /api/v1/sub_category/:id
+ * @desc    Update a sub_category
  * @access  Public
  * @params  id, name
  * @return  message, data
  * @error   400, { error }
  * @status  200, 400
  * 
- * @example /api/v1/business_category/1
+ * @example /api/v1/sub_category/1
  **/
 
 router.patch('/:id', async (c) => {
@@ -176,18 +176,18 @@ router.patch('/:id', async (c) => {
     }
 
     try {
-        const category = await updateBusinessCategory(id, name);
+        const sub_category = await updateSubCategory(id, name);
 
-        if (category) {
+        if (sub_category) {
             return c.json({
                 status: 200,
-                message: 'Business category updated successfully',
-                data: category
+                message: 'Sub category updated successfully',
+                data: sub_category
             });
         } else {
             return c.json({
                 status: 404,
-                message: 'Business category not found'
+                message: 'Sub category not found'
             });
         }
 
@@ -203,25 +203,25 @@ router.patch('/:id', async (c) => {
 
 
 /**
- * @route   DELETE /api/v1/business_category/:id
- * @desc    Delete a business_category
+ * @route   DELETE /api/v1/sub_category/:id
+ * @desc    Delete a sub_category
  * @access  Public
  * @params  id
  * @return  message, data
  * @error   400, { error }
  * @status  200, 400
  * 
- * @example /api/v1/business_category/1
+ * @example /api/v1/sub_category/1
  **/
 
 router.delete('/:id', async (c) => {
     const { id } = c.req.param();
 
     try {
-        await deleteBusinessCategory(id);
+        await deleteSubCategory(id);
         return c.json({
             status: 200,
-            message: 'Business category deleted successfully',
+            message: 'Sub category deleted successfully',
         });
 
     } catch (error) {
