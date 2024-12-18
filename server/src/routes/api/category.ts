@@ -8,7 +8,7 @@ import {
     getCategoryById,
     updateCategory,
     enableDisableCategory
-} from '../../controllers/category';
+} from '../../services/category';
 import { subCategory } from '../../config/database/schema';
 
 

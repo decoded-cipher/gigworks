@@ -56,14 +56,14 @@ export const subCategory = sqliteTable('sub_category', {
 
 
 // Sub Category Option
-export const subCategoryOption = sqliteTable('sub_category_option', {
-    id: text().primaryKey().$default(nanoid),
-    name: text().notNull(),
-    sub_category_id: integer().notNull().references(() => subCategory.id),
-    status: integer().default(1),
-    created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
-    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
-});
+// export const subCategoryOption = sqliteTable('sub_category_option', {
+//     id: text().primaryKey().$default(nanoid),
+//     name: text().notNull(),
+//     sub_category_id: integer().notNull().references(() => subCategory.id),
+//     status: integer().default(1),
+//     created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
+//     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`)
+// });
 
 
 
@@ -90,7 +90,7 @@ export const profile = sqliteTable('profile', {
     // Category
     category_id: integer().notNull().references(() => category.id),
     sub_category_id: integer().notNull().references(() => subCategory.id),
-    sub_category_option_id: integer().notNull().references(() => subCategoryOption.id),
+    // sub_category_option_id: integer().notNull().references(() => subCategoryOption.id),
 
     // Location
     address: text().notNull(),

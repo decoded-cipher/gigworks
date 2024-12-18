@@ -8,7 +8,7 @@ import {
     getSubCategoryById,
     updateSubCategory,
     deleteSubCategory
-} from '../../controllers/subCategory';
+} from '../../services/subCategory';
 
 
 
