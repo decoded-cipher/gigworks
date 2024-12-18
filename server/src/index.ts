@@ -8,8 +8,8 @@ import apiRouter from './routes/api';
 import authRouter from './routes/auth';
 
 type Bindings = {
-    DATABASE_URL : string,
-    DATABASE_AUTH_TOKEN : string
+    TURSO_URL : string,
+    TURSO_AUTH_TOKEN : string
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
