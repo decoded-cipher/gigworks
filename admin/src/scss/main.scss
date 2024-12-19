@@ -1,0 +1,73 @@
+
+@font-face {
+    font-family: 'CircularStd';
+    src: url('../fonts/CircularStd-Book.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap');
+
+// @font-face {
+//     font-family: "CircularStd";
+//     src: local("CircularStd"),
+//         url(@/fonts/CircularStd-Bold.otf) format("truetype");
+//     font-weight: bold;
+// }
+
+// @font-face {
+//     font-family: "CircularStd";
+//     src: local("CircularStd"),
+//         url(@/fonts/CircularStd-Black.otf) format("truetype");
+//     font-weight: 900;
+// }
+
+// @font-face {
+//     font-family: "CircularStd";
+//     src: local("CircularStd"),
+//         url(@/fonts/CircularStd-Medium.otf) format("truetype");
+//     font-weight: 500;
+// }
+
+// @font-face {
+//     font-family: "CircularStd";
+//     src: local("CircularStd"),
+//         url(@/fonts/CircularStd-BookItalic.otf) format("truetype");
+//     font-style: italic;
+// }
+
+// @font-face {
+//     font-family: "CircularStd";
+//     src: local("CircularStd"),
+//         url(@/fonts/CircularStd-BoldItalic.otf) format("truetype");
+//     font-weight: bold;
+//     font-style: italic;
+// }
+
+// @font-face {
+//     font-family: "CircularStd";
+//     src: local("CircularStd"),
+//         url(@/fonts/CircularStd-BlackItalic.otf) format("truetype");
+//     font-weight: 900;
+//     font-style: italic;
+// }
+
+// @font-face {
+//     font-family: "CircularStd";
+//     src: local("CircularStd"),
+//         url(@/fonts/CircularStd-MediumItalic.otf) format("truetype");
+//     font-weight: 500;
+//     font-style: italic;
+// }
+
+
+* {
+    font-family: "CircularStd", sans-serif;
+}
+
+.malayalam-font {
+    font-family: 'Noto Sans Malayalam', sans-serif;
+}
+
+// ------------------------------ Global SCSS ------------------------------
+
