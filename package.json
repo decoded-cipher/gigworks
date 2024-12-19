@@ -1,0 +1,19 @@
+{
+  "name": "gigworks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "devDependencies": {
+    "gulp-run": "^1.7.1",
+    "gulp-shell": "^0.8.0"
+  },
+  "scripts": {
+    "start": "gulp start",
+    "stop": "gulp stop"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "gulp": "^5.0.0"
+  }
+}

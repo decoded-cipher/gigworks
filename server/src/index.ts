@@ -7,8 +7,12 @@ dotenv.config();
 import apiRouter from './routes/api';
 import authRouter from './routes/auth';
 
-const app = new Hono();
+type Bindings = {
+    TURSO_URL : string,
+    TURSO_AUTH_TOKEN : string
+};
 
+const app = new Hono<{ Bindings: Bindings }>();
 
 app.route('/api/v1', apiRouter);
 app.route('/auth', authRouter);
