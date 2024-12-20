@@ -4,6 +4,7 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
 ## Platforms
 - **Web App**: [https://gigworks-client.pages.dev](https://gigworks-client.pages.dev)
 - **Backend API**: [https://gigworks-server.devmorphix.workers.dev](https://gigworks-server.devmorphix.workers.dev)
+- **Admin Panel**: [https://gigworks-admin.pages.dev](https://gigworks-admin.pages.dev)
 - **Blog**: [Coming Soon](#)
 - **Proxy Server**: [https://gigworks.devmorphix.workers.dev](https://gigworks-proxy.devmorphix.workers.dev)
 
@@ -12,12 +13,14 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
 The proxy server routes requests based on the URL path:
 
 - Requests starting with `/api` are proxied to the API server.
+- Requests starting with `/admin` are proxied to the admin server.
 - Requests starting with `/blog` are proxied to the blog server.
 - All other requests are proxied to the client website.
 
 ## Example
 
 - Access the Web App: [https://gigworks.devmorphix.workers.dev](https://gigworks.devmorphix.workers.dev)
+- Access the Admin Panel: [https://gigworks.devmorphix.workers.dev/admin](https://gigworks.devmorphix.workers.dev/admin)
 - Access the Backend API: [https://gigworks.devmorphix.workers.dev/api](https://gigworks.devmorphix.workers.dev/api)
 - Access the Blog: [https://gigworks.devmorphix.workers.dev/blog](https://gigworks.devmorphix.workers.dev/blog)
 
