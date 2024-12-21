@@ -19,7 +19,7 @@ import {
  * @params  name
  * @return  message, data
  * @error   400, { error }
- * @status  200, 400
+ * @status  201, 400
  *
  * @example /api/v1/sub_category
  **/
@@ -29,25 +29,22 @@ router.post('/', async (c) => {
 
     if (!name || !category_id) {
         return c.json({
-            status: 400,
             message: 'Name and Category ID are required'
-        });
+        }, 400);
     }
 
     try {
         const sub_category = await createSubCategory(name, category_id);
         return c.json({
-            status: 201,
             message: 'Sub category created successfully',
             // data: sub_category
-        });
+        }, 201);
 
     } catch (error) {
         return c.json({
-            status: 500,
             message: 'Internal Server Error',
             error: error.message
-        });
+        }, 500);
     }
 });
 
@@ -77,7 +74,6 @@ router.get('/', async (c) => {
 
         if (result.data.length > 0) {
             return c.json({
-                status: 200,
                 message: 'Sub categories fetched successfully',
                 data: {
                     sub_categories: result.data,
@@ -91,20 +87,18 @@ router.get('/', async (c) => {
                         next: result.data.length === limit ? `/api/v1/sub_category?page=${page + 1}&limit=${limit}` : null
                     }
                 }
-            });
+            }, 200);
         } else {
             return c.json({
-                status: 404,
                 message: 'Sub categories not found'
-            });
+            }, 404);
         }
 
     } catch (error) {
         return c.json({
-            status: 500,
             message: 'Internal Server Error',
             error: error.message
-        });
+        }, 500);
     }
 });
 
@@ -130,23 +124,20 @@ router.get('/:id', async (c) => {
 
         if (sub_category) {
             return c.json({
-                status: 200,
                 message: 'Sub category fetched successfully',
                 data: sub_category
-            });
+            }, 200);
         } else {
             return c.json({
-                status: 404,
                 message: 'Sub category not found'
-            });
+            }, 404);
         }
 
     } catch (error) {
         return c.json({
-            status: 500,
             message: 'Internal Server Error',
             error: error.message
-        });
+        }, 500);
     }
 });
 
@@ -170,9 +161,8 @@ router.patch('/:id', async (c) => {
 
     if (!name) {
         return c.json({
-            status: 400,
             message: 'All fields are required'
-        });
+        }, 400);
     }
 
     try {
@@ -180,23 +170,20 @@ router.patch('/:id', async (c) => {
 
         if (sub_category) {
             return c.json({
-                status: 200,
                 message: 'Sub category updated successfully',
                 data: sub_category
-            });
+            }, 200);
         } else {
             return c.json({
-                status: 404,
                 message: 'Sub category not found'
-            });
+            }, 404);
         }
 
     } catch (error) {
         return c.json({
-            status: 500,
             message: 'Internal Server Error',
             error: error.message
-        });
+        }, 500);
     }
 });
 
@@ -220,16 +207,14 @@ router.delete('/:id', async (c) => {
     try {
         await deleteSubCategory(id);
         return c.json({
-            status: 200,
             message: 'Sub category deleted successfully',
-        });
+        }, 200);
 
     } catch (error) {
         return c.json({
-            status: 500,
             message: 'Internal Server Error',
             error: error.message
-        });
+        }, 500);
     }
 });
 
