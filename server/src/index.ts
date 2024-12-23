@@ -11,7 +11,7 @@ import { requestId } from 'hono/request-id'
 import { secureHeaders } from 'hono/secure-headers'
 import { trimTrailingSlash } from 'hono/trailing-slash'
 
-import { activityLogger } from './middleware/activityLogger'
+// import { activityLogger } from './middleware/activityLogger'
 
 import apiRouter from './routes/api';
 import authRouter from './routes/auth';
@@ -23,6 +23,7 @@ type Bindings = {
     TURSO_AUTH_TOKEN : string,
     JWT_TOKEN_SECRET : string,
     JWT_TOKEN_EXPIRY : string,
+    KV_STORE: KVNamespace,
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -41,7 +42,7 @@ app.use('*', requestId());
 app.use(secureHeaders());
 app.use(trimTrailingSlash());
 
-app.use(activityLogger);
+// app.use(activityLogger);
 
 
 

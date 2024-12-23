@@ -6,15 +6,27 @@ import { timestamp } from 'drizzle-orm/mysql-core';
 
 
 
-// User Roles
-// export const userRoles = sqliteTable('user_roles', {
-//     id: integer().primaryKey(),
-//     name: text(),
-//     description: text(),
-//     status: integer().default(1),
-//     created_at: text().default(sql('CURRENT_TIMESTAMP')),
-//     updated_at: text().default(sql('CURRENT_TIMESTAMP')),
-// });
+// ------------------------------------------------------------------------------------------------------
+
+
+
+// Admin
+export const admin = sqliteTable('admin', {
+    id: text().primaryKey().$default(nanoid),
+    name: text().notNull(),
+    email: text().notNull().unique(),
+    password: text().notNull(),
+    role: integer().$type('ENUM', [1, 2]).default(2).notNull(), // 1: super admin, 2: admin
+    status: integer().default(1).notNull(),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
+}, (table) => {
+    return {
+        indexes: [
+            { columns: ['email'] }
+        ]
+    }
+});
 
 
 // User
@@ -22,9 +34,8 @@ export const user = sqliteTable('user', {
     id: text().primaryKey().$default(nanoid),
     name: text().notNull(),
     phone: text().notNull().unique(),
-    // role_id: integer().notNull().references(() => userRoles.id),
-    role: text().$type('ENUM', ['admin', 'partner', 'user']).default('user').notNull(),
-    status: integer().default(1).notNull(),
+    role: integer().$type('ENUM', [1, 2]).default(2).notNull(), // 1: partner, 2: profile (business owner)
+    status: integer().default(0).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
 }, (table) => {
@@ -32,6 +43,31 @@ export const user = sqliteTable('user', {
         indexes: [
             { columns: ['phone'] },
             { columns: ['role'] }
+        ]
+    }
+});
+
+
+export const tokenTable = sqliteTable('token', {
+    id: text().primaryKey().$default(nanoid),
+    
+    user_id: text().references(() => user.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    admin_id: text().references(() => admin.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    token: text().notNull().unique(),
+    expires_at: text().notNull(),
+    
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
+}, (table) => {
+    return {
+        indexes: [
+            { columns: ['admin_id'], unique: true },
+            { columns: ['user_id'], unique: true },
+            { columns: ['token'], unique: true },
+            { columns: ['expires_at'] }
+        ],
+        constraints: [
+            sql`CHECK (user_id IS NOT NULL OR admin_id IS NOT NULL)`
         ]
     }
 });
@@ -99,13 +135,107 @@ export const subCategoryOption = sqliteTable('sub_category_option', {
 
 
 
+// Partner
+export const partner = sqliteTable('partner', {
+    id: text().primaryKey().$default(nanoid),
+    user_id: text().notNull().references(() => user.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    avatar: text(),
+    referral_code: text().notNull().unique().$default(sql`
+        UPPER(SUBSTR(${user.name}, 1, 2)) || 
+        UPPER(SUBSTR(${user.phone}, 1, 2)) || 
+        UPPER(SUBSTR(HEX(RANDOMBLOB(1)), 1, 2)) || 
+        UPPER(SUBSTR(${user.phone}, -2))
+    `),
+
+    status: integer().default(1).notNull(),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
+}, (table) => {
+    return {
+        indexes: [
+            { columns: ['user_id'] },
+            { columns: ['referral_code'] }
+        ]
+    }
+});
+
+
+// Partner Payment Info
+export const partnerBank = sqliteTable('partner_bank', {
+    id: text().primaryKey().$default(nanoid),
+    partner_id: text().notNull().references(() => partner.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    
+    account_number: text().notNull().unique(),
+    ifsc: text().notNull(),
+    bank_name: text().notNull(),
+    branch_name: text().notNull(),
+    account_holder: text().notNull(),
+    
+    status: integer().default(1).notNull(),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
+}, (table) => {
+    return {
+        indexes: [
+            { columns: ['partner_id'] },
+            { columns: ['account_number'] }
+        ]
+    }
+});
+
+
+// Partner Identity Proof Type
+export const partnerIdProofType = sqliteTable('partner_id_proof_type', {
+    id: text().primaryKey().$default(nanoid),
+    name: text().notNull().unique(),
+    description: text(),
+    status: integer().default(1).notNull(),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
+}, (table) => {
+    return {
+        indexes: [
+            { columns: ['name'] }
+        ]
+    }
+});
+
+
+// Partner Identity Proof
+export const partnerIdProof = sqliteTable('partner_id_proof', {
+    id: text().primaryKey().$default(nanoid),
+    partner_id: text().notNull().references(() => partner.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    
+    proof_type_id: text().notNull().references(() => partnerIdProofType.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    proof_number: text().notNull().unique(),
+    proof_url: text().notNull(),
+    
+    status: integer().default(1).notNull(),
+    created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
+}, (table) => {
+    return {
+        indexes: [
+            { columns: ['partner_id'] },
+            { columns: ['number'] }
+        ]
+    }
+});
+
+
+
+// ------------------------------------------------------------------------------------------------------
+
+
+
 // Profile
 export const profile = sqliteTable('profile', {
     id: text().primaryKey().$default(nanoid),
-    owner_id: text().notNull().references(() => user.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    user_id: text().notNull().references(() => user.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     
     // Basic Info
     name: text().notNull(),
+    slug: text().notNull().unique(),
     description: text(),
     email: text().unique(),
     website: text(),
@@ -139,9 +269,12 @@ export const profile = sqliteTable('profile', {
     youtube: text(),
 
     // Additional details
-    logo: text(),
-    type: text().$type('ENUM', ['online', 'offline', 'hybrid']).notNull(),
+    avatar: text(),
+    banner: text(),
+    type: integer().$type('ENUM', [1, 2, 3]).default(1).notNull(), // 1: online, 2: offline, 3: hybrid
     additional_services: text(),
+    
+    partner_id: text().references(() => partner.id, {onDelete: 'SET NULL', onUpdate: 'CASCADE'}),
 
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
@@ -149,11 +282,20 @@ export const profile = sqliteTable('profile', {
 }, (table) => {
     return {
         indexes: [
-            { columns: ['owner_id'] },
+            { columns: ['user_id'] },
+            { columns: ['name'] },
+            { columns: ['slug'] },
+            { columns: ['phone'] },
             { columns: ['category_id'] },
             { columns: ['sub_category_id'] },
-            { columns: ['email'] },
-            { columns: ['phone'] }
+            // { columns: ['sub_category_option_id'] },
+            { columns: ['city'] },
+            { columns: ['state'] },
+            { columns: ['zip'] },
+            { columns: ['country'] },
+            { columns: ['partner_id'] },
+            { columns: ['type'] },
+            { columns: ['category_id', 'sub_category_id'] }
         ]
     }
 });
@@ -233,8 +375,6 @@ export const profileLicense = sqliteTable('profile_license', {
     license_type_id: text().notNull().references(() => licenseType.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     license_number: text().notNull().unique(),
     license_url: text(),
-    issue_date: text().notNull(),
-    expiry_date: text().notNull(),
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
@@ -255,26 +395,31 @@ export const profileLicense = sqliteTable('profile_license', {
 
 
 // Tags
-export const tags = sqliteTable('tag', {
+export const tag = sqliteTable('tag', {
     id: text().primaryKey().$default(nanoid),
     name: text().notNull().unique(),
+    category_id: text().notNull().references(() => category.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    sub_category_id: text().notNull().references(() => subCategory.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
 }, (table) => {
     return {
         indexes: [
-            { columns: ['name'] }
+            { columns: ['name'] },
+            { columns: ['category_id'] },
+            { columns: ['sub_category_id'] },
+            { columns: ['category_id', 'sub_category_id'] }
         ]
     }
 });
 
 
 // Profile Tags
-export const profileTags = sqliteTable('profile_tag', {
+export const profileTag = sqliteTable('profile_tag', {
     id: text().primaryKey().$default(nanoid),
     profile_id: text().notNull().references(() => profile.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
-    tag_id: text().notNull().references(() => tags.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    tag_id: text().notNull().references(() => tag.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
@@ -326,16 +471,32 @@ export const testimonial = sqliteTable('testimonial', {
 // Activity Log
 export const activityLog = sqliteTable('activity_log', {
     id: text().primaryKey().$default(nanoid),
-    user_id: text().notNull(),
-    activity: text().notNull(),
-    user_agent: text().notNull(),
-    timestamp: text().default(sql`(CURRENT_TIMESTAMP)`),
+    
+    user_id: text().references(() => user.id, {onDelete: 'SET NULL', onUpdate: 'CASCADE'}),
+    admin_id: text().references(() => admin.id, {onDelete: 'SET NULL', onUpdate: 'CASCADE'}),
+
+    path: text().notNull(),
+    method: text().notNull(),
+    status: integer().notNull(),
+    activity: text(),
+    user_agent: text(),
+
+    timestamp: timestamp().default(sql`(CURRENT_TIMESTAMP)`).notNull()
 }, (table) => {
     return {
         indexes: [
             { columns: ['user_id'] },
-            { columns: ['activity'] },
-            { columns: ['timestamp'] }
+            { columns: ['admin_id'] },
+            { columns: ['path'] },
+            { columns: ['method'] },
+            { columns: ['status'] },
+            { columns: ['timestamp'] },
+            { columns: ['timestamp', 'status'] },
+            { columns: ['timestamp', 'user_id'] },
+            { columns: ['timestamp', 'admin_id'] }
+        ],
+        constraints: [
+            sql`CHECK (user_id IS NOT NULL OR admin_id IS NOT NULL)`
         ]
     }
 });
