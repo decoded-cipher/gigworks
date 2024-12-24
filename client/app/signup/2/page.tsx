@@ -163,62 +163,72 @@ const LocationDetails: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Responsive Navigation */}
-      <nav className="flex flex-col sm:flex-row justify-between items-center p-4 w-full">
-        <div className="mb-4 sm:mb-0">
-          <Image
-            src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
-            alt="Logo"
-            width={150}
-            height={50}
-            className="mx-auto sm:mx-0"
-          />
-        </div>
-        <div className="flex items-center">
-          <div className="flex justify-center items-center space-x-2">
-            <div className="w-9 sm:w-10 h-9 sm:h-10 bg-black rounded-full flex items-center justify-center">
-              <h1 className="text-white text-center text-sm sm:text-base">1</h1>
-            </div>
-            <div className="hidden sm:flex items-center">
-              <div className="w-4 h-1 rounded-full bg-black mr-1"></div>
-              <div className="w-8 h-1 rounded-full bg-black"></div>
-              <div className="w-4 h-1 rounded-full bg-black ml-1"></div>
-            </div>
-            <div className="w-9 sm:w-10 h-9 sm:h-10 bg-black rounded-full flex items-center justify-center">
-              <h1 className="text-white text-center text-sm sm:text-base">2</h1>
-            </div>
-            <div className="hidden sm:flex items-center">
-              <div className="w-4 h-1 rounded-full bg-gray-300 mr-1"></div>
-              <div className="w-8 h-1 rounded-full bg-gray-300"></div>
-              <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
-            </div>
-            <div className="w-9 sm:w-10 h-9 sm:h-10 bg-gray-300 rounded-full flex items-center justify-center">
-              <h1 className="text-black text-center text-sm sm:text-base">3</h1>
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white">
+        <nav className="flex flex-col sm:flex-row justify-between items-center p-4 w-full">
+          <div className="mb-4 sm:mb-0">
+            <Image
+              src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
+              alt="Logo"
+              width={150}
+              height={50}
+              className="mx-auto sm:mx-0"
+            />
+          </div>
+          <div className="flex items-center">
+            <div className="flex justify-center items-center space-x-2">
+              <div className="w-9 sm:w-10 h-9 sm:h-10 bg-black rounded-full flex items-center justify-center">
+                <h1 className="text-white text-center text-sm sm:text-base">
+                  1
+                </h1>
+              </div>
+              <div className="hidden sm:flex items-center">
+                <div className="w-4 h-1 rounded-full bg-black mr-1"></div>
+                <div className="w-8 h-1 rounded-full bg-black"></div>
+                <div className="w-4 h-1 rounded-full bg-black ml-1"></div>
+              </div>
+              <div className="w-9 sm:w-10 h-9 sm:h-10 bg-black rounded-full flex items-center justify-center">
+                <h1 className="text-white text-center text-sm sm:text-base">
+                  2
+                </h1>
+              </div>
+              <div className="hidden sm:flex items-center">
+                <div className="w-4 h-1 rounded-full bg-gray-300 mr-1"></div>
+                <div className="w-8 h-1 rounded-full bg-gray-300"></div>
+                <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
+              </div>
+              <div className="w-9 sm:w-10 h-9 sm:h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                <h1 className="text-black text-center text-sm sm:text-base">
+                  3
+                </h1>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
 
-      <hr className="border-gray-200" />
+        <hr className="border-gray-200" />
+      </div>
 
       {/* Responsive Form Container */}
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col items-center w-full px-4 sm:px-8 md:px-16 lg:px-32 xl:px-44"
+        className="flex flex-col items-center w-full px-4 sm:px-8 md:px-16 lg:px-32 xl:px-44 pt-32 md:pt-20"
       >
         <div className="w-full bg-white rounded-md p-4 sm:p-6">
           {/* Header */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-800 mb-4 sm:mb-6">
+          <h1 className="text-2xl font-semibold text-gray-800">
             Location & Operating Details
           </h1>
 
           {/* Address & Location Section */}
-          <h1 className="py-2 sm:py-4 font-bold text-xl sm:text-2xl">
-            Business Operations <span className="text-red-500">*</span>
-          </h1>
 
-          <div className="space-y-4">
-            {/* Responsive Address Inputs */}
-            <div className="flex flex-col sm:flex-row gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 space-x-4">
+            <div>
+              {/* Responsive Address Inputs */}
+              <h1 className="py-2 sm:py-4 font-semibold text-xl ">
+                Address & Location <span className="text-red-500">*</span>
+              </h1>
+              <div className="space-y-8">
+
               <input
                 type="text"
                 name="streetAddress"
@@ -226,7 +236,7 @@ const LocationDetails: React.FC = () => {
                 onChange={handleAddressChange}
                 placeholder="Street Address"
                 className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
-              />
+                />
               <input
                 type="text"
                 name="city"
@@ -234,9 +244,8 @@ const LocationDetails: React.FC = () => {
                 onChange={handleAddressChange}
                 placeholder="City/Town"
                 className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
-              />
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4">
+                />
+
               <input
                 type="text"
                 name="state"
@@ -244,7 +253,7 @@ const LocationDetails: React.FC = () => {
                 onChange={handleAddressChange}
                 placeholder="State"
                 className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
-              />
+                />
               <input
                 type="text"
                 name="pinCode"
@@ -252,12 +261,14 @@ const LocationDetails: React.FC = () => {
                 onChange={handleAddressChange}
                 placeholder="Pin Code"
                 className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
-              />
+                />
+                </div>
             </div>
-
             {/* Location Picker */}
-            <div className="relative w-full">
-              <label className="block text-gray-700 mb-2">Pick Location</label>
+            <div className="relative w-full z-0">
+              <h1 className="py-2 sm:py-4 font-semibold text-xl ">
+                Pick Location <span className="text-red-500">*</span>
+              </h1>
               <div className="relative w-full  rounded-md">
                 <LocationPicker onLocationSelect={handleLocationSelect} />
                 <button
@@ -271,9 +282,9 @@ const LocationDetails: React.FC = () => {
           </div>
 
           {/* Operating Hours */}
-          <div className="mt-6 space-y-4">
+          <div className="mt-6 space-y-1">
             <div className="flex flex-col sm:flex-row justify-between items-center">
-              <h1 className="py-2 sm:py-4 font-bold text-xl sm:text-2xl">
+              <h1 className="py-2 sm:py-4 font-semibold text-xl">
                 Operating Hours<span className="text-red-500">*</span>
               </h1>
               <button
@@ -293,7 +304,7 @@ const LocationDetails: React.FC = () => {
                   name="day"
                   value={hours.day}
                   onChange={(e) => handleOperatingHoursChange(index, e)}
-                  className="w-full sm:w-1/3 border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                  className="w-full sm:w-1/3 border border-gray-300 rounded-md p-2  focus:outline-none focus:ring-1 focus:ring-[#303030]"
                 >
                   {[
                     "Monday",
@@ -315,14 +326,14 @@ const LocationDetails: React.FC = () => {
                     name="startTime"
                     value={hours.startTime}
                     onChange={(e) => handleOperatingHoursChange(index, e)}
-                    className="w-full border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
                   />
                   <input
                     type="time"
                     name="endTime"
                     value={hours.endTime}
                     onChange={(e) => handleOperatingHoursChange(index, e)}
-                    className="w-full border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
                   />
                   {operatingHours.length > 1 && (
                     <button
@@ -339,9 +350,9 @@ const LocationDetails: React.FC = () => {
           </div>
 
           {/* Social Media Handles */}
-          <div className="mt-6 space-y-4">
+          <div className="mt-6 space-y-1">
             <div className="flex flex-col sm:flex-row justify-between items-center">
-              <h1 className="py-2 sm:py-4 font-bold text-xl sm:text-2xl">
+              <h1 className="py-2 sm:py-4 font-semibold text-xl">
                 Social Media Handles<span className="text-red-500">*</span>
               </h1>
               <button
@@ -354,47 +365,47 @@ const LocationDetails: React.FC = () => {
             </div>
             {socialMediaHandles.map((handle, index) => (
               <div
-              key={index}
-              className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-2"
-            >
-              <select
-                name="platform"
-                value={handle.platform}
-                onChange={(e) => handleSocialMediaChange(index, e)}
-                className="w-full sm:w-1/3 border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                key={index}
+                className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-2"
               >
-                {[
-                  "Instagram",
-                  "Facebook",
-                  "Twitter",
-                  "LinkedIn",
-                  "Website",
-                ].map((platform) => (
-                  <option key={platform} value={platform}>
-                    {platform}
-                  </option>
-                ))}
-              </select>
-              <div className="flex items-center gap-2 w-full">
-                <input
-                  type="text"
-                  name="link"
-                  value={handle.link}
+                <select
+                  name="platform"
+                  value={handle.platform}
                   onChange={(e) => handleSocialMediaChange(index, e)}
-                  placeholder="Profile link address"
-                  className="flex-1 border border-gray-300 rounded-md p-2 sm:p-4 focus:outline-none focus:ring-1 focus:ring-[#303030]"
-                />
-                {socialMediaHandles.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeSocialMediaHandle(index)}
-                    className="text-red-500 px-2 py-1 rounded-md hover:bg-red-50 flex-shrink-0"
-                  >
-                    Remove
-                  </button>
-                )}
+                  className="w-full sm:w-1/3 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                >
+                  {[
+                    "Instagram",
+                    "Facebook",
+                    "Twitter",
+                    "LinkedIn",
+                    "Website",
+                  ].map((platform) => (
+                    <option key={platform} value={platform}>
+                      {platform}
+                    </option>
+                  ))}
+                </select>
+                <div className="flex items-center gap-2 w-full">
+                  <input
+                    type="text"
+                    name="link"
+                    value={handle.link}
+                    onChange={(e) => handleSocialMediaChange(index, e)}
+                    placeholder="Profile link address"
+                    className="flex-1 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                  />
+                  {socialMediaHandles.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSocialMediaHandle(index)}
+                      className="text-red-500 px-2 py-1 rounded-md hover:bg-red-50 flex-shrink-0"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
             ))}
           </div>
 
@@ -417,20 +428,21 @@ const LocationDetails: React.FC = () => {
         </div>
       </form>
       {/* Footer */}
-      <div className="bottom-0 px-4 py-4">
-        <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
+      <div className="fixed bottom-0 left-0 right-0 w-full border-t bg-background px-4 py-6">
+        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+          <p className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
             © 2024{" "}
             <a
               href="https://gigwork.co.in/"
               className="hover:underline"
               target="_blank"
+              rel="noopener noreferrer"
             >
               Gigwork
             </a>
             . All rights reserved.
           </p>
-          <div className="text-xs sm:text-sm text-gray-500 flex space-x-4">
+          <div className="text-sm text-gray-500 flex space-x-4">
             <a href="/privacy" className="hover:underline">
               Privacy Policy
             </a>

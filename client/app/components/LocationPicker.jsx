@@ -100,7 +100,7 @@ const LocationPicker = ({ onLocationSelect }) => {
   return (
     <div className="space-y-4">
       {/* Search Input */}
-      <form onSubmit={handleSearch} className="flex space-x-2">
+      {/* <form onSubmit={handleSearch} className="flex space-x-2">
         <input
           type="text"
           value={searchQuery}
@@ -114,10 +114,10 @@ const LocationPicker = ({ onLocationSelect }) => {
         >
           Search
         </button>
-      </form>
+      </form> */}
 
       {/* Map Container */}
-      <div className="w-full h-96 border border-gray-300 rounded-md overflow-hidden">
+      <div className="w-full h-64 border border-gray-300 rounded-md overflow-hidden">
         <MapContainer 
           center={position} 
           zoom={8} 
@@ -133,12 +133,12 @@ const LocationPicker = ({ onLocationSelect }) => {
       </div>
 
       {/* Selected Location Details */}
-      {position && (
+      {/* {position && (
         <div className="bg-gray-100 p-4 rounded-md">
           <p className="font-semibold">Selected Location:</p>
           <p className="text-sm text-gray-700">{address}</p>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
