@@ -67,6 +67,7 @@ export interface Profile {
     logo?: string;
     type: string;
     additional_services?: string;
+    partner_id?: string;
 
     status?: string;
 }
@@ -77,7 +78,7 @@ export interface ProfilePayment {
     amount: number;
     payment_mode: string;
     payment_status: string;
-    payment_id?: string;
+    transaction_id?: string;
     payment_date: string;
 }
 

@@ -237,7 +237,7 @@ export const profile = sqliteTable('profile', {
     name: text().notNull(),
     slug: text().notNull().unique(),
     description: text(),
-    email: text().unique(),
+    email: text(),
     website: text(),
     phone: text().unique(), // Extra phone number other than owner phone number
 
@@ -276,7 +276,7 @@ export const profile = sqliteTable('profile', {
     
     partner_id: text().references(() => partner.id, {onDelete: 'SET NULL', onUpdate: 'CASCADE'}),
 
-    status: integer().default(1).notNull(),
+    status: integer().default(1).notNull(), // 0: inactive, 1: active, 2: expired, 3: suspended
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
 }, (table) => {
@@ -307,11 +307,10 @@ export const profilePayment = sqliteTable('profile_payment', {
     profile_id: text().notNull().references(() => profile.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
 
     amount: integer().notNull(),
-    payment_mode: text().notNull().$type('ENUM', ['cash', 'debit_card', 'credit_card', 'net_banking', 'upi', 'wallet']).$default('cash'),
+    payment_mode: text().notNull().$type('ENUM', ['cash', 'debit_card', 'credit_card', 'net_banking', 'upi', 'wallet']).default('cash'),
     payment_status: text().notNull().$type('ENUM', ['pending', 'success', 'failed']),
-    payment_id: text(),
-    payment_date: text().notNull(),
-    
+    transaction_id: text(),
+    payment_date: text(),   // Date from payment gateway
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
