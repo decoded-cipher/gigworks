@@ -14,7 +14,6 @@ import {
     getProfilesByCategory
 } from '../../services/profile';
 
-import { user, profile, profilePayment, profileMedia, profileLicense, profileTags } from '../../config/database/schema';
 import { User, Profile, ProfilePayment, ProfileMedia, ProfileLicense, ProfileTag } from '../../config/database/interfaces';
 
 

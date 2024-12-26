@@ -9,7 +9,6 @@ import {
     updateCategory,
     enableDisableCategory
 } from '../../services/category';
-import { subCategory } from '../../config/database/schema';
 
 
 

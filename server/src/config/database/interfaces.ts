@@ -114,17 +114,9 @@ export interface ProfileTag {
 }
 
 
-// export interface Testimonial {
-//     profile_id: string;
-//     user_id: number;
-//     rating: number;
-//     comment: string;
-// }
-
-
-// export interface ActivityLog {
-//     user_id: string;
-//     activity: string;
-//     user_agent: string;
-//     timestamp: string;
-// }
+export interface Partner {
+    user_id: string;
+    avatar?: string;
+    referral_code?: string;
+    status?: string;
+}

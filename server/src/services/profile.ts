@@ -17,7 +17,6 @@ export const createProfile = async (data: Profile) => {
             result = result[0];
 
             return resolve(result);
-
         } catch (error) {
             reject(error);
         }
@@ -31,16 +30,12 @@ export const updateProfile = async (id: string, profile: Profile) => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            let result = await db
-                .update(profile)
-                .set({ ...profile })
-                .where(eq('id', profile_id))
-                .returning();
-            
-                result = result[0];
+            // SQL Query : UPDATE profile SET name = name, description = description, email = email, website = website, phone = phone, registration_number = registration_number, gstin = gstin, category_id = category
+
+            let result = await db.update(profile).set({ ...profile }).where(sql`${profile.id} = ${id}`).returning();
+            result = result[0];
 
             return resolve(result);
-
         } catch (error) {
             reject(error);
         }
