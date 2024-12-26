@@ -3,17 +3,21 @@
   "version": "1.0.0",
   "description": "",
   "main": "gulpfile.js",
-  "devDependencies": {
-    "gulp-run": "^1.7.1",
-    "gulp-shell": "^0.8.0"
-  },
   "scripts": {
-    "start": "gulp start",
-    "stop": "gulp stop"
+    "start:client": "gulp startClient",
+    "start:server": "gulp startServer",
+    "start:admin": "gulp startAdmin",
+    "start": "concurrently --kill-others --success first --prefix \"[{name}]  \" --names \"client,server,portal\" --prefix-colors \"blue,green,magenta\" \"npm run start:client\" \"npm run start:server\" \"npm run start:admin\""
   },
-  "author": "",
+  "author": "Arjun Krishna",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.7",
     "gulp": "^5.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "gulp-run": "^1.7.1",
+    "gulp-shell": "^0.8.0"
   }
 }

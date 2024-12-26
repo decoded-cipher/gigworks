@@ -9,7 +9,6 @@ import {
     updateCategory,
     enableDisableCategory
 } from '../../services/category';
-import { subCategory } from '../../config/database/schema';
 
 
 
@@ -20,7 +19,7 @@ import { subCategory } from '../../config/database/schema';
  * @params  name
  * @return  message, data
  * @error   400, { error }
- * @status  200, 400
+ * @status  201, 400
  *
  * @example /api/v1/category
  **/
@@ -30,25 +29,22 @@ router.post('/', async (c) => {
 
     if (!name) {
         return c.json({
-            status: 400,
             message: 'Name is required'
-        });
+        }, 400);
     }
 
     try {
         const category = await createCategory(name);
         return c.json({
-            status: 201,
             message: 'Category created successfully',
-            data: category
-        });
+            // data: category
+        }, 201);
 
     } catch (error) {
         return c.json({
-            status: 500,
             message: 'Internal Server Error',
             error: error.message
-        });
+        }, 500);
     }
 });
 
@@ -78,34 +74,33 @@ router.get('/', async (c) => {
 
         if (result.data.length > 0) {
             return c.json({
-                status: 200,
                 message: 'Categories fetched successfully',
                 data: {
                     categories: result.data,
                     meta: {
-                        page: page,
-                        limit: limit,
-                        search: search,
+                        params: {
+                            page: page,
+                            limit: limit,
+                            search: search
+                        },
                         total_count: result.count,
                         total_pages: Math.ceil(result.count / limit),
                         previous: page > 1 ? `/api/v1/category?page=${page - 1}&limit=${limit}` : null,
                         next: result.data.length === limit ? `/api/v1/category?page=${page + 1}&limit=${limit}` : null
                     }
                 }
-            });
+            }, 200);
         } else {
             return c.json({
-                status: 404,
                 message: 'Categories not found'
-            });
+            }, 404);
         }
 
     } catch (error) {
         return c.json({
-            status: 500,
             message: 'Internal Server Error',
             error: error.message
-        });
+        }, 500);
     }
 });
 
@@ -131,23 +126,20 @@ router.get('/:id', async (c) => {
 
         if (category) {
             return c.json({
-                status: 200,
                 message: 'Category fetched successfully',
                 data: category
-            });
+            }, 200);
         } else {
             return c.json({
-                status: 404,
                 message: 'Category not found'
-            });
+            }, 404);
         }
 
     } catch (error) {
         return c.json({
-            status: 500,
             message: 'Internal Server Error',
             error: error.message
-        });
+        }, 500);
     }
 });
 
@@ -171,9 +163,8 @@ router.patch('/:id', async (c) => {
 
     if (!name) {
         return c.json({
-            status: 400,
             message: 'All fields are required'
-        });
+        }, 400);
     }
 
     try {
@@ -181,23 +172,20 @@ router.patch('/:id', async (c) => {
 
         if (category) {
             return c.json({
-                status: 200,
                 message: 'Category updated successfully',
                 data: category
-            });
+            }, 200);
         } else {
             return c.json({
-                status: 404,
                 message: 'Category not found'
-            });
+            }, 404);
         }
 
     } catch (error) {
         return c.json({
-            status: 500,
             message: 'Internal Server Error',
             error: error.message
-        });
+        }, 500);
     }
 });
 
@@ -220,9 +208,8 @@ router.patch('/:id/:mode', async (c) => {
 
     if (!id || !mode) {
         return c.json({
-            status: 400,
             message: 'Category ID and MODE are required'
-        });
+        }, 400);
     }
 
     let status = 0;
@@ -235,24 +222,21 @@ router.patch('/:id/:mode', async (c) => {
             break;
         default:
             return c.json({
-                status: 400,
                 message: 'Invalid mode'
-            });
+            }, 400);
     }
 
     try {
         await enableDisableCategory(id, status);
         return c.json({
-            status: 200,
             message: 'Category and Sub-categories updated successfully',
-        });
+        }, 200);
 
     } catch (error) {
         return c.json({
-            status: 500,
             message: 'Internal Server Error',
             error: error.message
-        });
+        }, 500);
     }
 });
 
