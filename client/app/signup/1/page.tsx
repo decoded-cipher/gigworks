@@ -7,7 +7,7 @@ import { Textarea } from "@nextui-org/input";
 // Define the form data type
 interface FormData {
   profileImage: File | null;
-  coverImage: File | null;  
+  coverImage: File | null;
   businessName: string;
   businessDescription: string;
   whatsAppNumber: string;
@@ -16,6 +16,7 @@ interface FormData {
   ownerName: string;
   emailAddress: string;
   businessType: string;
+  slug: string;
   [key: string]: string | File | null;
 }
 
@@ -31,18 +32,33 @@ const MediaAndBranding = () => {
     ownerName: "",
     emailAddress: "",
     businessType: "",
+    slug: "",
   });
+  const [slugFocused, setSlugFocused] = useState(false);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value, files } = e.target as HTMLInputElement;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: files ? files[0] : value,
-    }));
-  };
 
+    if (name === "slug") {
+      const slugValue = value
+        .toLowerCase()
+        .replace(/[^a-z0-9-]/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+
+      setFormData((prev) => ({
+        ...prev,
+        [name]: slugValue,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: files ? files[0] : value,
+      }));
+    }
+  };
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(formData);
@@ -114,175 +130,227 @@ const MediaAndBranding = () => {
   return (
     <div className="flex flex-col min-h-screen w-full">
       {/* Navigation */}
-      <nav className="flex flex-col sm:flex-row justify-between items-center p-4 w-full">
-        <div className="flex justify-center sm:justify-start w-full sm:w-auto mb-4 sm:mb-0">
-          <Image
-            src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
-            alt="Logo"
-            width={150}
-            height={50}
-            className="max-w-[206px] max-h-[216px]"
-          />
-        </div>
-        <div className="flex items-center">
-          <div className="flex justify-center items-center space-x-2">
-            <div className="w-9 sm:w-10 h-9 sm:h-10 bg-black rounded-full flex items-center justify-center">
-              <h1 className="text-white text-center text-sm sm:text-base">1</h1>
-            </div>
-            <div className="hidden sm:flex items-center">
-              <div className="w-4 h-1 rounded-full bg-gray-300 mr-1"></div>
-              <div className="w-8 h-1 rounded-full bg-gray-300"></div>
-              <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
-            </div>
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white">
+        <nav className="flex flex-col sm:flex-row justify-between items-center p-4 w-full">
+          <div className="flex justify-center sm:justify-start w-full sm:w-auto mb-4 sm:mb-0">
+            <Image
+              src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
+              alt="Logo"
+              width={150}
+              height={50}
+              className="max-w-[206px] max-h-[216px]"
+            />
+          </div>
+          <div className="flex items-center">
+            <div className="flex justify-center items-center space-x-2">
+              <div className="w-9 sm:w-10 h-9 sm:h-10 bg-black rounded-full flex items-center justify-center">
+                <h1 className="text-white text-center text-sm sm:text-base">
+                  1
+                </h1>
+              </div>
+              <div className="hidden sm:flex items-center">
+                <div className="w-4 h-1 rounded-full bg-gray-300 mr-1"></div>
+                <div className="w-8 h-1 rounded-full bg-gray-300"></div>
+                <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
+              </div>
               <div className="w-9 sm:w-10 h-9 sm:h-10 bg-gray-300 rounded-full flex items-center justify-center">
-              <h1 className="text-black text-center text-sm sm:text-base">2</h1>
-            </div>
-            <div className="hidden sm:flex items-center">
-              <div className="w-4 h-1 rounded-full bg-gray-300 mr-1"></div>
-              <div className="w-8 h-1 rounded-full bg-gray-300"></div>
-              <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
-            </div>
-            <div className="w-9 sm:w-10 h-9 sm:h-10 bg-gray-300 rounded-full flex items-center justify-center">
-              <h1 className="text-black text-center text-sm sm:text-base">3</h1>
+                <h1 className="text-black text-center text-sm sm:text-base">
+                  2
+                </h1>
+              </div>
+              <div className="hidden sm:flex items-center">
+                <div className="w-4 h-1 rounded-full bg-gray-300 mr-1"></div>
+                <div className="w-8 h-1 rounded-full bg-gray-300"></div>
+                <div className="w-4 h-1 rounded-full bg-gray-300 ml-1"></div>
+              </div>
+              <div className="w-9 sm:w-10 h-9 sm:h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                <h1 className="text-black text-center text-sm sm:text-base">
+                  3
+                </h1>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+        <hr className="border-gray-200" />
+      </div>
 
-      <hr className="border-gray-200" />
+      <div className="flex-grow bg-white px-4 sm:px-8 md:px-20 pt-32 md:pt-20">
+        <h1 className="text-2xl font-bold py-4">Business Overview</h1>
 
-      {/* Main Content */}
-      <div className="flex-grow bg-white px-4 sm:px-8 md:px-20">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold py-4 text-center sm:text-left">
-          Media & Branding
-        </h1>
-
-        {/* Image Upload Section */}
-        <div className="flex flex-col sm:flex-row -mx-2">
-          {["profileImage", "coverImage"].map((imageType) => (
-            <div key={imageType} className="w-full sm:w-1/2 px-2 mb-4">
-              <label
-                htmlFor={imageType}
-                className="block text-base sm:text-xl font-bold pb-2 text-gray-700"
-              >
-                Upload {imageType === "profileImage" ? "Profile" : "Cover"}{" "}
-                Image
-                <span className="text-red-500"> *</span>
-                <div className="border-2 bg-gray-200 rounded-lg p-4 hover:border-gray-500 transition flex items-center justify-center h-20">
-                  <input
-                    type="file"
-                    id={imageType}
-                    name={imageType}
-                    onChange={handleInputChange}
-                    className="hidden"
-                    required
-                  />
-                  <p className="text-sm sm:text-base">
-                    Drag and drop or click to upload
-                  </p>
-                </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* First Row */}
+            <div>
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                Business Name<span className="text-red-500">*</span>
               </label>
-            </div>
-          ))}
-        </div>
-
-        {/* Business Overview Section */}
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold py-4 text-center sm:text-left">
-          Business Overview
-        </h1>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Business Name and Category Row */}
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="w-full lg:w-1/2">
-              {renderFormField(
-                "businessName",
-                "Business Name",
-                "text",
-                "Enter your business name"
-              )}
-            </div>
-            <div className="w-full lg:w-1/2">
-              {renderFormField(
-                "businessCategory",
-                "Business Category",
-                "select",
-                undefined,
-                true,
-                [
-                  { value: "retail", label: "Retail" },
-                  { value: "service", label: "Service" },
-                  { value: "food", label: "Food & Beverage" },
-                  { value: "technology", label: "Technology" },
-                  { value: "consulting", label: "Consulting" },
-                ]
-              )}
-            </div>
-          </div>
-
-          {/* Description and Business Type Row */}
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="w-full lg:w-1/2">
-              <label className="block text-base sm:text-xl font-bold pb-2 text-gray-700">Bussiness Description</label>
-              <textarea
-                name="businessDescription"
-                placeholder="Describe your business briefly"
+              <input
+                type="text"
+                placeholder="Eg : Super Maerk"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                required
               />
             </div>
-            <div className="w-full lg:w-1/2">
-            <label className="block text-base sm:text-xl font-bold pb-2 text-gray-700">Bussiness Type</label>
-              <select
-                name="businessType"
+
+            <div>
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                Business Category<span className="text-red-500">*</span>
+              </label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
+                <option value="">Select Category</option>
+                <option value="retail">Retail</option>
+                <option value="service">Service</option>
+                <option value="food">Food & Beverage</option>
+                <option value="technology">Technology</option>
+                <option value="consulting">Consulting</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                Sub Category<span className="text-red-500">*</span>
+              </label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
+                <option value="">Select Sub Category</option>
+              </select>
+            </div>
+
+            {/* Second Row */}
+            <div>
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                Sub Category Options<span className="text-red-500">*</span>
+              </label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
+                <option value="">Select Sub Category</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                Owner&apos;s/Manager&apos;s Name<span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Eg : Jhone Doe"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-              >
-                <option value="">Select Business Type</option>
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                WhatsApp Number<span className="text-red-500">*</span>
+              </label>
+              <input
+                type="tel"
+                placeholder="WhatsApp Number"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                required
+              />
+            </div>
+
+            {/* Third Row */}
+            <div>
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                Email Address<span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                placeholder="Eg : supermaerk@gmail.com"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                Business Type<span className="text-red-500">*</span>
+              </label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
+                <option value="">Business Type</option>
                 <option value="soleProprietorship">Sole Proprietorship</option>
                 <option value="partnership">Partnership</option>
                 <option value="corporation">Corporation</option>
-                <option value="limitedLiabilityCompany">Limited Liability Company</option>
+                <option value="limitedLiabilityCompany">
+                  Limited Liability Company
+                </option>
               </select>
             </div>
+
+            <div className="space-y-2">
+              <label className="block text-base font-bold  text-gray-700">
+                Slug<span className="text-red-500">*</span>
+              </label>
+
+              <div className="relative">
+                <input
+                  type="text"
+                  name="slug"
+                  placeholder="Eg: super-maerk"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  required
+                  onChange={handleInputChange}
+                  value={formData.slug}
+                  onFocus={() => setSlugFocused(true)}
+                  onBlur={() => setSlugFocused(false)}
+                />
+                {/* <div className="absolute right-3 top-1/2 -translate-y-1/2">
+          <Info className="text-gray-400" size={20} />
+        </div> */}
+              </div>
+
+              <div
+                className={`text-sm space-y-1 ${
+                  slugFocused ? "block" : "hidden"
+                }`}
+              >
+                <p className="text-gray-600">
+                  This will be your unique business URL: gigwork.co.in/
+                  <span className="font-medium">
+                    {formData.slug || "your-slug"}
+                  </span>
+                </p>
+                <ul className="text-gray-500 space-y-1 pl-4">
+                  <li>• Use only letters, numbers, and hyphens</li>
+                  <li>• Must be between 3-60 characters</li>
+                  <li>• Cannot start or end with a hyphen</li>
+                  <li>• Will be converted to lowercase</li>
+                </ul>
+              </div>
+            </div>
           </div>
 
-          {/* WhatsApp and Owner Name Row */}
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="w-full lg:w-1/2">
-              {renderFormField(
-                "whatsAppNumber",
-                "WhatsApp Number",
-                "tel",
-                "Enter your WhatsApp number"
-              )}
-            </div>
-            <div className="w-full lg:w-1/2">
-              {renderFormField(
-                "ownerName",
-                "Owner's/Manager's Name",
-                "text",
-                "Enter owner or manager name"
-              )}
-            </div>
+          {/* Business Description - Full Width */}
+          <div>
+            <label className="block text-base font-bold pb-2 text-gray-700">
+              Business Description
+            </label>
+            <textarea
+              placeholder="Business Description"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 h-24"
+            />
           </div>
 
-          {/* Website and Email Row */}
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* <div className="w-full lg:w-1/2">
-              {renderFormField(
-                "websiteURL",
-                "Website Link",
-                "url",
-                "Enter your website URL (optional)",
-                false
-              )}
-            </div> */}
-            <div className="w-full lg:w-1/2 lg:pr-2">
-              {renderFormField(
-                "emailAddress",
-                "Email Address",
-                "email",
-                "Enter your email address"
-              )}
+          {/* Media & Branding Section */}
+          <h1 className="text-2xl font-bold py-1">Media & Branding</h1>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                Upload Profile<span className="text-red-500">*</span>
+              </label>
+              <div className="border-2 bg-gray-200 rounded-lg p-4 hover:border-gray-500 transition flex items-center justify-center h-20">
+                <p className="text-sm">Drag and drop or click to upload</p>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                Upload Cover
+              </label>
+              <div className="border-2 bg-gray-200 rounded-lg p-4 hover:border-gray-500 transition flex items-center justify-center h-20">
+                <p className="text-sm">Drag and drop or click to upload</p>
+              </div>
             </div>
           </div>
 
@@ -297,15 +365,28 @@ const MediaAndBranding = () => {
           </div>
         </form>
       </div>
-       {/* Footer */}
-       <div className="bottom-0 px-4 py-4">
-        <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
-            © 2024 <a href="https://gigwork.co.in/" className="hover:underline" target="_blank">Gigwork</a>. All rights reserved.
+      {/* Footer */}
+      <div className="fixed bottom-0 left-0 right-0 w-full border-t bg-background px-4 py-6">
+        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+          <p className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
+            © 2024{" "}
+            <a
+              href="https://gigwork.co.in/"
+              className="hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Gigwork
+            </a>
+            . All rights reserved.
           </p>
-          <div className="text-xs sm:text-sm text-gray-500 flex space-x-4">
-            <a href="/privacy" className="hover:underline">Privacy Policy</a>
-            <a href="/terms" className="hover:underline">Terms of Service</a>
+          <div className="text-sm text-gray-500 flex space-x-4">
+            <a href="/privacy" className="hover:underline">
+              Privacy Policy
+            </a>
+            <a href="/terms" className="hover:underline">
+              Terms of Service
+            </a>
           </div>
         </div>
       </div>

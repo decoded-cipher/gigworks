@@ -91,11 +91,11 @@ const DevMorphixWebsite = () => {
       </div>
     </nav>
 
-      <div className="px-4 sm:px-6 lg:px-32">
+      <div className="px-4 sm:px-6 lg:px-52">
         <main>
           <ScrollToTopButton isProfilePage={true} />
-          <section className="relative py-16 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
-            <div className="absolute top-0 left-0 right-0 h-80 overflow-hidden">
+          <section className="relative py-8 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
+            <div className="absolute top-0 left-0 right-0 h-72 overflow-hidden">
               <img
                 src="/15879.png"
                 alt="Background"
@@ -184,7 +184,7 @@ const DevMorphixWebsite = () => {
 
           <section className="border my-7  rounded-3xl " id="service" style={{ scrollMarginTop: '100px' }}>
             <section className="bg-white rounded-full p-6 mb-8">
-              <h2 className="text-xl font-bold text-center mb-6">
+              <h2 className="text-2xl font-bold text-center mb-6">
                 Services Provides
               </h2>
               <div className="max-w-4xl mx-auto">
