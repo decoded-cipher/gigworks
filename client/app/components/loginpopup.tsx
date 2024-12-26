@@ -84,8 +84,8 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
               height={336}
               className="mx-auto mb-2 sm:mb-4 w-48 sm:w-auto"
             />
-            <h2 className="text-2xl sm:text-3xl text-black font-bold">Verify your number</h2>
-            <p className="text-gray-500  mb-4">
+            <h2 className="text-2xl text-black font-bold">Verify your number</h2>
+            <p className="text-gray-400  mb-4">
               Please enter your WhatsApp number for verification to proceed.
             </p>
             <div className="w-full space-y-3 sm:space-y-4">
@@ -156,6 +156,15 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
             >
               Verify
             </button>
+            <div className="text-center mt-4">
+                <span className="text-gray-600">Didn&apos;t receive code? </span>
+                <button
+                  // onClick={() => router.push("/signup/1")}
+                  className="text-green-600 hover:underline font-semibold"
+                >
+                  Resend 
+                </button>
+              </div>
           </>
         )}
       </div>
