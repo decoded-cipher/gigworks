@@ -184,6 +184,28 @@ export const getRenewalProfiles = async (page: number, limit: number, days: numb
 
 
 
+// Check if profile slug exists
+export const checkProfileSlug = async (slug: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : SELECT * FROM profile WHERE slug = slug
+
+            let result = await db
+                .select()
+                .from(profile)
+                .where(sql`${profile.slug} = ${slug}`)
+                .get();
+
+            resolve(result);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+
+
 // Get profile by slug
 export const getProfileBySlug = async (slug: string) => {
     return new Promise(async (resolve, reject) => {

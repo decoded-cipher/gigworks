@@ -11,6 +11,7 @@ import {
     getProfileCount, 
     getRenewalProfiles, 
     getProfileBySlug, 
+    checkProfileSlug, 
     getProfilesByCategory
 } from '../../services/profile';
 
@@ -185,6 +186,46 @@ router.get('/:slug', async (c) => {
         return c.json({
             message: 'Business fetched successfully',
             data: profile
+        }, 200);
+
+    } catch (error) {
+        return c.json({
+            message: 'Internal Server Error',
+            error: error.message
+        }, 500);
+    }
+});
+
+
+
+/**
+ * @route   GET /api/v1/business/slug/check
+ * @desc    Check if a business slug is available
+ * @access  Public
+ * @params  slug
+ * @return  message, data
+ * @error   400, { error }
+ * @status  200, 400
+ * 
+ * @example /api/v1/business/slug/check?value=slug
+ **/
+
+router.get('/slug/check', async (c) => {
+    try {
+
+        const slug = c.req.query('value');
+        
+        let exists = await checkProfileSlug(slug);
+        if (exists) {
+            return c.json({
+                message: 'Slug is not available',
+                data: false
+            }, 200);
+        }
+
+        return c.json({
+            message: 'Slug is available',
+            data: true
         }, 200);
 
     } catch (error) {
