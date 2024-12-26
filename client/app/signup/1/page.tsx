@@ -227,7 +227,7 @@ const MediaAndBranding = () => {
 
             <div>
               <label className="block text-base font-bold pb-2 text-gray-700">
-                Owner's/Manager's Name<span className="text-red-500">*</span>
+                Owner&apos;s/Manager&apos;s Name<span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
