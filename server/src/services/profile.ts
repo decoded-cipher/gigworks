@@ -1,8 +1,8 @@
 
 import { count, eq, sql } from "drizzle-orm";
 import { db } from '../config/database/connection';
-import { user, profile, profilePayment } from '../config/database/schema';
-import { User, Profile, ProfilePayment } from '../config/database/interfaces';
+import { user, profile, profilePayment, profileMedia, profileTag, profileLicense, category, subCategory, subCategoryOption } from '../config/database/schema';
+import { User, Profile } from '../config/database/interfaces';
 
 
 
@@ -17,42 +17,6 @@ export const createProfile = async (data: Profile) => {
             result = result[0];
 
             return resolve(result);
-
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-
-
-// Get all profiles (businesses) of a user
-export const getProfiles = async (user_id: number) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-
-            // SQL Query : SELECT * FROM profile WHERE user_id = user_id
-
-            let result = await db.select(profile).where(eq('user_id', user_id)).get();
-            return resolve(result);
-
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-
-
-// Get a profile (business) of a user by profile id
-export const getProfile = async (user_id: number, profile_id: string) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-
-            // SQL Query : SELECT * FROM profile WHERE user_id = user_id AND id = profile_id
-
-            let result = await db.select(profile).where(eq('user_id', user_id), eq('id', profile_id)).get();
-            return resolve(result[0]);
 
         } catch (error) {
             reject(error);
@@ -85,16 +49,61 @@ export const updateProfile = async (id: string, profile: Profile) => {
 
 
 
-// Get all profiles (businesses) by category id
-export const getProfilesByCategory = async (category_id: number) => {
+// Get all profiles by category id with pagination
+export const getProfilesByCategory = async (category_id: string, page: number, limit: number, search: string) => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            // SQL Query : SELECT * FROM profile WHERE category_id = category_id
+            /*
+                SELECT 
+                    profile.name, 
+                    profile.slug, 
+                    profile.type, 
+                    profile.avatar, 
+                    profile.city 
+                FROM 
+                    profile 
+                    LEFT JOIN category ON category.id = profile.category_id 
+                WHERE 
+                    profile.category_id = category_id AND 
+                    profile.name LIKE %search% AND 
+                    profile.status = 1 AND 
+                    category.status = 1 
+                ORDER BY 
+                    profile.name ASC 
+                LIMIT 
+                    limit 
+                OFFSET 
+                    (page - 1) * limit
+            */
 
-            let result = await db.select(profile).where(eq('category_id', category = id)).get();
-            return resolve(result);
+            let results = await db
+                .select({
+                    name: profile.name,
+                    slug: profile.slug,
+                    type: profile.type,
+                    avatar: profile.avatar,
+                    location: profile.city,
+                })
+                .from(profile)
+                .leftJoin(category, sql`${category.id} = ${profile.category_id}`)
+                .where(sql
+                    `
+                        ${profile.category_id} = ${category_id} AND 
+                        ${profile.name} LIKE ${'%' + search + '%'} AND 
+                        ${profile.status} = 1 AND
+                        ${category.status} = 1
+                    `
+                )
+                .limit(limit)
+                .offset((page - 1) * limit)
+                .orderBy(profile.name, 'ASC')
 
+            resolve({
+                data: results,
+                count: await db.$count(profile)
+            });
+            
         } catch (error) {
             reject(error);
         }
@@ -107,12 +116,14 @@ export const getProfilesByCategory = async (category_id: number) => {
 export const getProfileCount = async () => {
     return new Promise(async (resolve, reject) => {
         try {
-
+            
             // SQL Query : SELECT COUNT(*) FROM profile
 
-            let result = await db.select(count()).from(profile).get();
-            return resolve(result[0].count);
+            const additionalCount = 100;
+            let result = await db.select({ count: sql`COUNT(*)` }).from(profile).get();
+            result = result.count + additionalCount;
 
+            resolve(result);
         } catch (error) {
             reject(error);
         }
@@ -122,7 +133,7 @@ export const getProfileCount = async () => {
 
 
 // Get all profiles with upcoming renewals
-export const getRenewalProfiles = async () => {
+export const getRenewalProfiles = async (page: number, limit: number, days: number) => {
     return new Promise(async (resolve, reject) => {
         try {
 
@@ -139,9 +150,13 @@ export const getRenewalProfiles = async () => {
                     LEFT JOIN user ON user.id = profile.user_id 
                     LEFT JOIN profile_payment ON profile_payment.profile_id = profile.id 
                 WHERE 
-                    julianday(DATE(profile_payment.created_at, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) < 10 
+                    julianday(DATE(profile_payment.created_at, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) < days
                 ORDER BY 
                     profile_payment.created_at
+                LIMIT
+                    limit
+                OFFSET
+                    (page - 1) * limit
             */
 
             let results = await db
@@ -150,21 +165,116 @@ export const getRenewalProfiles = async () => {
                     profileName: profile.name,
                     owner: user.name,
                     phone: user.phone,
-                    // lastPaymentDate: profilePayment.created_at,
                     expiryDate: sql`DATETIME(${profilePayment.created_at}, '+1 YEAR')`,
                     daysLeft: sql`CAST((julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP)) AS INTEGER)`
-                    // daysLeft: sql`CAST((julianday(${profilePayment.payment_expiry}) - julianday(CURRENT_TIMESTAMP)) AS INTEGER)`
                 })
                 .from(profile)
                 .leftJoin(user, sql`${user.id} = ${profile.user_id}`)
                 .leftJoin(profilePayment, sql`${profilePayment.profile_id} = ${profile.id}`)
-                .where(sql`julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) < 10`)
+                .where(sql`julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) < ${days}`)
+                // .limit(limit)
+                // .offset((page - 1) * limit)
                 .orderBy(profilePayment.created_at)
 
-            resolve(results);
+            resolve({
+                data: results,
+                count: await db.$count(profile)
+            });
 
         } catch (error) {
             reject(error);
         }
     });
+}
+
+
+
+// Get profile by slug
+export const getProfileBySlug = async (slug: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            /*
+                SELECT 
+                    profile.*, 
+                    user.name, 
+                    user.phone, 
+                    category.name, 
+                    sub_category.name, 
+                    sub_category_option.name, 
+                    profile_media.*, 
+                    profile_license.*, 
+                    profile_tag.* 
+                FROM 
+                    profile 
+                    INNER JOIN user ON user.id = profile.user_id 
+                    LEFT JOIN profile_payment ON profile_payment.profile_id = profile.id 
+                    LEFT JOIN profile_media ON profile_media.profile_id = profile.id 
+                    LEFT JOIN profile_license ON profile_license.profile_id = profile.id 
+                    LEFT JOIN profile_tag ON profile_tag.profile_id = profile.id 
+                    LEFT JOIN category ON category.id = profile.category_id 
+                    LEFT JOIN sub_category ON sub_category.id = profile.sub_category_id 
+                    LEFT JOIN sub_category_option ON sub_category_option.id = profile.sub_category_option_id 
+                WHERE 
+                    profile.slug = slug AND 
+                    julianday(DATETIME(profile_payment.created_at, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0
+            */
+           
+            
+            let result = await db
+                .select({
+                    profile: profile,
+                    user: {
+                        name: user.name,
+                        phone: user.phone
+                    },
+                    category: category.name,
+                    subCategory: subCategory.name,
+                    // subCategoryOption: subCategoryOption.name,
+                    media: profileMedia,
+                    license: profileLicense,
+                    tags: profileTag,
+                })
+                .from(profile)
+                .innerJoin(user, sql`${user.id} = ${profile.user_id}`)
+                .leftJoin(profilePayment, sql`${profilePayment.profile_id} = ${profile.id}`)
+                .leftJoin(profileMedia, sql`${profileMedia.profile_id} = ${profile.id}`)
+                .leftJoin(profileLicense, sql`${profileLicense.profile_id} = ${profile.id}`)
+                .leftJoin(profileTag, sql`${profileTag.profile_id} = ${profile.id}`)
+                .leftJoin(category, sql`${category.id} = ${profile.category_id}`)
+                .leftJoin(subCategory, sql`${subCategory.id} = ${profile.sub_category_id}`)
+                // .leftJoin(subCategoryOption, sql`${subCategoryOption.id} = ${profile.sub_category_option_id}`)
+                .where(sql`
+                    ${profile.slug} = ${slug} AND 
+                    julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0`
+                )
+                .get();
+            
+            
+            const fieldsToRemove = ['id', 'user_id', 'partner_id', 'role', 'updated_at', 'created_at', 'status'];
+            // result = removeFields(result, fieldsToRemove);
+                        
+            resolve(result);
+
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+
+
+// Remove fields from object
+const removeFields = (obj: any, fields: string[]) => {
+    if (Array.isArray(obj)) {
+        return obj.map(item => removeFields(item, fields));
+    } else if (obj && typeof obj === 'object') {
+        return Object.keys(obj).reduce((newObj, key) => {
+            if (!fields.includes(key)) {
+                newObj[key] = removeFields(obj[key], fields);
+            }
+            return newObj;
+        }, {} as any);
+    }
+    return obj;
 }

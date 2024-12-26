@@ -41,6 +41,7 @@ export const user = sqliteTable('user', {
 }, (table) => {
     return {
         indexes: [
+            { columns: ['name'] },
             { columns: ['phone'] },
             { columns: ['role'] }
         ]
@@ -320,7 +321,8 @@ export const profilePayment = sqliteTable('profile_payment', {
             { columns: ['profile_id'] },
             { columns: ['payment_mode'] },
             { columns: ['payment_status'] },
-            { columns: ['payment_date'] }
+            { columns: ['payment_date'] },
+            { columns: ['created_at'] }
         ]
     }
 });

@@ -99,11 +99,19 @@ export interface ProfileLicense {
 }
 
 
-// export interface ProfileTag {
-//     profile_id: string;
-//     tag_id: string;
-//     status?: string;
-// }
+export interface Tag {
+    name: string;
+    category_id: string;
+    sub_category_id: string;
+    status?: string;
+}
+
+
+export interface ProfileTag {
+    profile_id: string;
+    tag_id: string;
+    status?: string;
+}
 
 
 // export interface Testimonial {

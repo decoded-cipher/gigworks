@@ -78,9 +78,11 @@ router.get('/', async (c) => {
                 data: {
                     sub_categories: result.data,
                     meta: {
-                        page: page,
-                        limit: limit,
-                        search: search,
+                        params: {
+                            page: page,
+                            limit: limit,
+                            search: search
+                        },
                         total_count: result.count,
                         total_pages: Math.ceil(result.count / limit),
                         previous: page > 1 ? `/api/v1/sub_category?page=${page - 1}&limit=${limit}` : null,
