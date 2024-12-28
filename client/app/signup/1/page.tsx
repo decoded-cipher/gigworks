@@ -366,7 +366,7 @@ const MediaAndBranding = () => {
         </form>
       </div>
       {/* Footer */}
-      <div className="fixed bottom-0 left-0 right-0 w-full border-t bg-background px-4 py-6">
+      <div className="bottom-0 left-0 right-0 w-full border-t bg-background px-4 py-6 mt-2">
         <div className="mx-auto max-w-7xl flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
           <p className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
             © 2024{" "}

@@ -85,7 +85,7 @@ export  function FooterSection() {
                 <ul className="text-white text-sm">
                   <li className="mb-4">
                     <a
-                      href="https://github.com/themesberg/flowbite"
+                      href=""
                       className="hover:underline flex "
                     >
                       <svg
@@ -106,7 +106,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href="https://github.com/themesberg/flowbite"
+                      href=""
                       className="hover:underline  flex"
                     >
                       <svg
@@ -127,7 +127,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href="https://github.com/themesberg/flowbite"
+                      href=""
                       className="hover:underline flex"
                     >
                       <svg
@@ -148,7 +148,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href="https://github.com/themesberg/flowbite"
+                      href=""
                       className="hover:underline flex"
                     >
                       <svg
@@ -169,7 +169,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href="https://github.com/themesberg/flowbite"
+                      href=""
                       className="hover:underline flex"
                     >
                       <svg
@@ -192,7 +192,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href="https://github.com/themesberg/flowbite"
+                      href=""
                       className="hover:underline flex"
                     >
                       <svg
@@ -235,7 +235,7 @@ export  function FooterSection() {
                       />
                     </svg>
                     <a href="#" className="hover:underline">
-                      +91 96565 19636
+                    +91 73061 04563
                     </a>
                   </li>
                   <li className="mb-2 md:flex">
@@ -252,7 +252,7 @@ export  function FooterSection() {
                       <path d="M20.677 4.117A1.996 1.996 0 0 0 20 4H4c-.225 0-.44.037-.642.105l.758.607L12 10.742 19.9 4.7l.777-.583Z" />
                     </svg>
                     <a href="#" className="hover:underline">
-                      hello@gigwork.co.in
+                      mail@gigwork.co.in
                     </a>
                   </li>
                   <li className="md:flex">
@@ -283,7 +283,7 @@ export  function FooterSection() {
                 <li className="rounded-full p-1">
                   {/* facebook */}
                   <a
-                    href="https://github.com/themesberg/flowbite"
+                    href=""
                     className="hover:underline"
                   >
                     <svg
@@ -303,7 +303,7 @@ export  function FooterSection() {
                 {/* insta */}
                 <li className="rounded-full p-1">
                   <a
-                    href="https://github.com/themesberg/flowbite"
+                    href=""
                     className="hover:underline  flex"
                   >
                     <svg
@@ -323,7 +323,7 @@ export  function FooterSection() {
                 {/* twitter */}
                 <li className="rounded-full p-1">
                   <a
-                    href="https://github.com/themesberg/flowbite"
+                    href=""
                     className="hover:underline"
                   >
                     <svg
@@ -343,7 +343,7 @@ export  function FooterSection() {
                 {/* linkedin */}
                 <li className="rounded-full p-1">
                   <a
-                    href="https://github.com/themesberg/flowbite"
+                    href=""
                     className="hover:underline flex"
                   >
                     <svg
@@ -363,7 +363,7 @@ export  function FooterSection() {
                 {/* youtube */}
                 <li className="rounded-full p-1">
                   <a
-                    href="https://github.com/themesberg/flowbite"
+                    href=""
                     className="hover:underline flex"
                   >
                     <svg
@@ -385,7 +385,7 @@ export  function FooterSection() {
                 {/* thread */}
                 <li className="rounded-full p-1">
                   <a
-                    href="https://github.com/themesberg/flowbite"
+                    href=""
                     className="hover:underline flex"
                   >
                     <svg

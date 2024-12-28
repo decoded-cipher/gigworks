@@ -16,11 +16,28 @@ import MissionSwiper from "./components/swiperMission";
 import { NumberTicker } from "./components/ui/AnimatedNumberTicket";
 import { FooterSection } from "./components/FooterSection";
 import ScrollToTopButton from "./components/ScrollToTop";
+import { fetchBusinessCount } from "./api";
 
 export default function GigWorkLandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [count, setCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const response = await fetchBusinessCount();
+        const count = response.data;
+        setCount(count);
+        
+      } catch (error) {
+        console.error('Error fetching business count:', error);
+      }
+    };
+
+    fetchCount();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -409,7 +426,7 @@ export default function GigWorkLandingPage() {
             Clients{" "}
             <span className="text-white bg-green-600 pr-3">Onboarded</span>
           </h2>
-          <NumberTicker value={1005} />
+          <NumberTicker value={count} />
           <div className="flex justify-center">
             <MissionSwiper />
           </div>
