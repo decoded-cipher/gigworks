@@ -4,11 +4,6 @@ import { createMiddleware } from 'hono/factory'
 import jwt from 'jsonwebtoken';
 
 
-// Generate Bearer Token
-export const generateToken = (data, c) => {
-    return jwt.sign(data, c.env.JWT_TOKEN_SECRET, { expiresIn: c.env.JWT_TOKEN_EXPIRY });
-}
-
 
 // Verify token
 export const verifyToken = createMiddleware<{

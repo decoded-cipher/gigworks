@@ -18,9 +18,12 @@ export interface LicenseType {
     description: string;
 }
 
-// export interface Tag {
-//     name: string;
-// }
+export interface Tag {
+    name: string;
+    category_id: string;
+    sub_category_id: string;
+    status?: string;
+}
 
 
 // ------------------------------------------------------------------------------------------------------
@@ -99,14 +102,6 @@ export interface ProfileLicense {
 }
 
 
-export interface Tag {
-    name: string;
-    category_id: string;
-    sub_category_id: string;
-    status?: string;
-}
-
-
 export interface ProfileTag {
     profile_id: string;
     tag_id: string;
@@ -131,4 +126,11 @@ export interface PartnerBank {
     branch_name?: string;
     account_holder?: string;
     upi_id?: string;
+}
+
+export interface TokenTable {
+    user_id?: string;
+    admin_id?: string;
+    token: string;
+    expiry: string;
 }

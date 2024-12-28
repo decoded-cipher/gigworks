@@ -2,8 +2,7 @@
 import { Hono } from 'hono';
 const router = new Hono();
 
-import { generateToken } from '../middleware/authentication';
-import { generateOTP, verifyOTP } from '../services/auth';
+import { generateOTP, verifyOTP, createAuthToken, deleteAuthToken } from '../services/auth';
 import { getUserByPhone, createUser, updateUser } from '../services/user';
 import { User } from '../config/database/interfaces';
 
@@ -23,51 +22,40 @@ import { User } from '../config/database/interfaces';
  */
 
 router.post('/register', async (c) => {
-    const { phone, name } = await c.req.json();
+    try {
+        const { phone, name } = await c.req.json();
 
-    if (!phone || !name) {
-        return c.json({
-            error: 'Phone number and name are required',
-        }, 400);
-    }
+        if (!phone || !name) {
+            return c.json({
+                error: 'Phone number and name are required'
+            }, 400);
+        }
 
-    try {        
         let user = await getUserByPhone(phone);
-        
-        if (user) {
+        const otp = await generateOTP(phone, c.env);
 
+        if (user) {
             if (user.status === 1) {
                 return c.json({
-                    error: 'User already exists. Please login',
+                    error: 'User already exists. Please login'
                 }, 400);
-            } else {
-                const otp = await generateOTP(phone, c.env);
-                // sendMessage(phone, `Your OTP is ${otp}`);
-
-                return c.json({
-                    message: 'OTP sent successfully',
-                    otp,
-                });
             }
-
         } else {
             user = await createUser({ phone, name } as User);
-            const otp = await generateOTP(phone, c.env);
-            // sendMessage(phone, `Your OTP is ${otp}`);
-
-            return c.json({
-                message: 'OTP sent successfully',
-                otp,
-            });
         }
+
+        // await sendMessage(phone, `Your OTP is ${otp}`);
+        return c.json({
+            message: 'OTP sent successfully',
+            otp
+        });
 
     } catch (error) {
         return c.json({
             message: 'Error generating OTP',
-            error
-        }, 400);
+            error: error.message || error
+        }, 500);
     }
-
 });
 
 
@@ -89,51 +77,47 @@ router.post('/verify/:mode', async (c) => {
     const { mode } = c.req.param();
 
     if (!phone || !otp) {
-        return c.json({
-            error: 'Phone number and OTP are required',
-        }, 400);
+        return errorRes(c, 'Phone number and OTP are required', 400);
     }
 
     try {
         const isValid = await verifyOTP(phone, otp, c.env);
-        console.log('isValid:', isValid);
         
         if (!isValid) {
-            return c.json({
-                error: 'Invalid OTP. Please try again',
-            }, 400);
+            return errorRes(c, 'Invalid OTP. Please try again', 400);
         }
         
         const user = await getUserByPhone(phone);
-        
+        if (!user) {
+            return errorRes(c, 'User not found', 404);
+        }
 
         switch (mode) {
             case 'register':
                 await updateUser({ id: user.id, status: 1 });
-                return c.json({
-                    message: 'Phone number verified successfully. Proceed to build your profile',
-                }, 201);
+                return successRes(c, 'Phone number verified successfully', 201);
 
             case 'login':
-                const token = await generateToken(user, c);
-                return c.json({
-                    message: 'User logged in successfully',
-                    token,
-                }, 201);
+                const token = await createAuthToken(user, c.env);
+                return successRes(c, 'User logged in successfully', 201, { token });
 
             default:
-                return c.json({
-                    error: 'Invalid mode. Please provide a valid mode',
-                }, 400);
+                return errorRes(c, 'Invalid mode. Please provide a valid mode', 400);
         }
 
     } catch (error) {
-        return c.json({
-            message: 'Error verifying OTP',
-            error
-        }, 400);
+        return errorRes(c, 'Error verifying OTP', 400, error);
     }
 });
+
+// Helper functions
+const errorRes = (c, message, statusCode, error = null) => {
+    return c.json({ error: message, details: error }, statusCode);
+}
+
+const successRes = (c, message, statusCode, data = {}) => {
+    return c.json({ message, ...data }, statusCode);
+}
 
 
 
@@ -149,36 +133,71 @@ router.post('/verify/:mode', async (c) => {
  */
 
 router.post('/login', async (c) => {
-    const { phone } = await c.req.json();
-
-    if (!phone) {
-        return c.json({
-            error: 'Phone number is required',
-        }, 400);
-    }
-
     try {
+        const { phone } = await c.req.json();
+
+        if (!phone) {
+            return c.json({
+                error: 'Phone number is required'
+            }, 400);
+        }
+
         const user = await getUserByPhone(phone);
 
         if (!user) {
             return c.json({
-                error: 'User not found. Please register',
-            }, 400);
+                error: 'User not found. Please register'
+            }, 404);
         }
 
         const otp = await generateOTP(phone, c.env);
-
-        // sendMessage(phone, `Your OTP is ${otp}`);
+        // await sendMessage(phone, `Your OTP is ${otp}`);
 
         return c.json({
             message: 'OTP sent successfully',
-            otp,
+            otp
         });
+
     } catch (error) {
         return c.json({
             message: 'Error generating OTP',
-            error
-        }, 400);
+            error: error.message || error
+        }, 500);
+    }
+});
+
+
+
+/**
+ * @route  POST /auth/logout
+ * @desc   Logout user
+ * @access Private
+ * @param  token
+ * @return message
+ * @error  400, error
+ * 
+ * @example POST /auth/logout
+ */
+
+router.post('/logout', async (c) => {
+    try {
+        const token = c.req.header('Authorization');
+        if (!token) {
+            return c.json({
+                error: 'Token is required'
+            }, 400);
+        }
+
+        await deleteAuthToken(token, c.env);
+        return c.json({
+            message: 'User logged out successfully'
+        });
+
+    } catch (error) {
+        return c.json({
+            message: 'Error logging out user',
+            error: error.message || error
+        }, 500);
     }
 });
 

@@ -55,7 +55,7 @@ export const tokenTable = sqliteTable('token', {
     user_id: text().references(() => user.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     admin_id: text().references(() => admin.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     token: text().notNull().unique(),
-    expires_at: text().notNull(),
+    expiry: text().notNull(),
     
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
