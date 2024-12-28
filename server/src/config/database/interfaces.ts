@@ -117,6 +117,18 @@ export interface ProfileTag {
 export interface Partner {
     user_id: string;
     avatar?: string;
+    address?: string;
     referral_code?: string;
     status?: string;
+}
+
+
+export interface PartnerBank {
+    partner_id: string;
+    account_number?: string;
+    ifsc?: string;
+    bank_name?: string;
+    branch_name?: string;
+    account_holder?: string;
+    upi_id?: string;
 }

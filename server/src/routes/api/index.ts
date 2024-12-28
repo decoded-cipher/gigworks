@@ -8,6 +8,7 @@ import categoryRouter from './category';
 import subCategoryRouter from './subCategory';
 import businessRouter from './business';
 import tagRouter from './tag';
+import partnerRouter from './partner';
 
 
 apiRouter.route('/user', userRouter);
@@ -15,6 +16,7 @@ apiRouter.route('/category', categoryRouter);
 apiRouter.route('/sub_category', subCategoryRouter);
 apiRouter.route('/business', businessRouter);
 apiRouter.route('/tag', tagRouter);
+apiRouter.route('/partner', partnerRouter);
 
 
 export default apiRouter;

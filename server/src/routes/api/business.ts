@@ -218,13 +218,13 @@ router.get('/slug/check', async (c) => {
         let exists = await checkProfileSlug(slug);
         if (exists) {
             return c.json({
-                message: 'Slug is not available',
+                message: 'This slug is already in use. Try another one.',
                 data: false
             }, 200);
         }
 
         return c.json({
-            message: 'Slug is available',
+            message: 'This slug is available for use. You can proceed.',
             data: true
         }, 200);
 

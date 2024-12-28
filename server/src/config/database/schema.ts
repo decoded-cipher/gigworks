@@ -141,13 +141,8 @@ export const partner = sqliteTable('partner', {
     id: text().primaryKey().$default(nanoid),
     user_id: text().notNull().references(() => user.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     avatar: text(),
-    referral_code: text().notNull().unique().$default(sql`
-        UPPER(SUBSTR(${user.name}, 1, 2)) || 
-        UPPER(SUBSTR(${user.phone}, 1, 2)) || 
-        UPPER(SUBSTR(HEX(RANDOMBLOB(1)), 1, 2)) || 
-        UPPER(SUBSTR(${user.phone}, -2))
-    `),
-
+    referral_code: text(),
+    address: text(),
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
@@ -166,11 +161,12 @@ export const partnerBank = sqliteTable('partner_bank', {
     id: text().primaryKey().$default(nanoid),
     partner_id: text().notNull().references(() => partner.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     
-    account_number: text().notNull().unique(),
-    ifsc: text().notNull(),
-    bank_name: text().notNull(),
-    branch_name: text().notNull(),
-    account_holder: text().notNull(),
+    account_number: text().unique(),
+    ifsc: text(),
+    bank_name: text(),
+    branch_name: text(),
+    account_holder: text(),
+    upi_id: text().unique(),
     
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
@@ -179,7 +175,8 @@ export const partnerBank = sqliteTable('partner_bank', {
     return {
         indexes: [
             { columns: ['partner_id'] },
-            { columns: ['account_number'] }
+            { columns: ['account_number'] },
+            { columns: ['upi_id'] }
         ]
     }
 });

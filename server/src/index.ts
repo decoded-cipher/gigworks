@@ -5,6 +5,7 @@ dotenv.config();
 import { Hono } from 'hono'
 
 import { cors } from 'hono/cors'
+// import { cache } from 'hono/cache'
 import { logger } from 'hono/logger'
 import { timeout } from 'hono/timeout'
 import { requestId } from 'hono/request-id'
@@ -35,6 +36,14 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     headers: ['Content-Type', 'Authorization'],
 }));
+
+// app.get(
+//     '*',
+//     cache({
+//         cacheName: 'api-cache',
+//         cacheControl: 'public, max-age=3600',   // 1 hour
+//     })
+// )
 
 app.use(logger());
 app.use(timeout(10000));
