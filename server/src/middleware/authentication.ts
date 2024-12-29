@@ -1,48 +1,37 @@
 
-import { ne } from 'drizzle-orm';
-import { createMiddleware } from 'hono/factory'
-import jwt from 'jsonwebtoken';
+import { HonoContext, Next } from 'hono';
+import jwt, { TokenExpiredError } from 'jsonwebtoken';
 
 
-
-// Verify token
-export const verifyToken = createMiddleware<{
-    Variables: {
-        token: string;
-        decoded: any;
-    }
-  }>(async (c, next) => {
-    console.log('Verifying token');
-    await next();
-});
-
-
-// ------------------------------------------------------------------------------------------------------
-
-
-// Verify Admin
-export const verifyAdmin = (c, next) => {
-    if (c.req.user.role !== 'admin') {
-        return c.res.status(403).json({ message: 'Forbidden' });
-    }
-    next();
+interface DecodedToken {
+    [key: string]: any;
 }
 
 
-// Verify Partner
-export const verifyPartner = (c, next) => {
-    if (c.req.user.role !== 'partner') {
-        return c.res.status(403).json({ message: 'Forbidden' });
+export const verifyToken = async (c: HonoContext, next: Next) => {
+    const authHeader = c.req.header('Authorization');
+    if (!authHeader) {
+        return c.json({
+            message: 'Access denied. No token provided'
+        }, 401);
     }
-    next();
-}
 
+    const bearerToken = authHeader.split(' ')[1];
 
-// Verify User
-export const verifyUser = (c, next) => {
-    if (c.req.user.role !== 'user') {
-        return c.res.status(403).json({ message: 'Forbidden' });
+    try {
+        const decoded = jwt.verify(bearerToken, c.env.JWT_TOKEN_SECRET) as DecodedToken;
+        c.req.user = decoded;
+        await next();
+    } catch (error) {
+        if (error instanceof TokenExpiredError) {
+            return c.json({
+                message: 'Token expired. Please login again',
+            }, 401);
+        }
+        return c.json({
+            message: 'Invalid token. Please login again',
+            // error: error.message,
+        }, 400);
     }
-    next();
-}
+};
 

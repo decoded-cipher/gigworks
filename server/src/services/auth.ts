@@ -97,7 +97,11 @@ export const createAuthToken = async (user: User, env: Env): Promise<string> => 
     return new Promise(async (resolve, reject) => {
         try {
             
-            const token = jwt.sign(user, env.JWT_TOKEN_SECRET, { expiresIn: env.JWT_TOKEN_EXPIRY });         
+            const token = jwt.sign({
+                id: user.id,
+                phone: user.phone,
+                role: user.role
+            }, env.JWT_TOKEN_SECRET, { expiresIn: env.JWT_TOKEN_EXPIRY });
 
             const existingToken = await db
                 .select(tokenTable)
@@ -109,7 +113,6 @@ export const createAuthToken = async (user: User, env: Env): Promise<string> => 
                     .update(tokenTable)
                     .set({
                         token,
-                        expiry: sql`(julianday(DATETIME('now', '+1 day')))`,
                         updated_at: sql`(CURRENT_TIMESTAMP)`
                     })
                     .where(sql`${tokenTable.user_id} = ${user.id}` || sql`${tokenTable.admin_id} = ${user.id}`)
@@ -118,8 +121,7 @@ export const createAuthToken = async (user: User, env: Env): Promise<string> => 
                     .insert(tokenTable)
                     .values({
                         user_id: user.id,
-                        token,
-                        expiry: sql`(julianday(DATETIME('now', '+1 day')))`
+                        token
                     })
                     .returning();
             }
