@@ -134,3 +134,10 @@ export interface TokenTable {
     token: string;
     expiry: string;
 }
+
+export interface ProfileMedia {
+    profile_id: string;
+    url: string;
+    description?: string;
+    status?: string;
+}

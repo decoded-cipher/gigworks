@@ -4,8 +4,8 @@ const router = new Hono();
 
 import { createUser, getUserByPhone } from '../../services/user';
 import { createPayment } from '../../services/payment';
-// import { uploadMedia } from '../../services/media';
-// import { uploadLicense } from '../../services/license';
+import { saveProfileLicense } from '../../services/profileLicense';
+
 import { 
     createProfile, 
     getProfileCount, 
@@ -33,26 +33,23 @@ import { User, Profile, ProfilePayment, ProfileMedia, ProfileLicense, ProfileTag
 
 router.post('/', async (c) => {
     try {
-        const data = await c.req.json();        
 
+        const data = await c.req.json();
+        const profileStatus = data.payment.payment_status === 'success' ? 1 : 0;
+        
         let user: User = await getUserByPhone(data.user.phone);
-    
-        let profile: Profile = await createProfile({ ...data.profile, user_id: user.id });
+
+        let profile: Profile = await createProfile({ ...data.profile, user_id: user.id, status: profileStatus });
         
         let payment: ProfilePayment | null = null;
         if (data.payment) {
             payment = await createPayment({ ...data.payment, profile_id: profile.id });
         }
 
-        // let media: Media | null = null;
-        // if (data.media) {
-        //     media = await uploadMedia(data.media, user);
-        // }
-
-        // let license: License | null = null;
-        // if (data.license) {
-        //     license = await uploadLicense(data.license, user);
-        // }
+        let license: License | null = null;
+        if (data.license) {
+            license = await saveProfileLicense(profile.id, data.license);
+        }
     
         return c.json({
             message: 'Business created successfully',
@@ -60,8 +57,7 @@ router.post('/', async (c) => {
                 user,
                 profile,
                 payment,
-                // media,
-                // license
+                license
             }
         }, 201);
     } catch (error) {
