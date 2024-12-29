@@ -79,10 +79,10 @@ export interface Profile {
 export interface ProfilePayment {
     profile_id: string;
     amount: number;
-    payment_mode: string;
-    payment_status: string;
-    transaction_id?: string;
-    payment_date: string;
+    payment_mode?: string;
+    payment_status?: string;
+    payment_id?: string;
+    payment_date?: string;
 }
 
 

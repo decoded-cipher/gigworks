@@ -107,6 +107,31 @@ export const getProfilesByCategory = async (category_id: string, page: number, l
 
 
 
+// Get all profiles by user
+export const getProfilesByUser = async (user_id: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : SELECT slug, name, avatar FROM profile WHERE user_id = user_id
+
+            let results = await db
+                .select({
+                    name: profile.name,
+                    slug: profile.slug,
+                    avatar: profile.avatar
+                })
+                .from(profile)
+                .where(sql`${profile.user_id} = ${user_id}`)
+
+            resolve(results);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+
+
 // Get total number of profiles (businesses)
 export const getProfileCount = async () => {
     return new Promise(async (resolve, reject) => {
@@ -234,7 +259,8 @@ export const getProfileBySlug = async (slug: string) => {
                     LEFT JOIN sub_category_option ON sub_category_option.id = profile.sub_category_option_id 
                 WHERE 
                     profile.slug = slug AND 
-                    julianday(DATETIME(profile_payment.created_at, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0
+                    julianday(DATETIME(profile_payment.created_at, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0 AND
+                    profile_payment.payment_status = 'success'
             */
            
             
@@ -263,8 +289,9 @@ export const getProfileBySlug = async (slug: string) => {
                 // .leftJoin(subCategoryOption, sql`${subCategoryOption.id} = ${profile.sub_category_option_id}`)
                 .where(sql`
                     ${profile.slug} = ${slug} AND 
-                    julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0`
-                )
+                    julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0 AND
+                    ${profilePayment.payment_status} = 'success'
+                `)
                 .get();
             
             

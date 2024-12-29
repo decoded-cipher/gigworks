@@ -97,7 +97,7 @@ export const createAuthToken = async (user: User, env: Env): Promise<string> => 
     return new Promise(async (resolve, reject) => {
         try {
             
-            const token = jwt.sign(user, env.JWT_TOKEN_SECRET, { expiresIn: env.JWT_TOKEN_EXPIRY });            
+            const token = jwt.sign(user, env.JWT_TOKEN_SECRET, { expiresIn: env.JWT_TOKEN_EXPIRY });         
 
             const existingToken = await db
                 .select(tokenTable)

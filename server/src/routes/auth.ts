@@ -4,6 +4,7 @@ const router = new Hono();
 
 import { generateOTP, verifyOTP, createAuthToken, deleteAuthToken } from '../services/auth';
 import { getUserByPhone, createUser, updateUser } from '../services/user';
+import { getProfilesByUser } from '../services/profile';
 import { User } from '../config/database/interfaces';
 
 // import { sendMessage } from '../services/message';
@@ -99,7 +100,8 @@ router.post('/verify/:mode', async (c) => {
 
             case 'login':
                 const token = await createAuthToken(user, c.env);
-                return successRes(c, 'User logged in successfully', 201, { token });
+                const profiles = await getProfilesByUser(user.id);
+                return successRes(c, 'User logged in successfully', 201, { token, profiles });
 
             default:
                 return errorRes(c, 'Invalid mode. Please provide a valid mode', 400);
