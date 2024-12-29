@@ -1,11 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/navSection";
 import { FooterSection } from "../components/FooterSection";
 import Link from "next/link";
+import { fetchBusinessData } from "../api";
 
 // Define the type for the category
 interface Category {
+  id: string;
   title: string;
   src: string;
 }
@@ -13,61 +15,83 @@ interface Category {
 function ExplorePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [visibleCategories, setVisibleCategories] = useState(15);
+  //to get category form api
+  const [categories, setCategories] = useState<Category[]>([]);
   
-  const categories: Category[] = [
-    { title: "Plumber", src: "/icons/plumber.svg" },
-    { title: "Electrician", src: "/icons/electrician.svg" },
-    { title: "Carpenter", src: "/icons/carpenter.svg" },
-    { title: "Painter", src: "/icons/painter.svg" },
-    { title: "Auto Mechanic", src: "/icons/mechanic.svg" },
-    { title: "Landscape Gardener", src: "/icons/gardener.svg" },
-    { title: "House Cleaner", src: "/icons/cleaner.svg" },
-    { title: "Chef", src: "/icons/cook.svg" },
-    { title: "Chauffeur", src: "/icons/driver.svg" },
-    { title: "Private Tutor", src: "/icons/tutor.svg" },
-    { title: "Childcare Provider", src: "/icons/babysitter.svg" },
-    { title: "Wellness Therapist", src: "/icons/massage.svg" },
-    { title: "Personal Trainer", src: "/icons/fitness.svg" },
-    { title: "Event Photographer", src: "/icons/photographer.svg" },
-    { title: "Repair Specialist", src: "/icons/handyman.svg" },
-    { title: "Frontend Developer", src: "/icons/developer.svg" },
-    { title: "Pipe Fitter", src: "/icons/plumber.svg" },
-    { title: "Residential Electrician", src: "/icons/electrician.svg" },
-    { title: "Furniture Carpenter", src: "/icons/carpenter.svg" },
-    { title: "Interior Painter", src: "/icons/painter.svg" },
-    { title: "Bicycle Mechanic", src: "/icons/mechanic.svg" },
-    { title: "Urban Gardener", src: "/icons/gardener.svg" },
-    { title: "Office Cleaner", src: "/icons/cleaner.svg" },
-    { title: "Pastry Chef", src: "/icons/cook.svg" },
-    { title: "Delivery Driver", src: "/icons/driver.svg" },
-    { title: "Language Tutor", src: "/icons/tutor.svg" },
-    { title: "Nanny", src: "/icons/babysitter.svg" },
-    { title: "Massage Expert", src: "/icons/massage.svg" },
-    { title: "Gym Instructor", src: "/icons/fitness.svg" },
-    { title: "Nature Photographer", src: "/icons/photographer.svg" },
-    { title: "DIY Specialist", src: "/icons/handyman.svg" },
-    { title: "Backend Developer", src: "/icons/developer.svg" },
-    { title: "Boiler Technician", src: "/icons/plumber.svg" },
-    { title: "Commercial Electrician", src: "/icons/electrician.svg" },
-    { title: "Construction Carpenter", src: "/icons/carpenter.svg" },
-    { title: "Exterior Painter", src: "/icons/painter.svg" },
-    { title: "Engine Mechanic", src: "/icons/mechanic.svg" },
-    { title: "Botanical Gardener", src: "/icons/gardener.svg" },
-    { title: "Window Cleaner", src: "/icons/cleaner.svg" },
-    { title: "Sushi Chef", src: "/icons/cook.svg" },
-    { title: "Truck Driver", src: "/icons/driver.svg" },
-    { title: "Math Tutor", src: "/icons/tutor.svg" },
-    { title: "Daycare Worker", src: "/icons/babysitter.svg" },
-    { title: "Spa Therapist", src: "/icons/massage.svg" },
-    { title: "Athletic Coach", src: "/icons/fitness.svg" },
-    { title: "Wedding Photographer", src: "/icons/photographer.svg" },
-    { title: "Home Improvement Pro", src: "/icons/handyman.svg" },
-    { title: "Full Stack Developer", src: "/icons/developer.svg" }
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchBusinessData();
+        // Ensure categories are in the correct format
+        const validCategories = response.data.categories?.map((cat: any) => ({
+          id: cat.id || '',
+          title: cat.name || cat.title || 'Untitled',
+          src: cat.src || '/icons/default.svg'
+        })) || [];
+        setCategories(validCategories);
+      } catch (error) {
+        console.error('Error:', error);
+        setCategories([]); // Set empty array on error
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  // const categories: Category[] = [
+  //   { title: "Plumber", src: "/icons/plumber.svg" },
+  //   { title: "Electrician", src: "/icons/electrician.svg" },
+  //   { title: "Carpenter", src: "/icons/carpenter.svg" },
+  //   { title: "Painter", src: "/icons/painter.svg" },
+  //   { title: "Auto Mechanic", src: "/icons/mechanic.svg" },
+  //   { title: "Landscape Gardener", src: "/icons/gardener.svg" },
+  //   { title: "House Cleaner", src: "/icons/cleaner.svg" },
+  //   { title: "Chef", src: "/icons/cook.svg" },
+  //   { title: "Chauffeur", src: "/icons/driver.svg" },
+  //   { title: "Private Tutor", src: "/icons/tutor.svg" },
+  //   { title: "Childcare Provider", src: "/icons/babysitter.svg" },
+  //   { title: "Wellness Therapist", src: "/icons/massage.svg" },
+  //   { title: "Personal Trainer", src: "/icons/fitness.svg" },
+  //   { title: "Event Photographer", src: "/icons/photographer.svg" },
+  //   { title: "Repair Specialist", src: "/icons/handyman.svg" },
+  //   { title: "Frontend Developer", src: "/icons/developer.svg" },
+  //   { title: "Pipe Fitter", src: "/icons/plumber.svg" },
+  //   { title: "Residential Electrician", src: "/icons/electrician.svg" },
+  //   { title: "Furniture Carpenter", src: "/icons/carpenter.svg" },
+  //   { title: "Interior Painter", src: "/icons/painter.svg" },
+  //   { title: "Bicycle Mechanic", src: "/icons/mechanic.svg" },
+  //   { title: "Urban Gardener", src: "/icons/gardener.svg" },
+  //   { title: "Office Cleaner", src: "/icons/cleaner.svg" },
+  //   { title: "Pastry Chef", src: "/icons/cook.svg" },
+  //   { title: "Delivery Driver", src: "/icons/driver.svg" },
+  //   { title: "Language Tutor", src: "/icons/tutor.svg" },
+  //   { title: "Nanny", src: "/icons/babysitter.svg" },
+  //   { title: "Massage Expert", src: "/icons/massage.svg" },
+  //   { title: "Gym Instructor", src: "/icons/fitness.svg" },
+  //   { title: "Nature Photographer", src: "/icons/photographer.svg" },
+  //   { title: "DIY Specialist", src: "/icons/handyman.svg" },
+  //   { title: "Backend Developer", src: "/icons/developer.svg" },
+  //   { title: "Boiler Technician", src: "/icons/plumber.svg" },
+  //   { title: "Commercial Electrician", src: "/icons/electrician.svg" },
+  //   { title: "Construction Carpenter", src: "/icons/carpenter.svg" },
+  //   { title: "Exterior Painter", src: "/icons/painter.svg" },
+  //   { title: "Engine Mechanic", src: "/icons/mechanic.svg" },
+  //   { title: "Botanical Gardener", src: "/icons/gardener.svg" },
+  //   { title: "Window Cleaner", src: "/icons/cleaner.svg" },
+  //   { title: "Sushi Chef", src: "/icons/cook.svg" },
+  //   { title: "Truck Driver", src: "/icons/driver.svg" },
+  //   { title: "Math Tutor", src: "/icons/tutor.svg" },
+  //   { title: "Daycare Worker", src: "/icons/babysitter.svg" },
+  //   { title: "Spa Therapist", src: "/icons/massage.svg" },
+  //   { title: "Athletic Coach", src: "/icons/fitness.svg" },
+  //   { title: "Wedding Photographer", src: "/icons/photographer.svg" },
+  //   { title: "Home Improvement Pro", src: "/icons/handyman.svg" },
+  //   { title: "Full Stack Developer", src: "/icons/developer.svg" }
+  // ];
 
   // Filter categories based on search term
   const filteredCategories = categories.filter(category => 
-    category.title.toLowerCase().includes(searchTerm.toLowerCase())
+    category?.title?.toLowerCase().includes(searchTerm.toLowerCase() || '')
   );
 
   // Function to load more categories
