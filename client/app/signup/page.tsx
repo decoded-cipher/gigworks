@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import BusinessOverview from '../components/signup/bussiness-overview'
 import LocationDetails from '../components/signup/location-details'
 import BusinessOperations from '../components/signup/business-operations'
+import { createBusiness } from '../api/index'
 
 // Define the main form data interface
 export interface FormData {
@@ -125,17 +127,63 @@ export default function SignupPage() {
     }
   })
 
-  const router = useRouter()
+  const handleFinalSubmit = async () => {
+    try {
+      const payload = {
+        user: {
+          name: formData.ownerName,
+          phone: formData.whatsAppNumber,
+        },
+        profile: {
+          name: formData.businessName,
+          slug: formData.slug,
+          description: formData.businessDescription,
+          email: formData.emailAddress,
+          website: formData.websiteURL || '',
+          category_id: formData.businessCategory,
+          sub_category_id: '', // Add this to your form if needed
+          address: formData.address.streetAddress,
+          city: formData.address.city,
+          state: formData.address.state,
+          zip: formData.address.pinCode,
+          type: formData.businessType.toLowerCase(),
+        },
+        payment: {
+          amount: 100.00, // This should come from your configuration
+          payment_status: 'success', // This should be updated based on actual payment status
+        }
+      }
 
-  const handleNext = () => {
+      const response = await createBusiness(payload)
+      toast.success('Business created successfully!')
+      router.push('/profile') // or wherever you want to redirect after success
+    } catch (error) {
+      console.error('Error creating business:', error)
+      toast.error('Failed to create business. Please try again.')
+    }
+  }
+
+  const handleNext = async () => {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1)
     } else {
       // Handle final submission
-      console.log('Final form data:', formData)
-      router.push('/profile')
+      await handleFinalSubmit()
     }
   }
+
+
+  const router = useRouter()
+
+  // const handleNext = () => {
+  //   if (currentStep < 3) {
+  //     setCurrentStep(currentStep + 1)
+  //   } else {
+  //     // Handle final submission
+  //     console.log('Final form data:', formData)
+  //     router.push('/profile')
+  //   }
+  // }
 
   const handlePrevious = () => {
     if (currentStep > 1) {

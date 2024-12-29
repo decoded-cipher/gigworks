@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import { Textarea } from "@nextui-org/input"
 import type { FormData } from '../../signup/page'
+import{fetchBusinessData, fetchsubCategoryByCategory} from '../../api/index'
 
 interface BusinessOverviewProps {
   formData: FormData
@@ -10,12 +11,19 @@ interface BusinessOverviewProps {
   onNext: () => void
 }
 
+interface Category {
+  id: string;
+  name: string;
+}
 export default function BusinessOverview({
   formData,
   updateFormData,
   onNext
 }: BusinessOverviewProps) {
   const [slugFocused, setSlugFocused] = useState(false)
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -37,6 +45,35 @@ export default function BusinessOverview({
     }
   }
 
+  
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchBusinessData();
+        setCategories(data.data.categories); // Adjust according to the structure of your data
+        console.log(data.data.categories);
+        
+      } catch (error) {
+        console.error('Error fetching business categories:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleCategoryChange = async (event: any) => {
+    const categoryId = event.target.value;
+    setSelectedCategory(categoryId);
+
+    try {
+      const data = await fetchsubCategoryByCategory(categoryId);
+      setSubCategories(data.data.subCategory); // Adjust according to the structure of your data
+      console.log(data.data.subCategory);
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onNext()
@@ -57,7 +94,7 @@ export default function BusinessOverview({
               type="text"
               name="businessName"
               value={formData.businessName}
-              onChange={handleInputChange}
+              onChange={handleCategoryChange}
               placeholder="Eg : Super Maerk"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
               required
@@ -70,17 +107,16 @@ export default function BusinessOverview({
             </label>
             <select 
               name="businessCategory"
-              value={formData.businessCategory}
-              onChange={handleInputChange}
+              value={selectedCategory}
+              onChange={handleCategoryChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
               required
             >
+              
               <option value="">Select Category</option>
-              <option value="retail">Retail</option>
-              <option value="service">Service</option>
-              <option value="food">Food & Beverage</option>
-              <option value="technology">Technology</option>
-              <option value="consulting">Consulting</option>
+              {categories.map((category:Category) => (
+                <option key={category.id} value={category.id}>{category.name}</option>
+              ))}
             </select>
           </div>
 
@@ -91,9 +127,11 @@ export default function BusinessOverview({
             <select 
               name="subCategory"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-              
-            >
+                        >
               <option value="">Select Sub Category</option>
+              {subCategories.map((subCategory: any) => (
+                <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
+              ))}
             </select>
           </div>
 
@@ -105,8 +143,7 @@ export default function BusinessOverview({
             <select 
               name="subCategoryOptions"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-              
-            >
+                          >
               <option value="">Select Sub Category</option>
             </select>
           </div>
@@ -169,10 +206,9 @@ export default function BusinessOverview({
               required
             >
               <option value="">Business Type</option>
-              <option value="soleProprietorship">Sole Proprietorship</option>
-              <option value="partnership">Partnership</option>
-              <option value="corporation">Corporation</option>
-              <option value="limitedLiabilityCompany">Limited Liability Company</option>
+              <option value="online">Online</option>
+              <option value="offline">Offline</option>
+              <option value="hybrid">Hybrid</option>
             </select>
           </div>
 
@@ -217,7 +253,7 @@ export default function BusinessOverview({
               value={formData.businessDescription}
               onChange={handleInputChange}
               placeholder="Business Description"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 h-24"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md  h-24"
             />
           </div>
 
@@ -261,6 +297,7 @@ export default function BusinessOverview({
             </div>
           </div>
         </div>
+
         <div className="flex justify-end mt-4">
           <button
             type="submit"
