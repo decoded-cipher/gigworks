@@ -182,29 +182,12 @@ export const partnerBank = sqliteTable('partner_bank', {
 });
 
 
-// Partner Identity Proof Type
-export const partnerIdProofType = sqliteTable('partner_id_proof_type', {
-    id: text().primaryKey().$default(nanoid),
-    name: text().notNull().unique(),
-    description: text(),
-    status: integer().default(1).notNull(),
-    created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
-    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
-}, (table) => {
-    return {
-        indexes: [
-            { columns: ['name'] }
-        ]
-    }
-});
-
-
 // Partner Identity Proof
 export const partnerIdProof = sqliteTable('partner_id_proof', {
     id: text().primaryKey().$default(nanoid),
     partner_id: text().notNull().references(() => partner.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     
-    proof_type_id: text().notNull().references(() => partnerIdProofType.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    proof_type: integer().$type('ENUM', [1, 2, 3]).default(1).notNull(), // 1: aadhar, 2: pan, 3: driving license
     proof_number: text().notNull().unique(),
     proof_url: text().notNull(),
     

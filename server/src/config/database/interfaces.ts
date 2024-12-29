@@ -70,6 +70,8 @@ export interface Profile {
     logo?: string;
     type: string;
     additional_services?: string;
+
+    referral_code?: string;
     partner_id?: string;
 
     status?: string;

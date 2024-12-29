@@ -40,6 +40,12 @@ router.post('/', async (c) => {
         let user: User = await getUserByPhone(data.user.phone);
 
         let profile: Profile = await createProfile({ ...data.profile, user_id: user.id, status: profileStatus });
+
+        if (!profile) {
+            return c.json({
+                message: 'Business creation failed',
+            }, 400);
+        }
         
         let payment: ProfilePayment | null = null;
         if (data.payment) {
