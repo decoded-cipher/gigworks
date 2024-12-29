@@ -36,11 +36,12 @@ export const fetchBusinessesByslug = async (slug: string) => {
   }
 };
 
-export const CreateBusiness = async (data: any) => {
+
+export const fetchBusinessCount = async () =>{
   try {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/business`,
-      data
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/business/count`
+
     );
     return response.data;
   } catch (error) {
@@ -92,11 +93,25 @@ export const UserLogout = async (data: any) => {
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+}
+
+
+
+
+
+
+export const CreateBusiness = async (data: any) => {
+  try {
+    const response = await axios.post(
+      '${process.env.NEXT_PUBLIC_API_URL}/api/v1/business',
+
       data
     );
     return response.data;
   } catch (error) {
     console.error('Error fetching businesses:', error);
-    throw error;
-  }
+
+    throw error;
+  }
+
 };
