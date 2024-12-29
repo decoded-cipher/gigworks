@@ -114,7 +114,7 @@ export const getProfileCount = async () => {
             
             // SQL Query : SELECT COUNT(*) FROM profile
 
-            const additionalCount = 100;
+            const additionalCount = 1000;
             let result = await db.select({ count: sql`COUNT(*)` }).from(profile).get();
             result = result.count + additionalCount;
 
