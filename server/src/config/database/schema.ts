@@ -306,9 +306,10 @@ export const profilePayment = sqliteTable('profile_payment', {
 
     amount: integer().notNull(),
     payment_mode: text().notNull().$type('ENUM', ['cash', 'debit_card', 'credit_card', 'net_banking', 'upi', 'wallet']).default('cash'),
-    payment_status: text().notNull().$type('ENUM', ['pending', 'success', 'failed']),
+    payment_status: text().notNull().$type('ENUM', ['pending', 'success', 'failed']).default('pending'),
     transaction_id: text(),
     payment_date: text(),   // Date from payment gateway
+
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()

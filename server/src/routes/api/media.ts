@@ -21,16 +21,15 @@ import { generatePreSignedUrl } from '../../services/media';
 
 router.get('/get-presigned-url', async (c) => {    
     try {
-        const name = c.req.query('name');
         const type = c.req.query('type');
         const category = c.req.query('category');
 
         const categories = ['avatar', 'banner', 'license', 'identity'];
         const allowedFileTypes = ['image', 'video'];
 
-        if (!name || !type || !category) {
+        if (!type || !category) {
             return c.json({
-                message: 'Name, Type and Category are required'
+                message: 'Type and Category are required'
             }, 400);
         }
 
@@ -48,9 +47,7 @@ router.get('/get-presigned-url', async (c) => {
 
         const fileExtension = type.split('/')[1];
         const path = `${category}/${nanoid()}${fileExtension ? `.${fileExtension}` : ''}`;
-        const url = await generatePreSignedUrl(path, type, c.env);
-        console.log(url);
-        
+        const url = await generatePreSignedUrl(path, type, c.env);        
 
         if (!url) {
             return c.json({
