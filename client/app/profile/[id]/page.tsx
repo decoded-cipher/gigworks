@@ -43,6 +43,8 @@ interface BusinessData {
     services?: string[]; // Add services to the interface
   }
 
+  export const runtime = 'edge';
+
 const DevMorphixWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
