@@ -93,8 +93,14 @@ export const UserLogout = async (data: any) => {
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
-}
-
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    throw error;
+  }
+};
 
 interface BusinessPayload {
   user: {
