@@ -23,12 +23,9 @@ export const createProfile = async (data: Profile) => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            let partnerData = null;
-            let socials = data.socials;
-            delete data.socials;
-
             // SQL Query : SELECT id FROM partner WHERE referral_code = data.referral_code
-
+            
+            let partnerData = null;
             if (data.referral_code) {
                 partnerData = await db
                     .select({
@@ -42,13 +39,20 @@ export const createProfile = async (data: Profile) => {
                 }
             }
 
+            if(data.operating_hours) {
+                data.operating_hours = JSON.stringify(data.operating_hours);
+            }
+
+            if(data.socials) {
+                data.socials = JSON.stringify(data.socials);
+            }
+
             // SQL Query : INSERT INTO profile (name, slug, description, email, website, phone, gstin, category_id, sub_category_id, sub_category_option_id, address, city, state, zip, country, facebook, instagram, twitter, linkedin, youtube, logo, type, additional_services, referral_code, partner_id) VALUES (data.name, data.slug, data.description, data.email, data.website, data.phone, data.gstin, data.category_id, data.sub_category_id, data.sub_category_option_id, data.address, data.city, data.state, data.zip, data.country, data.facebook, data.instagram, data.twitter, data.linkedin, data.youtube, data.logo, data.type, data.additional_services, data.referral_code, partnerData[0].id)
             
             let result = await db
                 .insert(profile)
                 .values({
                     ...data,
-                    ...socials,
                     partner_id: partnerData ? partnerData[0].id : null
                 }).returning();
 
@@ -356,7 +360,10 @@ export const getProfileBySlug = async (slug: string) => {
                     
                 ]);
                 
-                const data = { ...profileResult, licenses, media, tags };
+                let data = { ...profileResult, licenses, media, tags };
+                data.profile.operating_hours = JSON.parse(data.profile.operating_hours);
+                data.profile.socials = JSON.parse(data.profile.socials);
+
                 
                 const fieldsToRemove = ['id', 'user_id', 'category_id', 'sub_category_id', 'sub_category_option_id', 'partner_id', 'role', 'updated_at', 'created_at', 'status'];
                 const result = removeFields(data, fieldsToRemove);

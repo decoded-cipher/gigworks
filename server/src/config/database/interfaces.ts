@@ -45,12 +45,11 @@ export interface Profile {
     slug: string;
     description?: string;
     email?: string;
-    website?: string;
     phone?: string;
 
-    category_id: number;
-    sub_category_id: number;
-    // sub_category_option_id: number
+    category_id: string;
+    sub_category_id: string;
+    sub_category_option_id: string;
 
     address?: string;
     city?: string;
@@ -58,11 +57,8 @@ export interface Profile {
     zip?: string;
     country?: string;
 
-    facebook?: string;
-    instagram?: string;
-    twitter?: string;
-    linkedin?: string;
-    youtube?: string;
+    operating_hours?: string;
+    socials?: string;
 
     logo?: string;
     type: string;

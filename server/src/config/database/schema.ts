@@ -221,7 +221,6 @@ export const profile = sqliteTable('profile', {
     slug: text().notNull().unique(),
     description: text(),
     email: text(),
-    website: text(),
     phone: text().unique(), // Extra phone number other than owner phone number
 
     // Category
@@ -236,23 +235,15 @@ export const profile = sqliteTable('profile', {
     zip: text(),  // pin code
     country: text().default('India'),
 
-    // Operating Hours
-    // open_time: text(),
-    // close_time: text(),
-
-    // Social Media
-    facebook: text(),
-    instagram: text(),
-    twitter: text(),
-    linkedin: text(),
-    youtube: text(),
+    operating_hours: text(),
+    socials: text(),
 
     // Additional details
     avatar: text(),
     banner: text(),
     type: integer().$type('ENUM', [1, 2, 3]).default(1).notNull(), // 1: online, 2: offline, 3: hybrid
     additional_services: text(),
-    gstin: text().unique(),
+    gstin: text(),
     
     partner_id: text().references(() => partner.id, {onDelete: 'SET NULL', onUpdate: 'CASCADE'}),
 
@@ -268,7 +259,7 @@ export const profile = sqliteTable('profile', {
             { columns: ['phone'] },
             { columns: ['category_id'] },
             { columns: ['sub_category_id'] },
-            // { columns: ['sub_category_option_id'] },
+            { columns: ['sub_category_option_id'] },
             { columns: ['city'] },
             { columns: ['state'] },
             { columns: ['zip'] },
@@ -354,7 +345,7 @@ export const profileLicense = sqliteTable('profile_license', {
     id: text().primaryKey().$default(nanoid),
     profile_id: text().notNull().references(() => profile.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     license_type_id: text().notNull().references(() => licenseType.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
-    license_number: text().notNull().unique(),
+    license_number: text().notNull(),
     license_url: text(),
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
