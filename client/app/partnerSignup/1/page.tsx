@@ -3,14 +3,21 @@
 import React, { useState, ChangeEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { GetURL } from '../../api/index';
+import axios from "axios";
 
 interface FormData {
   fullName: string;
   whatsAppNumber: string;
   address: string;
   idProof: string;
-  uploadId: File | null;
-  profileImage: File | null;
+  uploadId: string;  // Changed to string with empty default
+  profileImage: string;  // Changed to string with empty default
+}
+
+interface UploadResponse {
+  presignedUrl: string;
+  assetpath: string;
 }
 
 const ProfileForm = () => {
@@ -19,52 +26,134 @@ const ProfileForm = () => {
     whatsAppNumber: "",
     address: "",
     idProof: "",
-    uploadId: null,
-    profileImage: null,
+    uploadId: "",  // Initialize with empty string instead of null
+    profileImage: "",  // Initialize with empty string instead of null
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const router = useRouter();
 
-  const handleInputChange = (
+  // Debug log for form data changes
+  React.useEffect(() => {
+    console.log('Current Form Data:', formData);
+  }, [formData]);
+
+  const handleInputChange = async (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
     const files = (e.target as HTMLInputElement).files;
 
-    if (type === "file" && files) {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: files[0],
-      }));
+    if (type === "file" && files && files[0]) {
+      try {
+        setIsUploading(true);
+        const file = files[0];
+    
+        // Get file type from the mime type
+        const type = file.type;
+    
+        // Set category based on input field name
+        const category = name === 'uploadId' ? 'identity' : 'avatar';
+    
+        console.log('Uploading file:', {
+          name,
+          type,
+          category,
+          fileSize: file.size
+        });
+        // Get presigned URL
+        const response:any = await GetURL({
+          type,
+          category
+        });
+
+        console.log('GetURL Response:', response);
+
+        // Upload file to presigned URL
+        const uploadResponse: any = await axios.put(response.data.presignedUrl, file, {
+          headers: {
+            'Content-Type': file.type,
+            // 'x-amz-acl': 'public-read'
+          }
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error(`HTTP error! status: ${uploadResponse.status}`);
+        }
+
+        console.log('File uploaded successfully');
+
+        // Log the responseAttachment
+        console.log('ResponseAttachment:', `${name}-${response.assetpath}. URL: ${response.presignedUrl}`);
+
+        // Update form data with assetpath
+        setFormData(prev => {
+          const newData = {
+            ...prev,
+            [name]: response.assetpath
+          };
+          console.log('Updated form data:', newData);
+          return newData;
+        });
+
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        alert('Error uploading file. Please try again.');
+      } finally {
+        setIsUploading(false);
+      }
     } else {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         [name]: value,
       }));
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
+    console.log('Submitting form with data:', formData);
+
+    try {
+      // Format the data according to the required structure
+      const formattedData = {
+        user: {
+          name: formData.fullName,
+          phone: formData.whatsAppNumber,
+        },
+        partner: {
+          address: formData.address,
+          avatar: formData.profileImage || "https://fastly.picsum.photos/id/535/200/300.jpg?hmac=iN2CqXJjjbBwtMlTUpWyZV6xFRfk_-XSDYRSk2eFbsQ",
+          identityProof: formData.uploadId
+        }
+      };
+
+      // Store in localStorage
+      localStorage.setItem('partnerFormData', JSON.stringify(formattedData));
+      
+      // Navigate to next step
+      router.push("/partnerSignup/2");
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Error submitting form. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Preview component to show uploaded files
+  const FilePreview = ({ path, label }: { path: string; label: string }) => {
+    if (!path) return null;
     
-    // Format the data according to the required structure
-    const formattedData = {
-      user: {
-        name: formData.fullName,
-        phone: formData.whatsAppNumber,
-      },
-      partner: {
-        address: formData.address,
-        avatar: "https://fastly.picsum.photos/id/535/200/300.jpg?hmac=iN2CqXJjjbBwtMlTUpWyZV6xFRfk_-XSDYRSk2eFbsQ"
-        // avatar will be handled later
-      }
-    };
-  
-    // Store in localStorage
-    localStorage.setItem('partnerFormData', JSON.stringify(formattedData));
-    
-    // Use router instead of window.location
-    router.push("/partnerSignup/2");
+    return (
+      <div className="mt-2">
+        <p className="text-sm text-gray-600">{label}: {path}</p>
+      </div>
+    );
   };
 
   return (
@@ -144,9 +233,12 @@ const ProfileForm = () => {
                 Address <span className="text-red-500">*</span>
               </label>
               <textarea
-              placeholder="Business Description"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 h-36"
-            />
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+                placeholder="Business Description"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 h-36"
+              />
             </div>
 
             {/* ID Proof */}
@@ -175,9 +267,13 @@ const ProfileForm = () => {
               <input
                 type="file"
                 name="uploadId"
+                accept="image/*"
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                disabled={isUploading}
               />
+              {isUploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>}
+              <FilePreview path={formData.uploadId} label="ID Document" />
             </div>
           </div>
 
@@ -196,13 +292,15 @@ const ProfileForm = () => {
                   className="hidden"
                   id="profileImage"
                   accept="image/*"
+                  disabled={isUploading}
                 />
                 <label
                   htmlFor="profileImage"
-                  className="cursor-pointer text-gray-600"
+                  className={`cursor-pointer text-gray-600 ${isUploading ? 'opacity-50' : ''}`}
                 >
-                  Drag and drop or click to upload
+                  {isUploading ? 'Uploading...' : 'Drag and drop or click to upload'}
                 </label>
+                <FilePreview path={formData.profileImage} label="Profile Image" />
               </div>
             </div>
           </div>
@@ -211,9 +309,10 @@ const ProfileForm = () => {
            <div className="flex justify-end mt-4">
             <button
               type="submit"
-              className="w-full md:w-40 bg-[#303030] text-white font-bold px-4 py-2 rounded-md hover:bg-gray-800 transition-colors"
+              disabled={isSubmitting || isUploading}
+              className="w-full md:w-40 bg-[#303030] text-white font-bold px-4 py-2 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
             >
-              Next &rarr;
+              {isSubmitting ? 'Submitting...' : 'Next →'}
             </button>
           </div>
         </form>

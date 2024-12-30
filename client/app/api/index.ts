@@ -1,9 +1,11 @@
 import axios from 'axios';
 
+const BASE_URL = "https://gigworks-server.devmorphix.workers.dev";
+// const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export const fetchBusinessData = async () => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/category` ///api/v1/category?page=1&limit=3
+      `${BASE_URL}/api/v1/category` ///api/v1/category?page=1&limit=3
     );
     return response.data;
   } catch (error) {
@@ -15,7 +17,7 @@ export const fetchBusinessData = async () => {
 export const fetchBusinessesByCategory = async (categoryId: string) => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/business?category_id=${categoryId}`
+      `${BASE_URL}/api/v1/business?category_id=${categoryId}`
     );
     return response.data;
   } catch (error) {
@@ -27,7 +29,7 @@ export const fetchBusinessesByCategory = async (categoryId: string) => {
 export const fetchBusinessesByslug = async (slug: string) => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/business/${slug}`
+      `${BASE_URL}/api/v1/business/${slug}`
     );
     return response.data;
   } catch (error) {
@@ -40,7 +42,7 @@ export const fetchBusinessesByslug = async (slug: string) => {
 export const fetchBusinessCount = async () =>{
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/business/count`
+      `${BASE_URL}/api/v1/business/count`
 
     );
     return response.data;
@@ -50,17 +52,30 @@ export const fetchBusinessCount = async () =>{
   }
 };
 
-// pending
+interface GetURLParams {
+  type: string;
+  category: 'identity' | 'avatar';
+}
 
-export const GetURL = async () =>{
+interface GetURLResponse {
+  presignedUrl: string;
+  assetpath: string;
+}
+
+export const GetURL = async (params: GetURLParams): Promise<GetURLResponse> => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/get-presigned-url`
-
+      `${BASE_URL}/api/v1/media/get-presigned-url`,
+      {
+        params: {
+          type: params.type,     
+          category: params.category 
+        }
+      }
     );
     return response.data;
   } catch (error) {
-    console.error('Error fetching businesses:', error);
+    console.error('Error getting presigned URL:', error);
     throw error;
   }
 };
@@ -70,7 +85,7 @@ export const GetURL = async () =>{
 export const UploadMedia = async (data: any) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+      `${BASE_URL}/auth/register`,
       data
     );
     return response.data;
@@ -83,7 +98,7 @@ export const UploadMedia = async (data: any) => {
 export const UserRegister = async (data: any) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+      `${BASE_URL}/auth/register`,
       data
     );
     return response.data;
@@ -96,7 +111,7 @@ export const UserRegister = async (data: any) => {
 export const UserLogin = async (data: any) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+      `${BASE_URL}/auth/login`,
       data
     );
     return response.data;
@@ -109,7 +124,7 @@ export const UserLogin = async (data: any) => {
 export const VerifyLoginOTP = async (data: any) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/verify/login`,
+      `${BASE_URL}/auth/verify/login`,
       data
     );
     return response.data;
@@ -127,7 +142,7 @@ export const CreatePartner = async (data: any) => {
       ?.split('=')[1];
 
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/partner`,
+      `${BASE_URL}/api/v1/partner`,
       data,
       {
         headers: {
@@ -145,7 +160,7 @@ export const CreatePartner = async (data: any) => {
 export const VerifyRegisterOTP = async (data: any) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/verify/register`,
+      `${BASE_URL}/auth/verify/register`,
       data
     );
     return response.data;
@@ -158,7 +173,7 @@ export const VerifyRegisterOTP = async (data: any) => {
 export const UserLogout = async (data: any) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+      `${BASE_URL}/auth/logout`,
       data
     );
     return response.data;
@@ -198,7 +213,7 @@ interface BusinessPayload {
 export const createBusiness = async (data: BusinessPayload) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/business`,
+      `${BASE_URL}/api/v1/business`,
 
       data
     )
@@ -213,7 +228,7 @@ export const createBusiness = async (data: BusinessPayload) => {
 export const fetchsubCategoryByCategory = async (categoryId: string) => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/category/${categoryId}`
+      `${BASE_URL}/api/v1/category/${categoryId}`
     );
     // console.log('response',response.data);
     
@@ -228,7 +243,7 @@ export const fetchsubCategoryByCategory = async (categoryId: string) => {
 export const fetchDataBySubCategory = async (subCategoryId: string) => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/sub_category/${subCategoryId}`
+      `${BASE_URL}/api/v1/sub_category/${subCategoryId}`
     );
     console.log('response',response.data);
     
@@ -243,7 +258,7 @@ export const fetchDataBySubCategory = async (subCategoryId: string) => {
 export const checkSlug = async (value: string) => { 
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/business/slug/check`,
+      `${BASE_URL}/api/v1/business/slug/check`,
       {
         params: { value }
       }
@@ -258,7 +273,7 @@ export const checkSlug = async (value: string) => {
 export const fetchLicenseData = async () => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/license`
+      `${BASE_URL}/api/v1/license`
     );
     return response.data;
   } catch (error) {
