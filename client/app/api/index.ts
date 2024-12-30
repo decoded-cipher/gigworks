@@ -52,30 +52,44 @@ export const fetchBusinessCount = async () =>{
 
 // pending
 
-export const GetURL = async () =>{
+export const GetURL = async (category: 'avatar' | 'banner' | 'license' | 'identity', fileType: string) => {
   try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/get-presigned-url`
+    // Check if API URL is defined
+    if (!process.env.NEXT_PUBLIC_API_URL) {
+      throw new Error('API URL is not defined');
+    }
 
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/get-presigned-url`,
+      {
+        params: {
+          type: fileType,
+          category: category
+        }
+      }
     );
     return response.data;
-  } catch (error) {
-    console.error('Error fetching businesses:', error);
+  } catch (error: any) {
+    // Better error handling
+    if (error.code === 'ERR_NAME_NOT_RESOLVED') {
+      console.error('API URL could not be resolved. Check your environment variables and API server.');
+    }
     throw error;
   }
 };
 
-// no correct
-
-export const UploadMedia = async (data: any) => {
+export const uploadToPresignedUrl = async (presignedUrl: string, file: File) => {
+  console.log(file);
+  
   try {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
-      data
-    );
-    return response.data;
+    await axios.put(presignedUrl, file, {
+      headers: {
+        'Content-Type': file.type,
+      },
+    });
+    return true;
   } catch (error) {
-    console.error('Error fetching businesses:', error);
+    console.error('Error uploading file:', error);
     throw error;
   }
 };
@@ -214,6 +228,21 @@ export const fetchsubCategoryByCategory = async (categoryId: string) => {
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/category/${categoryId}`
+    );
+    // console.log('response',response.data);
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching subcategory:', error);
+    throw error;
+  }
+}
+
+
+export const fetchDataBySubCategory = async (subCategoryId: string) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/sub_category/${subCategoryId}`
     );
     console.log('response',response.data);
     

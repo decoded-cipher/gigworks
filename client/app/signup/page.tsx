@@ -15,11 +15,15 @@ export interface FormData {
   // Business Overview
   profileImage: File | null;
   coverImage: File | null;
+  avatar: string; // Add this to store the avatar asset path
+  banner: string; // Add this to store the banner asset path
   businessName: string;
   businessDescription: string;
   whatsAppNumber: string;
   websiteURL: string;
   businessCategory: string;
+  subCategory: string;  // Add this new field
+  subCategoryOption: string;  // Add this new field
   ownerName: string;
   emailAddress: string;
   businessType: string;
@@ -70,11 +74,15 @@ export default function SignupPage() {
     // Business Overview initial state
     profileImage: null,
     coverImage: null,
+    avatar: "", // Initialize avatar
+    banner: "", // Initialize banner
     businessName: "",
     businessDescription: "",
     whatsAppNumber: "",
     websiteURL: "",
     businessCategory: "",
+    subCategory: "",
+    subCategoryOption: "",
     ownerName: "",
     emailAddress: "",
     businessType: "",
@@ -136,53 +144,65 @@ export default function SignupPage() {
 
   const handleFinalSubmit = async () => {
     try {
+      const profileData = {
+        name: formData.businessName,
+        slug: formData.slug,
+        description: formData.businessDescription,
+        email: formData.emailAddress,
+        website: formData.websiteURL || "",
+        category_id: formData.businessCategory,
+        sub_category_id: formData.subCategory,
+        sub_category_option_id: formData.subCategoryOption,
+        address: formData.address.streetAddress,
+        city: formData.address.city,
+        state: formData.address.state,
+        zip: formData.address.pinCode,
+        socials: {
+          facebook: formData.socialMediaHandles.find(h => h.platform === "Facebook")?.link || "",
+          instagram: formData.socialMediaHandles.find(h => h.platform === "Instagram")?.link || "",
+          twitter: formData.socialMediaHandles.find(h => h.platform === "Twitter")?.link || "",
+          linkedin: formData.socialMediaHandles.find(h => h.platform === "LinkedIn")?.link || "",
+          youtube: formData.socialMediaHandles.find(h => h.platform === "YouTube")?.link || ""
+        },
+        avatar: formData.profileImage ? "avatar/path-to-uploaded-image.png" : "",
+        banner: formData.coverImage ? "banner/path-to-uploaded-image.png" : "",
+        type: formData.businessType.toLowerCase(),
+        additional_services: Object.entries(formData.additionalServices)
+          .filter(([_, value]) => value)
+          .map(([key]) => key)
+          .join(", "),
+        gstin: formData.gstin,
+        referral_code: formData.referral_code
+      };
+
       const payload = {
         user: {
           name: formData.ownerName,
           phone: formData.whatsAppNumber
         },
-        profile: {
-          name: formData.businessName,
-          slug: formData.slug,
-          description: formData.businessDescription,
-          email: formData.emailAddress,
-          website: formData.websiteURL || "",
-          category_id: formData.businessCategory,
-          sub_category_id: "", // Make sure to add this to your form data
-          address: formData.address.streetAddress,
-          city: formData.address.city,
-          state: formData.address.state,
-          zip: formData.address.pinCode,
-          socials: {
-            facebook: formData.socialMediaHandles[0]?.link || "",
-            instagram: formData.socialMediaHandles[1]?.link || "",
-            twitter: formData.socialMediaHandles[2]?.link || "",
-            linkedin: formData.socialMediaHandles[3]?.link || "",
-            youtube: formData.socialMediaHandles[4]?.link || ""
-          },
-          avatar: formData.profileImage ? "avatar/path-to-uploaded-image.png" : "",
-          banner: formData.coverImage ? "banner/path-to-uploaded-image.png" : "",
-          type: formData.businessType.toLowerCase(),
-          additional_services: Object.entries(formData.additionalServices)
-            .filter(([_, value]) => value)
-            .map(([key]) => key)
-            .join(", "),
-          gstin: formData.gstin,
-          referral_code: formData.referral_code
-        },
+        profile: profileData,
         payment: {
-          amount: 250 // Fixed amount as per your requirement
+          amount: 250
         },
-        license: formData.otherLicenses.map(license => ({
-          type_id: license.type,
-          number: license.registrationNumber,
-          url: license.certification || "license/test.png"
-        }))
+        license: formData.otherLicenses
+          .filter(license => license.type && license.registrationNumber)
+          .map(license => ({
+            type_id: license.type,
+            number: license.registrationNumber,
+            url: license.certification || "license/test.png"
+          }))
       };
 
       const response = await createBusiness(payload);
+      
+      // Extract the slug from the response
+      const profileSlug = response.data.profile.slug;
+      
       toast.success("Business created successfully!");
-      router.push("/profile");
+      
+      // Redirect to the profile page with the slug
+      router.push(`/profile/${profileSlug}`);
+      
     } catch (error) {
       console.error("Error creating business:", error);
       toast.error("Failed to create business. Please try again.");

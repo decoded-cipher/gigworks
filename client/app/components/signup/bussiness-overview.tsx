@@ -3,10 +3,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { Textarea } from "@nextui-org/input";
 import type { FormData } from "../../signup/page";
+import { handleAssetUpload } from "../../utils/assetUpload";  // Add this import
 import {
   fetchBusinessData,
   fetchsubCategoryByCategory,
   checkSlug,
+  fetchDataBySubCategory
 } from "../../api/index";
 
 interface Category {
@@ -37,6 +39,8 @@ export default function BusinessOverview({
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   const [slugError, setSlugError] = useState<string | null>(null);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState('');
+  const [subCategoryOptions, setSubCategoryOptions] = useState([]);
 
   // Debounce function
   const debounce = (func: Function, wait: number) => {
@@ -73,12 +77,28 @@ export default function BusinessOverview({
     []
   );
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+  const handleInputChange = async (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value, files } = e.target as HTMLInputElement;
+    const { name, value, type, files } = e.target as HTMLInputElement;
+
+    if (files && files[0]) {
+      try {
+        // Determine category based on input name
+        const category = name === 'profileImage' ? 'avatar' : 'banner';
+        const assetPath = await handleAssetUpload(files[0], category);
+        
+        updateFormData({
+          [name]: files[0],
+          [category]: assetPath // Store the returned asset path
+        });
+        
+      } catch (error) {
+        console.error(`Error uploading ${name}:`, error);
+        // Consider adding error toast/notification here
+      }
+      return;
+    }
 
     if (name === "slug") {
       const slugValue = value
@@ -95,7 +115,7 @@ export default function BusinessOverview({
       }
     } else {
       updateFormData({
-        [name]: files ? files[0] : value,
+        [name]: value,
       });
     }
   };
@@ -116,15 +136,45 @@ export default function BusinessOverview({
   const handleCategoryChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const categoryId = event.target.value;
     setSelectedCategory(categoryId);
+    
+    // Update form data with category ID
+    updateFormData({
+      businessCategory: categoryId
+    });
 
     try {
       const data = await fetchsubCategoryByCategory(categoryId);
-      // Add null check and default to empty array if data.data.subCategory is undefined
       setSubCategories(data.data.subCategory || []);
     } catch (error) {
       console.error("Error fetching subcategories:", error);
-      setSubCategories([]); // Set empty array on error
+      setSubCategories([]);
     }
+  };
+
+  const handleSubCategoryChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const subCategoryId = event.target.value;
+    setSelectedSubCategory(subCategoryId);
+
+    // Update form data with subcategory ID
+    updateFormData({
+      subCategory: subCategoryId
+    });
+
+    try {
+      const data = await fetchDataBySubCategory(subCategoryId);
+      setSubCategoryOptions(data.data.subCategoryOption);
+    } catch (error) {
+      console.error("Error fetching data by subcategory:", error);
+    }
+  };
+
+  const handleSubCategoryOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const optionId = event.target.value;
+    
+    // Update form data with subcategory option ID
+    updateFormData({
+      subCategoryOption: optionId
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -160,7 +210,7 @@ export default function BusinessOverview({
             </label>
             <select
               name="businessCategory"
-              value={formData.businessCategory = selectedCategory} 
+              value={selectedCategory}
               onChange={handleCategoryChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
               required
@@ -176,34 +226,41 @@ export default function BusinessOverview({
 
           <div>
             <label className="block text-base font-bold pb-2 text-gray-700">
-              Sub Category<span className="text-red-500">*</span>
+              SubCategory<span className="text-red-500">*</span>
             </label>
             <select
               name="subCategory"
+              value={selectedSubCategory}
+              onChange={handleSubCategoryChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+              required
             >
-              <option value="">Select Sub Category</option>
-              {Array.isArray(subCategories) && subCategories.map((subCategory: SubCategory) => (
-                <option key={subCategory.id} value={subCategory.id}>
-                  {subCategory.name}
-                </option>
+              <option value="">Select SubCategory</option>
+              {subCategories.map((subCategory: any) => (
+                <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
               ))}
             </select>
           </div>
 
-          {/* Second Row */}
           <div>
             <label className="block text-base font-bold pb-2 text-gray-700">
               Sub Category Options<span className="text-red-500">*</span>
             </label>
             <select
-              name="subCategoryOptions"
+              name="subCategoryOption"
+              value={formData.subCategoryOption}
+              onChange={handleSubCategoryOptionChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
-              <option value="">Select Sub Category</option>
+              <option value="">Select Sub Category Option</option>
+              {subCategoryOptions.map((option: any) => (
+                <option key={option.id} value={option.id}>{option.name}</option>
+              ))}
             </select>
           </div>
 
+          {/* Rest of your form fields */}
+          {/* Second Row */}
           <div>
             <label className="block text-base font-bold pb-2 text-gray-700">
               Owner&apos;s/Manager&apos;s Name

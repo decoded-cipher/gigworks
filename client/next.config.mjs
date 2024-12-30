@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === 'development') {
 const nextConfig = {
   serverRuntimeConfig: {
     runtime: 'edge'
-  }
+  },
 };
 
 export default nextConfig;
