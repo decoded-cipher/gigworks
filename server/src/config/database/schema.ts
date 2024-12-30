@@ -227,7 +227,7 @@ export const profile = sqliteTable('profile', {
     // Category
     category_id: text().notNull().references(() => category.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     sub_category_id: text().notNull().references(() => subCategory.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
-    // sub_category_option_id: text().notNull().references(() => subCategoryOption.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    sub_category_option_id: text().notNull().references(() => subCategoryOption.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
 
     // Location
     address: text(),

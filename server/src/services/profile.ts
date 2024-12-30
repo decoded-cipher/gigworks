@@ -299,12 +299,14 @@ export const getProfileBySlug = async (slug: string) => {
                         },
                         category: category.name,
                         subCategory: subCategory.name,
+                        subCategoryOption: subCategoryOption.name
                     })
                     .from(profile)
                     .innerJoin(user, sql`${user.id} = ${profile.user_id}`)
                     .leftJoin(profilePayment, sql`${profilePayment.profile_id} = ${profile.id}`)
                     .leftJoin(category, sql`${category.id} = ${profile.category_id}`)
                     .leftJoin(subCategory, sql`${subCategory.id} = ${profile.sub_category_id}`)
+                    .leftJoin(subCategoryOption, sql`${subCategoryOption.id} = ${profile.sub_category_option_id}`)
                     .where(sql`
                         ${profile.slug} = ${slug} AND 
                         julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0 AND
@@ -353,7 +355,7 @@ export const getProfileBySlug = async (slug: string) => {
                 
                 const data = { ...profileResult, licenses, media, tags };
                 
-                const fieldsToRemove = ['id', 'user_id', 'category_id', 'sub_category_id', 'partner_id', 'role', 'updated_at', 'created_at', 'status'];
+                const fieldsToRemove = ['id', 'user_id', 'category_id', 'sub_category_id', 'sub_category_option_id', 'partner_id', 'role', 'updated_at', 'created_at', 'status'];
                 const result = removeFields(data, fieldsToRemove);
                 
                 resolve(result);
