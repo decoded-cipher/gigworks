@@ -4,13 +4,14 @@ const router = new Hono();
 
 import { createUser, getUserByPhone } from '../../services/user';
 import { createPayment } from '../../services/payment';
-// import { uploadMedia } from '../../services/media';
-// import { uploadLicense } from '../../services/license';
+import { saveProfileLicense } from '../../services/profileLicense';
+
 import { 
     createProfile, 
     getProfileCount, 
     getRenewalProfiles, 
     getProfileBySlug, 
+    checkProfileSlug, 
     getProfilesByCategory
 } from '../../services/profile';
 
@@ -32,26 +33,29 @@ import { User, Profile, ProfilePayment, ProfileMedia, ProfileLicense, ProfileTag
 
 router.post('/', async (c) => {
     try {
-        const data = await c.req.json();        
 
+        const data = await c.req.json();
+        const profileStatus = data.payment.payment_status === 'success' ? 1 : 0;
+        
         let user: User = await getUserByPhone(data.user.phone);
-    
-        let profile: Profile = await createProfile({ ...data.profile, user_id: user.id });
+
+        let profile: Profile = await createProfile({ ...data.profile, user_id: user.id, status: profileStatus });
+
+        if (!profile) {
+            return c.json({
+                message: 'Business creation failed',
+            }, 400);
+        }
         
         let payment: ProfilePayment | null = null;
         if (data.payment) {
             payment = await createPayment({ ...data.payment, profile_id: profile.id });
         }
 
-        // let media: Media | null = null;
-        // if (data.media) {
-        //     media = await uploadMedia(data.media, user);
-        // }
-
-        // let license: License | null = null;
-        // if (data.license) {
-        //     license = await uploadLicense(data.license, user);
-        // }
+        let license: License | null = null;
+        if (data.license) {
+            license = await saveProfileLicense(profile.id, data.license);
+        }
     
         return c.json({
             message: 'Business created successfully',
@@ -59,8 +63,7 @@ router.post('/', async (c) => {
                 user,
                 profile,
                 payment,
-                // media,
-                // license
+                license
             }
         }, 201);
     } catch (error) {
@@ -185,6 +188,46 @@ router.get('/:slug', async (c) => {
         return c.json({
             message: 'Business fetched successfully',
             data: profile
+        }, 200);
+
+    } catch (error) {
+        return c.json({
+            message: 'Internal Server Error',
+            error: error.message
+        }, 500);
+    }
+});
+
+
+
+/**
+ * @route   GET /api/v1/business/slug/check
+ * @desc    Check if a business slug is available
+ * @access  Public
+ * @params  slug
+ * @return  message, data
+ * @error   400, { error }
+ * @status  200, 400
+ * 
+ * @example /api/v1/business/slug/check?value=slug
+ **/
+
+router.get('/slug/check', async (c) => {
+    try {
+
+        const slug = c.req.query('value');
+        
+        let exists = await checkProfileSlug(slug);
+        if (exists) {
+            return c.json({
+                message: 'This slug is already in use. Try another one.',
+                data: false
+            }, 200);
+        }
+
+        return c.json({
+            message: 'This slug is available for use. You can proceed.',
+            data: true
         }, 200);
 
     } catch (error) {

@@ -27,7 +27,7 @@ export const createTag = async (data: Tag) => {
 
 
 // Get all tags by category and sub category with pagination
-export const getTags = async (category_id: number, sub_category_id: number, page: number, limit: number, search: string) => {
+export const getTags = async (category_id: string, sub_category_id: string, page: number, limit: number, search: string) => {
     return new Promise(async (resolve, reject) => {
         try {
             

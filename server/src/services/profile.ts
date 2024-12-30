@@ -1,7 +1,19 @@
 
 import { count, eq, sql } from "drizzle-orm";
 import { db } from '../config/database/connection';
-import { user, profile, profilePayment, profileMedia, profileTag, profileLicense, category, subCategory, subCategoryOption } from '../config/database/schema';
+import { 
+    user, 
+    profile, 
+    partner, 
+    profilePayment, 
+    profileMedia, 
+    profileTag,
+    licenseType,
+    profileLicense, 
+    category, 
+    subCategory, 
+    subCategoryOption
+} from '../config/database/schema';
 import { User, Profile } from '../config/database/interfaces';
 
 
@@ -11,12 +23,42 @@ export const createProfile = async (data: Profile) => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            // SQL Query : INSERT INTO profile (name, description, email, website, phone, registration_number, gstin, category_id, user_id) VALUES (name, description, email, website, phone, registration_number, gstin, category_id, user_id)
+            // SQL Query : SELECT id FROM partner WHERE referral_code = data.referral_code
             
-            let result = await db.insert(profile).values({ ...data }).returning();
+            let partnerData = null;
+            if (data.referral_code) {
+                partnerData = await db
+                    .select({
+                        id: partner.id
+                    })
+                    .from(partner)
+                    .where(sql`${partner.referral_code} = ${data.referral_code}`)
+    
+                if (!partnerData.length) {
+                    reject(new Error('Invalid referral code'));
+                }
+            }
+
+            if(data.operating_hours) {
+                data.operating_hours = JSON.stringify(data.operating_hours);
+            }
+
+            if(data.socials) {
+                data.socials = JSON.stringify(data.socials);
+            }
+
+            // SQL Query : INSERT INTO profile (name, slug, description, email, website, phone, gstin, category_id, sub_category_id, sub_category_option_id, address, city, state, zip, country, facebook, instagram, twitter, linkedin, youtube, logo, type, additional_services, referral_code, partner_id) VALUES (data.name, data.slug, data.description, data.email, data.website, data.phone, data.gstin, data.category_id, data.sub_category_id, data.sub_category_option_id, data.address, data.city, data.state, data.zip, data.country, data.facebook, data.instagram, data.twitter, data.linkedin, data.youtube, data.logo, data.type, data.additional_services, data.referral_code, partnerData[0].id)
+            
+            let result = await db
+                .insert(profile)
+                .values({
+                    ...data,
+                    partner_id: partnerData ? partnerData[0].id : null
+                }).returning();
+
             result = result[0];
 
-            return resolve(result);
+            resolve(result);
         } catch (error) {
             reject(error);
         }
@@ -30,7 +72,7 @@ export const updateProfile = async (id: string, profile: Profile) => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            // SQL Query : UPDATE profile SET name = name, description = description, email = email, website = website, phone = phone, registration_number = registration_number, gstin = gstin, category_id = category
+            // SQL Query : UPDATE profile SET name = name, description = description, email = email, website = website, phone = phone, gstin = gstin, category_id = category
 
             let result = await db.update(profile).set({ ...profile }).where(sql`${profile.id} = ${id}`).returning();
             result = result[0];
@@ -107,6 +149,31 @@ export const getProfilesByCategory = async (category_id: string, page: number, l
 
 
 
+// Get all profiles by user
+export const getProfilesByUser = async (user_id: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : SELECT slug, name, avatar FROM profile WHERE user_id = user_id
+
+            let results = await db
+                .select({
+                    name: profile.name,
+                    slug: profile.slug,
+                    avatar: profile.avatar
+                })
+                .from(profile)
+                .where(sql`${profile.user_id} = ${user_id}`)
+
+            resolve(results);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+
+
 // Get total number of profiles (businesses)
 export const getProfileCount = async () => {
     return new Promise(async (resolve, reject) => {
@@ -114,7 +181,7 @@ export const getProfileCount = async () => {
             
             // SQL Query : SELECT COUNT(*) FROM profile
 
-            const additionalCount = 100;
+            const additionalCount = 1000;
             let result = await db.select({ count: sql`COUNT(*)` }).from(profile).get();
             result = result.count + additionalCount;
 
@@ -184,6 +251,28 @@ export const getRenewalProfiles = async (page: number, limit: number, days: numb
 
 
 
+// Check if profile slug exists
+export const checkProfileSlug = async (slug: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : SELECT * FROM profile WHERE slug = slug
+
+            let result = await db
+                .select()
+                .from(profile)
+                .where(sql`${profile.slug} = ${slug}`)
+                .get();
+
+            resolve(result);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+
+
 // Get profile by slug
 export const getProfileBySlug = async (slug: string) => {
     return new Promise(async (resolve, reject) => {
@@ -195,61 +284,91 @@ export const getProfileBySlug = async (slug: string) => {
                     user.name, 
                     user.phone, 
                     category.name, 
-                    sub_category.name, 
-                    sub_category_option.name, 
-                    profile_media.*, 
-                    profile_license.*, 
-                    profile_tag.* 
+                    sub_category.name 
                 FROM 
                     profile 
                     INNER JOIN user ON user.id = profile.user_id 
                     LEFT JOIN profile_payment ON profile_payment.profile_id = profile.id 
-                    LEFT JOIN profile_media ON profile_media.profile_id = profile.id 
-                    LEFT JOIN profile_license ON profile_license.profile_id = profile.id 
-                    LEFT JOIN profile_tag ON profile_tag.profile_id = profile.id 
                     LEFT JOIN category ON category.id = profile.category_id 
                     LEFT JOIN sub_category ON sub_category.id = profile.sub_category_id 
-                    LEFT JOIN sub_category_option ON sub_category_option.id = profile.sub_category_option_id 
                 WHERE 
                     profile.slug = slug AND 
-                    julianday(DATETIME(profile_payment.created_at, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0
+                    julianday(DATETIME(profile_payment.created_at, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0 AND 
+                    profile_payment.payment_status = 'success'
             */
-           
-            
-            let result = await db
-                .select({
-                    profile: profile,
-                    user: {
-                        name: user.name,
-                        phone: user.phone
-                    },
-                    category: category.name,
-                    subCategory: subCategory.name,
-                    // subCategoryOption: subCategoryOption.name,
-                    media: profileMedia,
-                    license: profileLicense,
-                    tags: profileTag,
-                })
-                .from(profile)
-                .innerJoin(user, sql`${user.id} = ${profile.user_id}`)
-                .leftJoin(profilePayment, sql`${profilePayment.profile_id} = ${profile.id}`)
-                .leftJoin(profileMedia, sql`${profileMedia.profile_id} = ${profile.id}`)
-                .leftJoin(profileLicense, sql`${profileLicense.profile_id} = ${profile.id}`)
-                .leftJoin(profileTag, sql`${profileTag.profile_id} = ${profile.id}`)
-                .leftJoin(category, sql`${category.id} = ${profile.category_id}`)
-                .leftJoin(subCategory, sql`${subCategory.id} = ${profile.sub_category_id}`)
-                // .leftJoin(subCategoryOption, sql`${subCategoryOption.id} = ${profile.sub_category_option_id}`)
-                .where(sql`
-                    ${profile.slug} = ${slug} AND 
-                    julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0`
-                )
-                .get();
-            
-            
-            const fieldsToRemove = ['id', 'user_id', 'partner_id', 'role', 'updated_at', 'created_at', 'status'];
-            // result = removeFields(result, fieldsToRemove);
-                        
-            resolve(result);
+
+                let profileResult = await db
+                    .select({
+                        profile: profile,
+                        user: {
+                            name: user.name,
+                            phone: user.phone
+                        },
+                        category: category.name,
+                        subCategory: subCategory.name,
+                        subCategoryOption: subCategoryOption.name
+                    })
+                    .from(profile)
+                    .innerJoin(user, sql`${user.id} = ${profile.user_id}`)
+                    .leftJoin(profilePayment, sql`${profilePayment.profile_id} = ${profile.id}`)
+                    .leftJoin(category, sql`${category.id} = ${profile.category_id}`)
+                    .leftJoin(subCategory, sql`${subCategory.id} = ${profile.sub_category_id}`)
+                    .leftJoin(subCategoryOption, sql`${subCategoryOption.id} = ${profile.sub_category_option_id}`)
+                    .where(sql`
+                        ${profile.slug} = ${slug} AND 
+                        julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0 AND
+                        ${profilePayment.payment_status} = 'success'
+                    `)
+                    .get();
+                
+                if (!profileResult) {
+                    resolve(null);
+                    return;
+                }
+                
+                const [licenses, media, tags] = await Promise.all([
+
+                    /*
+                        SELECT 
+                            license_type.name, 
+                            profile_license.license_number, 
+                            profile_license.license_url, 
+                            license_type.description 
+                        FROM 
+                            profile_license 
+                            LEFT JOIN license_type ON license_type.id = profile_license.license_type_id 
+                        WHERE 
+                            profile_license.profile_id = profileResult.profile.id
+                    */
+                    
+                    db.select({
+                        name: licenseType.name,
+                        number: profileLicense.license_number,
+                        url: profileLicense.license_url,
+                        description: licenseType.description
+                    })
+                    .from(profileLicense)
+                    .leftJoin(licenseType, sql`${licenseType.id} = ${profileLicense.license_type_id}`)
+                    .where(sql`${profileLicense.profile_id} = ${profileResult.profile.id}`)
+                    .all(),
+                    
+                    // SQL Query : SELECT * FROM profile_media WHERE profile_id = profileResult.profile.id
+                    db.select().from(profileMedia).where(sql`${profileMedia.profile_id} = ${profileResult.profile.id}`).all(),
+
+                    // SQL Query : SELECT * FROM profile_tag WHERE profile_id = profileResult.profile.id
+                    db.select().from(profileTag).where(sql`${profileTag.profile_id} = ${profileResult.profile.id}`).all()
+                    
+                ]);
+                
+                let data = { ...profileResult, licenses, media, tags };
+                data.profile.operating_hours = JSON.parse(data.profile.operating_hours);
+                data.profile.socials = JSON.parse(data.profile.socials);
+
+                
+                const fieldsToRemove = ['id', 'user_id', 'category_id', 'sub_category_id', 'sub_category_option_id', 'partner_id', 'role', 'updated_at', 'created_at', 'status'];
+                const result = removeFields(data, fieldsToRemove);
+                
+                resolve(result);
 
         } catch (error) {
             reject(error);
