@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+
 export const fetchBusinessData = async () => {
   try {
     const response = await axios.get(
@@ -50,17 +51,30 @@ export const fetchBusinessCount = async () =>{
   }
 };
 
-// pending
+interface GetURLParams {
+  type: string;
+  category: 'identity' | 'avatar';
+}
 
-export const GetURL = async () =>{
+interface GetURLResponse {
+  presignedUrl: string;
+  assetpath: string;
+}
+
+export const GetURL = async (params: GetURLParams): Promise<GetURLResponse> => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/get-presigned-url`
-
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/get-presigned-url`,
+      {
+        params: {
+          type: params.type,     
+          category: params.category 
+        }
+      }
     );
     return response.data;
   } catch (error) {
-    console.error('Error fetching businesses:', error);
+    console.error('Error getting presigned URL:', error);
     throw error;
   }
 };
