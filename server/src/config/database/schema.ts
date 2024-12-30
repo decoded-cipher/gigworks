@@ -4,6 +4,8 @@ import { sql, gte, lte } from "drizzle-orm";
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { timestamp } from 'drizzle-orm/mysql-core';
 
+import { partnerIdProofTypes } from './interfaces';
+
 
 
 // ------------------------------------------------------------------------------------------------------
@@ -187,7 +189,7 @@ export const partnerIdProof = sqliteTable('partner_id_proof', {
     id: text().primaryKey().$default(nanoid),
     partner_id: text().notNull().references(() => partner.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     
-    proof_type: integer().$type('ENUM', [1, 2, 3]).default(1).notNull(), // 1: aadhar, 2: pan, 3: driving license
+    proof_type_id: integer().$type('ENUM', partnerIdProofTypes.map((type) => type.id)).notNull(),
     proof_number: text().notNull().unique(),
     proof_url: text().notNull(),
     

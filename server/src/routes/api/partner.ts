@@ -5,9 +5,9 @@ const router = new Hono();
 import { createUser, getUserByPhone } from '../../services/user';
 import { createPartner } from '../../services/partner';
 import { createPartnerBank } from '../../services/partnerBank';
-// import { createPartnerIdProof } from '../../services/partnerIdProof';
+import { createPartnerIdProof } from '../../services/partnerProof';
 
-import { User, Partner, PartnerBank, PartnerIdProof, PartnerIdProofType } from '../../config/database/interfaces';
+import { User, Partner, PartnerBank, PartnerIdProof } from '../../config/database/interfaces';
 
 
 /**
@@ -41,10 +41,10 @@ router.post('/', async (c) => {
             partnerBank = await createPartnerBank({ ...data.partnerBank, partner_id: partner.id });
         }
 
-        // let partnerIdProof: PartnerIdProof | null = null;
-        // if (data.partnerIdProof) {
-        //     partnerIdProof = await createPartnerIdProof({ ...data.partnerIdProof, partner_id: partner.id });
-        // }
+        let partnerIdProof = null;
+        if (data.identityProof) {
+            partnerIdProof = await createPartnerIdProof({ ...data.identityProof, partner_id: partner.id });
+        }
     
         return c.json({
             message: 'Partner created successfully',
@@ -52,7 +52,7 @@ router.post('/', async (c) => {
                 user,
                 partner,
                 partnerBank,
-                // partnerIdProof
+                partnerIdProof
             }
         });
     } catch (error) {

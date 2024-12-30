@@ -143,3 +143,29 @@ export interface ProfileMedia {
     description?: string;
     status?: string;
 }
+
+
+// ------------------------------------------------------------------------------------------------------
+
+
+interface PartnerIdProofType {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+export const partnerIdProofTypes: PartnerIdProofType[] = [
+    { id: 1, name: 'Aadhar Card', slug: 'aadhar-card' },
+    { id: 2, name: 'Voter ID', slug: 'voter-id' },
+    { id: 3, name: 'Driving License', slug: 'driving-license' },
+    { id: 4, name: 'Passport', slug: 'passport' },
+    { id: 5, name: 'PAN Card', slug: 'pan-card' }
+];
+
+export interface PartnerIdProof {
+    partner_id: string;
+    proof_type_id: number;
+    proof_number: string;
+    proof_url?: string;
+    status?: string;
+}
