@@ -215,6 +215,21 @@ export const fetchsubCategoryByCategory = async (categoryId: string) => {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/category/${categoryId}`
     );
+    // console.log('response',response.data);
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching subcategory:', error);
+    throw error;
+  }
+}
+
+
+export const fetchDataBySubCategory = async (subCategoryId: string) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/sub_category/${subCategoryId}`
+    );
     console.log('response',response.data);
     
     return response.data;

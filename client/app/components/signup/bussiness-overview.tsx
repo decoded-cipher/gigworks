@@ -7,6 +7,7 @@ import {
   fetchBusinessData,
   fetchsubCategoryByCategory,
   checkSlug,
+  fetchDataBySubCategory
 } from "../../api/index";
 
 interface BusinessOverviewProps {
@@ -27,6 +28,8 @@ export default function BusinessOverview({
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   const [slugError, setSlugError] = useState<string | null>(null);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState('');
+  const [subCategoryOptions, setSubCategoryOptions] = useState([]);
 
   // Debounce function
   const debounce = (func: Function, wait: number) => {
@@ -119,6 +122,22 @@ export default function BusinessOverview({
     }
   };
 
+  const handleSubCategoryChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const subCategoryId = event.target.value;
+    setSelectedSubCategory(subCategoryId);
+
+    try {
+      const data = await fetchDataBySubCategory(subCategoryId);
+      // Handle the fetched data as needed
+      setSubCategoryOptions(data.data.subCategoryOption);
+      console.log("data aney",data.data.subCategoryOption);
+    } catch (error) {
+      console.error("Error fetching data by subcategory:", error);
+    }
+  };
+
+  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onNext();
@@ -167,22 +186,22 @@ export default function BusinessOverview({
           </div>
 
           <div>
-            <label className="block text-base font-bold pb-2 text-gray-700">
-              Sub Category<span className="text-red-500">*</span>
-            </label>
-            <select
-              name="subCategory"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              <option value="">Select Sub Category</option>
-              {subCategories.map((subCategory: any) => (
-                <option key={subCategory.id} value={subCategory.id}>
-                  {subCategory.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                SubCategory<span className="text-red-500">*</span>
+              </label>
+              <select
+                name="subCategory"
+                value={selectedSubCategory}
+                onChange={handleSubCategoryChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                required
+              >
+                <option value="">Select SubCategory</option>
+                {subCategories.map((subCategory: any) => (
+                  <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
+                ))}
+              </select>
+            </div>
           {/* Second Row */}
           <div>
             <label className="block text-base font-bold pb-2 text-gray-700">
@@ -193,6 +212,9 @@ export default function BusinessOverview({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
               <option value="">Select Sub Category</option>
+              {subCategoryOptions.map((option: any) => (
+                <option key={option.id} value={option.id}>{option.name}</option>
+              ))}
             </select>
           </div>
 
