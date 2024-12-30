@@ -157,7 +157,7 @@ export default function LocationDetails({
               </div>
             </div>
 
-            <div className="relative w-full z-0">
+            {/* <div className="relative w-full z-0">
               <h1 className="py-2 sm:py-4 font-semibold text-xl">
                 Pick Location <span className="text-red-500">*</span>
               </h1>
@@ -170,7 +170,7 @@ export default function LocationDetails({
                   Choose Location
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Operating Hours */}

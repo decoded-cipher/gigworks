@@ -1,12 +1,12 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import type { FormData } from '../../signup/page'
 
 interface BusinessOperationsProps {
   formData: FormData
   updateFormData: (data: Partial<FormData>) => void
-  onNext: () => void
+  onNext: () => Promise<void> // Updated to handle async
   onPrevious: () => void
 }
 
@@ -16,6 +16,8 @@ export default function BusinessOperations({
   onNext,
   onPrevious
 }: BusinessOperationsProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -44,6 +46,7 @@ export default function BusinessOperations({
       updateFormData({ [name]: value })
     }
   }
+  
 
   const addLicense = () => {
     updateFormData({
@@ -60,9 +63,16 @@ export default function BusinessOperations({
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onNext()
+    setIsSubmitting(true)
+    try {
+      await onNext()
+    } catch (error) {
+      console.error('Submission error:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -98,7 +108,7 @@ export default function BusinessOperations({
               <React.Fragment key={index}>
                 <div className="w-full">
                   <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-lg font-bold">Other Licenses</h3>
+                    <h3 className="text-lg font-bold">Licenses</h3>
                     {index === formData.otherLicenses.length - 1 && (
                       <button
                         type="button"
@@ -226,7 +236,7 @@ export default function BusinessOperations({
               <input
                 type="text"
                 name="businessRegistrationNumber"
-                value={formData.businessRegistrationNumber}
+                value={formData.referral_code}
                 onChange={handleInputChange}
                 placeholder="If any referral code"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030]"
@@ -240,15 +250,17 @@ export default function BusinessOperations({
           <button
             type="button"
             onClick={onPrevious}
-            className="w-full md:w-40 bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
+            disabled={isSubmitting}
+            className="w-full md:w-40 bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded-md hover:bg-gray-300 transition-colors disabled:opacity-50"
           >
             &larr; Previous
           </button>
           <button
             type="submit"
-            className="w-full md:w-40 bg-[#303030] text-white font-bold px-4 py-2 rounded-md hover:bg-gray-800 transition-colors"
+            disabled={isSubmitting}
+            className="w-full md:w-40 bg-[#303030] text-white font-bold px-4 py-2 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
           >
-            Submit
+            {isSubmitting ? 'Creating...' : 'Submit'}
           </button>
         </div>
       </form>
