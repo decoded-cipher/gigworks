@@ -46,8 +46,25 @@ const ProfileForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
-    router.push("/signup/2");
+    
+    // Format the data according to the required structure
+    const formattedData = {
+      user: {
+        name: formData.fullName,
+        phone: formData.whatsAppNumber,
+      },
+      partner: {
+        address: formData.address,
+        avatar: "https://fastly.picsum.photos/id/535/200/300.jpg?hmac=iN2CqXJjjbBwtMlTUpWyZV6xFRfk_-XSDYRSk2eFbsQ"
+        // avatar will be handled later
+      }
+    };
+  
+    // Store in localStorage
+    localStorage.setItem('partnerFormData', JSON.stringify(formattedData));
+    
+    // Use router instead of window.location
+    router.push("/partnerSignup/2");
   };
 
   return (
@@ -142,7 +159,6 @@ const ProfileForm = () => {
                 value={formData.idProof}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                required
               >
                 <option value="">Select</option>
                 <option value="passport">Passport</option>
@@ -154,14 +170,13 @@ const ProfileForm = () => {
             {/* Upload ID */}
             <div>
               <label className="block text-base font-semibold mb-2">
-                Upload ID <span className="text-red-500">*</span>
+                Upload ID
               </label>
               <input
                 type="file"
                 name="uploadId"
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                required
               />
             </div>
           </div>
@@ -171,7 +186,7 @@ const ProfileForm = () => {
             <h2 className="text-xl font-bold mb-4">Media</h2>
             <div>
               <label className="block text-base font-semibold mb-2">
-                Upload Profile <span className="text-red-500">*</span>
+                Upload Profile
               </label>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
                 <input
@@ -181,7 +196,6 @@ const ProfileForm = () => {
                   className="hidden"
                   id="profileImage"
                   accept="image/*"
-                  required
                 />
                 <label
                   htmlFor="profileImage"
@@ -197,7 +211,6 @@ const ProfileForm = () => {
            <div className="flex justify-end mt-4">
             <button
               type="submit"
-              onClick={() => (window.location.href = "/partnerSignup/2")}
               className="w-full md:w-40 bg-[#303030] text-white font-bold px-4 py-2 rounded-md hover:bg-gray-800 transition-colors"
             >
               Next &rarr;

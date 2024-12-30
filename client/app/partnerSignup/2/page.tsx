@@ -3,6 +3,7 @@
 import React, { useState, ChangeEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { CreatePartner } from "../../api";
 
 interface BankDetails {
   accountHolderName: string;
@@ -10,6 +11,7 @@ interface BankDetails {
   ifsc: string;
   branch: string;
   upiId: string;
+  bankName: string;  // Add this new field
 }
 
 const BankDetailsForm = () => {
@@ -19,6 +21,7 @@ const BankDetailsForm = () => {
     ifsc: "",
     branch: "",
     upiId: "",
+    bankName: "",  // Add this new field
   });
 
   const router = useRouter();
@@ -31,10 +34,40 @@ const BankDetailsForm = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
-    // Handle form submission
+    
+    // Get the previous data from localStorage
+    const previousData = JSON.parse(localStorage.getItem('partnerFormData') || '{}');
+    
+    if (!previousData.user || !previousData.partner) {
+      console.error('Missing user data from step 1');
+      router.push("/partnerSignup/1");
+      return;
+    }
+
+    // Combine all data in the required format
+    const finalData = {
+      user: previousData.user,
+      partner: previousData.partner,
+      partnerBank: {
+        account_number: formData.accountNumber,
+        ifsc: formData.ifsc,
+        bank_name: formData.bankName,
+        branch_name: formData.branch,
+        account_holder: formData.accountHolderName,
+        upi_id: formData.upiId
+      }
+    };
+
+    try {
+      const response = await CreatePartner(finalData);
+      console.log('Partner created:', response);
+      localStorage.removeItem('partnerFormData');
+      router.push("/partnerProfile");
+    } catch (error) {
+      console.error('Error creating partner:', error);
+    }
   };
 
   return (
@@ -76,6 +109,22 @@ const BankDetailsForm = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Add Bank Name field */}
+            <div>
+              <label className="block text-base font-semibold mb-2">
+                Bank Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="bankName"
+                placeholder="Bank Name"
+                value={formData.bankName}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                required
+              />
+            </div>
+
             {/* Account Holder Name */}
             <div>
               <label className="block text-base font-semibold mb-2">

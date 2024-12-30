@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { UserLogin, VerifyLoginOTP, UserRegister } from '../api';
+import { UserLogin, VerifyLoginOTP, UserRegister, VerifyRegisterOTP } from '../api';  // Add VerifyRegisterOTP
 import { toast } from 'react-hot-toast';
 
 // Add the cookie utility function at the top
@@ -139,17 +139,29 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
 
     try {
       setIsLoading(true);
-      const response = await VerifyLoginOTP({
-        phone: phoneNumber,
-        otp: otpValue
-      });
+      let response;
+
+      if (isRegistering) {
+        // Use VerifyRegisterOTP for registration
+        response = await VerifyRegisterOTP({
+          name,
+          phone: phoneNumber,
+          otp: otpValue
+        });
+      } else {
+        // Use VerifyLoginOTP for login
+        response = await VerifyLoginOTP({
+          phone: phoneNumber,
+          otp: otpValue
+        });
+      }
 
       // Save token in cookie
       setCookie('token', response.data.token, 7);
 
       const profiles = response.data.user.profiles;
 
-      // Save profiles in localStorage
+      // Save profiles and user data in localStorage
       setLocalStorage('userProfiles', profiles);
       setLocalStorage('userData', {
         name: response.data.user.name,
@@ -170,7 +182,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
         setShowProfileSelector(true);
       }
 
-      toast.success('Login successful!');
+      toast.success(isRegistering ? 'Registration successful!' : 'Login successful!');
     } catch (error: any) {
       setError(error.response?.data?.message || 'Invalid OTP. Please try again.');
     } finally {
