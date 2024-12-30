@@ -63,9 +63,8 @@ const ProfileForm = () => {
           category,
           fileSize: file.size
         });
-
         // Get presigned URL
-        const response = await GetURL({
+        const response:any = await GetURL({
           type,
           category
         });
@@ -73,7 +72,7 @@ const ProfileForm = () => {
         console.log('GetURL Response:', response);
 
         // Upload file to presigned URL
-        const uploadResponse = await axios.put(response.data.presignedUrl, file, {
+        const uploadResponse: any = await axios.put(response.data.presignedUrl, file, {
           headers: {
             'Content-Type': file.type,
             // 'x-amz-acl': 'public-read'
