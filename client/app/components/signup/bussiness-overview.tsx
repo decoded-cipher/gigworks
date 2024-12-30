@@ -1,51 +1,97 @@
-'use client'
+"use client";
 
-import { useState,useEffect } from 'react'
-import { Textarea } from "@nextui-org/input"
-import type { FormData } from '../../signup/page'
-import{fetchBusinessData, fetchsubCategoryByCategory} from '../../api/index'
+import { useState, useEffect, useCallback } from "react";
+import { Textarea } from "@nextui-org/input";
+import type { FormData } from "../../signup/page";
+import {
+  fetchBusinessData,
+  fetchsubCategoryByCategory,
+  checkSlug,
+} from "../../api/index";
 
 interface BusinessOverviewProps {
-  formData: FormData
-  updateFormData: (data: Partial<FormData>) => void
-  onNext: () => void
+  formData: FormData;
+  updateFormData: (data: Partial<FormData>) => void;
+  onNext: () => void;
 }
 
-interface Category {
-  id: string;
-  name: string;
-}
 export default function BusinessOverview({
   formData,
   updateFormData,
-  onNext
+  onNext,
 }: BusinessOverviewProps) {
-  const [slugFocused, setSlugFocused] = useState(false)
+  const [slugFocused, setSlugFocused] = useState(false);
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [isCheckingSlug, setIsCheckingSlug] = useState(false);
+  const [slugError, setSlugError] = useState<string | null>(null);
+  const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+
+  // Debounce function
+  const debounce = (func: Function, wait: number) => {
+    let timeout: NodeJS.Timeout;
+    return (...args: any[]) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  };
+
+  // Debounced slug check function
+  const debouncedSlugCheck = useCallback(
+    debounce(async (slug: string) => {
+      if (slug.length < 3) {
+        setSlugError("Slug must be at least 3 characters long");
+        setSlugAvailable(null);
+        return;
+      }
+
+      setIsCheckingSlug(true);
+      try {
+        const response = await checkSlug(slug);
+        console.log("response slug", response);
+
+        setSlugAvailable(response.data);
+        setSlugError(response.data ? null : "This slug is already taken");
+      } catch (error) {
+        setSlugError("Error checking slug availability");
+        setSlugAvailable(null);
+      } finally {
+        setIsCheckingSlug(false);
+      }
+    }, 500),
+    []
+  );
+
+  console.log("form data anu",formData);
+  
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
-    const { name, value, files } = e.target as HTMLInputElement
+    const { name, value, files } = e.target as HTMLInputElement;
 
     if (name === "slug") {
       const slugValue = value
         .toLowerCase()
         .replace(/[^a-z0-9-]/g, "-")
         .replace(/-+/g, "-")
-        .replace(/^-|-$/g, "")
+        .replace(/^-|-$/g, "");
 
-      updateFormData({ [name]: slugValue })
+      updateFormData({ [name]: slugValue });
+
+      // Only check if slug is valid length
+      if (slugValue.length >= 3) {
+        debouncedSlugCheck(slugValue);
+      }
     } else {
       updateFormData({
-        [name]: files ? files[0] : value
-      })
+        [name]: files ? files[0] : value,
+      });
     }
-  }
-
-  
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,9 +99,8 @@ export default function BusinessOverview({
         const data = await fetchBusinessData();
         setCategories(data.data.categories); // Adjust according to the structure of your data
         console.log(data.data.categories);
-        
       } catch (error) {
-        console.error('Error fetching business categories:', error);
+        console.error("Error fetching business categories:", error);
       }
     };
     fetchData();
@@ -70,14 +115,14 @@ export default function BusinessOverview({
       setSubCategories(data.data.subCategory); // Adjust according to the structure of your data
       console.log(data.data.subCategory);
     } catch (error) {
-      console.error('Error fetching subcategories:', error);
+      console.error("Error fetching subcategories:", error);
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onNext()
-  }
+    e.preventDefault();
+    onNext();
+  };
 
   return (
     <div>
@@ -94,7 +139,7 @@ export default function BusinessOverview({
               type="text"
               name="businessName"
               value={formData.businessName}
-              onChange={handleCategoryChange}
+              onChange={handleInputChange}
               placeholder="Eg : Super Maerk"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
               required
@@ -105,17 +150,18 @@ export default function BusinessOverview({
             <label className="block text-base font-bold pb-2 text-gray-700">
               Business Category<span className="text-red-500">*</span>
             </label>
-            <select 
+            <select
               name="businessCategory"
-              value={selectedCategory}
+              value={formData.businessCategory = selectedCategory} 
               onChange={handleCategoryChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
               required
             >
-              
               <option value="">Select Category</option>
-              {categories.map((category:Category) => (
-                <option key={category.id} value={category.id}>{category.name}</option>
+              {categories.map((category: any) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
               ))}
             </select>
           </div>
@@ -124,13 +170,15 @@ export default function BusinessOverview({
             <label className="block text-base font-bold pb-2 text-gray-700">
               Sub Category<span className="text-red-500">*</span>
             </label>
-            <select 
+            <select
               name="subCategory"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                        >
+            >
               <option value="">Select Sub Category</option>
               {subCategories.map((subCategory: any) => (
-                <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
+                <option key={subCategory.id} value={subCategory.id}>
+                  {subCategory.name}
+                </option>
               ))}
             </select>
           </div>
@@ -140,17 +188,18 @@ export default function BusinessOverview({
             <label className="block text-base font-bold pb-2 text-gray-700">
               Sub Category Options<span className="text-red-500">*</span>
             </label>
-            <select 
+            <select
               name="subCategoryOptions"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                          >
+            >
               <option value="">Select Sub Category</option>
             </select>
           </div>
 
           <div>
             <label className="block text-base font-bold pb-2 text-gray-700">
-              Owner&apos;s/Manager&apos;s Name<span className="text-red-500">*</span>
+              Owner&apos;s/Manager&apos;s Name
+              <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -207,7 +256,7 @@ export default function BusinessOverview({
             >
               <option value="">Business Type</option>
               <option value="online">Online</option>
-              <option value="offline">Offline</option>
+              <option value="Offline">Offline</option>
               <option value="hybrid">Hybrid</option>
             </select>
           </div>
@@ -221,19 +270,45 @@ export default function BusinessOverview({
                 type="text"
                 name="slug"
                 placeholder="Eg: super-maerk"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className={`w-full px-3 py-2 border ${
+                  slugError
+                    ? "border-red-500"
+                    : slugAvailable
+                    ? "border-green-500"
+                    : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500`}
                 required
                 onChange={handleInputChange}
                 value={formData.slug}
                 onFocus={() => setSlugFocused(true)}
                 onBlur={() => setSlugFocused(false)}
+                
               />
+              {isCheckingSlug && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin h-5 w-5 border-2 border-gray-500 rounded-full border-t-transparent"></div>
+                </div>
+              )}
+              {!isCheckingSlug && slugAvailable && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500">
+                  ✓
+                </div>
+              )}
             </div>
-            <div className={`text-sm space-y-1 ${slugFocused ? "block" : "hidden"}`}>
+            {slugError && <p className="text-red-500 text-sm">{slugError}</p>}
+            <div
+              className={`text-sm space-y-1 ${
+                slugFocused ? "block" : "hidden"
+              }`}
+            >
+              {slugAvailable && (
               <p className="text-gray-600">
                 This will be your unique business URL: gigwork.co.in/
-                <span className="font-medium">{formData.slug || "your-slug"}</span>
+                <span className="font-medium">
+                  {formData.slug || "your-slug"}
+                </span>
               </p>
+              )}
               <ul className="text-gray-500 space-y-1 pl-4">
                 <li>• Use only letters, numbers, and hyphens</li>
                 <li>• Must be between 3-60 characters</li>
@@ -253,7 +328,8 @@ export default function BusinessOverview({
               value={formData.businessDescription}
               onChange={handleInputChange}
               placeholder="Business Description"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md  h-24"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-0 h-24"
+              required
             />
           </div>
 
@@ -273,7 +349,9 @@ export default function BusinessOverview({
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <p className="text-sm text-gray-600">Drag and drop or click to upload</p>
+                    <p className="text-sm text-gray-600">
+                      Drag and drop or click to upload
+                    </p>
                   </div>
                 </div>
               </div>
@@ -290,7 +368,9 @@ export default function BusinessOverview({
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <p className="text-sm text-gray-600">Drag and drop or click to upload</p>
+                    <p className="text-sm text-gray-600">
+                      Drag and drop or click to upload
+                    </p>
                   </div>
                 </div>
               </div>
@@ -308,6 +388,5 @@ export default function BusinessOverview({
         </div>
       </form>
     </div>
-  )
+  );
 }
-

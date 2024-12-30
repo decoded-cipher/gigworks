@@ -46,6 +46,7 @@ export default function BusinessOperations({
       updateFormData({ [name]: value })
     }
   }
+  
 
   const addLicense = () => {
     updateFormData({
@@ -235,7 +236,7 @@ export default function BusinessOperations({
               <input
                 type="text"
                 name="businessRegistrationNumber"
-                value={formData.businessRegistrationNumber}
+                value={formData.referral_code}
                 onChange={handleInputChange}
                 placeholder="If any referral code"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030]"

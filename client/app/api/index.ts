@@ -157,3 +157,31 @@ export const fetchsubCategoryByCategory = async (categoryId: string) => {
   }
 }
 
+
+export const checkSlug = async (value: string) => { 
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/business/slug/check`,
+      {
+        params: { value }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching businesses:', error);
+    throw error;
+  }
+}
+
+export const fetchLicenseData = async () => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/license`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching license data:', error);
+    throw error;
+  }
+}
+
