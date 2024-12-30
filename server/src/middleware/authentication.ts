@@ -20,7 +20,7 @@ export const verifyToken = async (c: HonoContext, next: Next) => {
 
     try {
         const decoded = jwt.verify(bearerToken, c.env.JWT_TOKEN_SECRET) as DecodedToken;
-        c.req.user = decoded;
+        c.req._user = decoded;
         await next();
     } catch (error) {
         if (error instanceof TokenExpiredError) {

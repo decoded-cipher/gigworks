@@ -99,6 +99,7 @@ export const createAuthToken = async (user: User, env: Env): Promise<string> => 
             
             const token = jwt.sign({
                 id: user.id,
+                name: user.name,
                 phone: user.phone,
                 role: user.role
             }, env.JWT_TOKEN_SECRET, { expiresIn: env.JWT_TOKEN_EXPIRY });
