@@ -224,10 +224,6 @@ export const profile = sqliteTable('profile', {
     website: text(),
     phone: text().unique(), // Extra phone number other than owner phone number
 
-    // Registration Details
-    registration_number: text().unique(),
-    gstin: text().unique(),
-
     // Category
     category_id: text().notNull().references(() => category.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     sub_category_id: text().notNull().references(() => subCategory.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
@@ -256,6 +252,7 @@ export const profile = sqliteTable('profile', {
     banner: text(),
     type: integer().$type('ENUM', [1, 2, 3]).default(1).notNull(), // 1: online, 2: offline, 3: hybrid
     additional_services: text(),
+    gstin: text().unique(),
     
     partner_id: text().references(() => partner.id, {onDelete: 'SET NULL', onUpdate: 'CASCADE'}),
 

@@ -48,9 +48,6 @@ export interface Profile {
     website?: string;
     phone?: string;
 
-    registration_number?: string;
-    gstin?: string;
-
     category_id: number;
     sub_category_id: number;
     // sub_category_option_id: number
@@ -70,6 +67,7 @@ export interface Profile {
     logo?: string;
     type: string;
     additional_services?: string;
+    gstin?: string;
 
     referral_code?: string;
     partner_id?: string;

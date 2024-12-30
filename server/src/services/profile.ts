@@ -39,7 +39,7 @@ export const createProfile = async (data: Profile) => {
                 reject(new Error('Invalid referral code'));
             }
 
-            // SQL Query : INSERT INTO profile (name, slug, description, email, website, phone, registration_number, gstin, category_id, sub_category_id, sub_category_option_id, address, city, state, zip, country, facebook, instagram, twitter, linkedin, youtube, logo, type, additional_services, referral_code, partner_id) VALUES (data.name, data.slug, data.description, data.email, data.website, data.phone, data.registration_number, data.gstin, data.category_id, data.sub_category_id, data.sub_category_option_id, data.address, data.city, data.state, data.zip, data.country, data.facebook, data.instagram, data.twitter, data.linkedin, data.youtube, data.logo, data.type, data.additional_services, data.referral_code, partnerData[0].id)
+            // SQL Query : INSERT INTO profile (name, slug, description, email, website, phone, gstin, category_id, sub_category_id, sub_category_option_id, address, city, state, zip, country, facebook, instagram, twitter, linkedin, youtube, logo, type, additional_services, referral_code, partner_id) VALUES (data.name, data.slug, data.description, data.email, data.website, data.phone, data.gstin, data.category_id, data.sub_category_id, data.sub_category_option_id, data.address, data.city, data.state, data.zip, data.country, data.facebook, data.instagram, data.twitter, data.linkedin, data.youtube, data.logo, data.type, data.additional_services, data.referral_code, partnerData[0].id)
             
             let result = await db
                 .insert(profile)
@@ -65,7 +65,7 @@ export const updateProfile = async (id: string, profile: Profile) => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            // SQL Query : UPDATE profile SET name = name, description = description, email = email, website = website, phone = phone, registration_number = registration_number, gstin = gstin, category_id = category
+            // SQL Query : UPDATE profile SET name = name, description = description, email = email, website = website, phone = phone, gstin = gstin, category_id = category
 
             let result = await db.update(profile).set({ ...profile }).where(sql`${profile.id} = ${id}`).returning();
             result = result[0];
