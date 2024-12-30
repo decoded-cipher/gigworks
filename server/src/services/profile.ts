@@ -23,20 +23,23 @@ export const createProfile = async (data: Profile) => {
     return new Promise(async (resolve, reject) => {
         try {
 
+            let partnerData = null;
             let socials = data.socials;
             delete data.socials;
 
             // SQL Query : SELECT id FROM partner WHERE referral_code = data.referral_code
 
-            let partnerData = await db
-                .select({
-                    id: partner.id
-                })
-                .from(partner)
-                .where(sql`${partner.referral_code} = ${data.referral_code}`)
-
-            if (!partnerData.length) {
-                reject(new Error('Invalid referral code'));
+            if (data.referral_code) {
+                partnerData = await db
+                    .select({
+                        id: partner.id
+                    })
+                    .from(partner)
+                    .where(sql`${partner.referral_code} = ${data.referral_code}`)
+    
+                if (!partnerData.length) {
+                    reject(new Error('Invalid referral code'));
+                }
             }
 
             // SQL Query : INSERT INTO profile (name, slug, description, email, website, phone, gstin, category_id, sub_category_id, sub_category_option_id, address, city, state, zip, country, facebook, instagram, twitter, linkedin, youtube, logo, type, additional_services, referral_code, partner_id) VALUES (data.name, data.slug, data.description, data.email, data.website, data.phone, data.gstin, data.category_id, data.sub_category_id, data.sub_category_option_id, data.address, data.city, data.state, data.zip, data.country, data.facebook, data.instagram, data.twitter, data.linkedin, data.youtube, data.logo, data.type, data.additional_services, data.referral_code, partnerData[0].id)
@@ -46,7 +49,7 @@ export const createProfile = async (data: Profile) => {
                 .values({
                     ...data,
                     ...socials,
-                    partner_id: partnerData[0].id
+                    partner_id: partnerData ? partnerData[0].id : null
                 }).returning();
 
             result = result[0];
