@@ -32,7 +32,7 @@ export default function BusinessOperations({
       newLicenses[index] = {
         ...newLicenses[index],
         [field as string]: value
-      }
+      } 
       updateFormData({ otherLicenses: newLicenses })
     } else if (type === "checkbox" && checked !== undefined) {
       const [group, key] = name.split(".")

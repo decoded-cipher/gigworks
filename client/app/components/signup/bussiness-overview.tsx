@@ -9,6 +9,16 @@ import {
   checkSlug,
 } from "../../api/index";
 
+interface Category {
+  id: string;
+  name: string;
+}
+
+interface SubCategory {
+  id: string;
+  name: string;
+}
+
 interface BusinessOverviewProps {
   formData: FormData;
   updateFormData: (data: Partial<FormData>) => void;
@@ -21,8 +31,8 @@ export default function BusinessOverview({
   onNext,
 }: BusinessOverviewProps) {
   const [slugFocused, setSlugFocused] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [subCategories, setSubCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   const [slugError, setSlugError] = useState<string | null>(null);
@@ -62,9 +72,6 @@ export default function BusinessOverview({
     }, 500),
     []
   );
-
-  console.log("form data anu",formData);
-  
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -106,16 +113,17 @@ export default function BusinessOverview({
     fetchData();
   }, []);
 
-  const handleCategoryChange = async (event: any) => {
+  const handleCategoryChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const categoryId = event.target.value;
     setSelectedCategory(categoryId);
 
     try {
       const data = await fetchsubCategoryByCategory(categoryId);
-      setSubCategories(data.data.subCategory); // Adjust according to the structure of your data
-      console.log(data.data.subCategory);
+      // Add null check and default to empty array if data.data.subCategory is undefined
+      setSubCategories(data.data.subCategory || []);
     } catch (error) {
       console.error("Error fetching subcategories:", error);
+      setSubCategories([]); // Set empty array on error
     }
   };
 
@@ -175,7 +183,7 @@ export default function BusinessOverview({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
               <option value="">Select Sub Category</option>
-              {subCategories.map((subCategory: any) => (
+              {Array.isArray(subCategories) && subCategories.map((subCategory: SubCategory) => (
                 <option key={subCategory.id} value={subCategory.id}>
                   {subCategory.name}
                 </option>

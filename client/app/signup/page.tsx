@@ -139,7 +139,7 @@ export default function SignupPage() {
       const payload = {
         user: {
           name: formData.ownerName,
-          phone: formData.whatsAppNumber,
+          phone: formData.whatsAppNumber
         },
         profile: {
           name: formData.businessName,
@@ -148,35 +148,41 @@ export default function SignupPage() {
           email: formData.emailAddress,
           website: formData.websiteURL || "",
           category_id: formData.businessCategory,
-          sub_category_id: "", // Add this to your form if needed
+          sub_category_id: "", // Make sure to add this to your form data
           address: formData.address.streetAddress,
           city: formData.address.city,
           state: formData.address.state,
           zip: formData.address.pinCode,
-          type: formData.businessType.toLowerCase(),
           socials: {
-            facebook: formData.socialMediaHandles,
-            instagram: "https://www.instagram.com/nvidia/",
-            twitter: "https://x.com/nvidia",
-            linkedin: "https://www.linkedin.com/company/nvidia/",
-            youtube: "https://www.youtube.com/@NVIDIA",
+            facebook: formData.socialMediaHandles[0]?.link || "",
+            instagram: formData.socialMediaHandles[1]?.link || "",
+            twitter: formData.socialMediaHandles[2]?.link || "",
+            linkedin: formData.socialMediaHandles[3]?.link || "",
+            youtube: formData.socialMediaHandles[4]?.link || ""
           },
-          avatar:"",
-          banner:"",
-          additional_services: formData.additionalServices,
-          referral_code:formData.referral_code,
+          avatar: formData.profileImage ? "avatar/path-to-uploaded-image.png" : "",
+          banner: formData.coverImage ? "banner/path-to-uploaded-image.png" : "",
+          type: formData.businessType.toLowerCase(),
+          additional_services: Object.entries(formData.additionalServices)
+            .filter(([_, value]) => value)
+            .map(([key]) => key)
+            .join(", "),
+          gstin: formData.gstin,
+          referral_code: formData.referral_code
         },
         payment: {
-          amount: 100.0, // This should come from your configuration
-          payment_status: "success", // This should be updated based on actual payment status
+          amount: 250 // Fixed amount as per your requirement
         },
+        license: formData.otherLicenses.map(license => ({
+          type_id: license.type,
+          number: license.registrationNumber,
+          url: license.certification || "license/test.png"
+        }))
       };
-
-      console.log("ivdeundey", formData);
 
       const response = await createBusiness(payload);
       toast.success("Business created successfully!");
-      router.push("/profile"); // or wherever you want to redirect after success
+      router.push("/profile");
     } catch (error) {
       console.error("Error creating business:", error);
       toast.error("Failed to create business. Please try again.");
