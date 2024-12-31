@@ -7,7 +7,7 @@ import { FooterSection } from "../components/FooterSection";
 import { div } from "framer-motion/client";
 import DynamicQRCode from "../components/QrSection";
 import ScrollToTopButton from "../components/ScrollToTop";
-import { GetPartner, GetPartnerAnalytics } from "../api";
+import { GetPartner, GetPartnerAnalytics, ASSET_BASE_URL } from "../api";
 
 interface PartnerData {
   name: string;
@@ -156,7 +156,7 @@ const DevMorphixWebsite = () => {
             <div className="relative z-10 w-80 h-80 border border-white border-8 bg-black rounded-full flex items-center justify-center mb-8 mt-20">
               {partnerData?.avatar ? (
                 <img 
-                  src={partnerData.avatar} 
+                  src={`${ASSET_BASE_URL}/${partnerData.avatar}`} 
                   alt="Profile" 
                   className="w-full h-full rounded-full object-cover"
                 />

@@ -35,10 +35,10 @@ interface LoginPopupProps {
   redirectAfterLogin?: string;
 }
 
-const LoginPopup: React.FC<LoginPopupProps> = ({ 
-  isOpen, 
-  onClose, 
-  redirectAfterLogin 
+const LoginPopup: React.FC<LoginPopupProps> = ({
+  isOpen,
+  onClose,
+  redirectAfterLogin
 }) => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [name, setName] = useState<string>('');
@@ -55,6 +55,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
   const [userData, setUserData] = useState<{ name: string, phone: string } | null>(null);
   const [showRoleSelector, setShowRoleSelector] = useState<boolean>(false);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [selectedRole, setSelectedRole] = useState<'business' | 'partner' | null>(null);
 
   React.useEffect(() => {
     if (isOpen) {
@@ -113,8 +114,17 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
 
     try {
       setIsLoading(true);
+      if (isRegistering && !selectedRole) {
+        setShowRoleSelector(true);
+        return;
+      }
+      
       if (isRegistering) {
-        await UserRegister({ name, phone: phoneNumber });
+        await UserRegister({ 
+          name, 
+          phone: phoneNumber,
+          isPartner: selectedRole === 'partner' // Add this line
+        });
       } else {
         await UserLogin({ phone: phoneNumber });
       }
@@ -166,77 +176,98 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
       setError('Please enter a valid 6-digit OTP');
       return;
     }
-
+  
     try {
       setIsLoading(true);
       setIsVerifying(true);
       let response;
-
+  
       if (isRegistering) {
         response = await VerifyRegisterOTP({
           name,
           phone: phoneNumber,
           otp: otpValue
         });
+        console.log('Registration Response:', response);
+        
+        // For registration, proceed if response exists
+        if (response?.status === 201 || response?.status === 200) {
+          setLocalStorage('userData', {
+            name: name,
+            phone: phoneNumber
+          });
+          
+          toast.success('Registration successful!');
+          
+          if (selectedRole === 'business') {
+            router.push('/signup');
+          } else if (selectedRole === 'partner') {
+            router.push('/partnerSignup/1');
+          }
+          handleClose();
+          return;
+        }
       } else {
         response = await VerifyLoginOTP({
           phone: phoneNumber,
           otp: otpValue
         });
-      }
-
-      if (response?.status === 200 || response?.status === 201) {
-        // Save token in cookie
-        setCookie('token', response.data.token, 7);
-
-        toast.success(isRegistering ? 'Registration successful!' : 'Login successful!');
-
-        // If there's only a token in the response, show role selector
-        if (!response.data.user || !response.data.user.profiles) {
-          setShowRoleSelector(true);
-          return;
-        }
-
-        const { profiles, isPartner } = response.data.user;
-
-        // Save user data in localStorage
-        if (profiles) {
-          setLocalStorage('userProfiles', profiles);
+  
+        console.log('Login Response:', response);
+  
+        if (response?.status === 200 || response?.status === 201) {
+          // Store user data first
           setLocalStorage('userData', {
-            name: response.data.user.name,
-            phone: response.data.user.phone
+            name: response?.data?.user?.name || '',
+            phone: phoneNumber
           });
-        }
-
-        // Handle redirect after successful login
-        if (redirectAfterLogin) {
-          router.push(redirectAfterLogin);
+  
+          toast.success('Login successful!');
+  
+          // Check for isPartner first
+          if (response?.data?.user?.isPartner) {
+            router.push('/partner/profile');
+            handleClose();
+            return;
+          }
+  
+          // Then check for profiles
+          if (response?.data?.user?.profiles?.length > 0) {
+            const profiles = response.data.user.profiles;
+            setLocalStorage('userProfiles', profiles);
+            
+            if (profiles.length === 1) {
+              router.push(`/profile/${profiles[0].slug}`);
+              handleClose();
+            } else {
+              setUserProfiles(profiles);
+              setUserData({
+                name: response.data.user.name,
+                phone: response.data.user.phone
+              });
+              setShowProfileSelector(true);
+            }
+            return;
+          }
+  
+          // If neither isPartner nor profiles exist, redirect to signup
+          router.push('/signup');
           handleClose();
           return;
         }
-
-        // Handle navigation based on user status
-        if (profiles?.length > 0 || isPartner) {
-          if (isPartner) {
-            router.push('/partner/profile');
-            handleClose();
-          } else if (profiles.length === 1) {
-            router.push(`/profile/${profiles[0].slug}`);
-            handleClose();
-          } else {
-            setUserProfiles(profiles);
-            setUserData({
-              name: response.data.user.name,
-              phone: response.data.user.phone
-            });
-            setShowProfileSelector(true);
-          }
-        } else {
-          setShowRoleSelector(true);
-        }
+  
+        // If we get here, something went wrong
+        console.error('Unexpected response:', response);
+        setError('Authentication failed. Please try again.');
       }
     } catch (error: any) {
-      setError(error.response?.data?.message || 'Invalid OTP. Please try again.');
+      console.error('Error details:', error);
+      setError(
+        error.response?.data?.message || 
+        error.response?.data?.error || 
+        error.message || 
+        'Invalid OTP. Please try again.'
+      );
     } finally {
       setIsLoading(false);
       setIsVerifying(false);
@@ -248,7 +279,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
     if (role === 'business') {
       router.push('/signup');
     } else {
-      router.push('/partnerSignup');
+      router.push('/partnerSignup/1');
     }
     handleClose();
   };
@@ -257,6 +288,18 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
   const handleProfileSelect = (slug: string) => {
     router.push(`/profile/${slug}`);
     handleClose();
+  };
+
+  // Replace the existing setIsRegistering click handler with this
+  const handleCreateAccount = () => {
+    setShowRoleSelector(true);
+  };
+
+  // Add new role selection handler
+  const handleInitialRoleSelect = (role: 'business' | 'partner') => {
+    setSelectedRole(role);
+    setShowRoleSelector(false);
+    setIsRegistering(true);
   };
 
   if (!isOpen) {
@@ -322,9 +365,12 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
                   {isLoading ? 'Sending...' : 'Send OTP'}
                 </button>
                 <div className="text-center mt-4">
-                  <span className="text-gray-600">{isRegistering ? 'Already have an account? ' : 'I have an account? '}</span>
+                  <span className="text-gray-600">{isRegistering ? 'Already have an account? ' : 'Don\'t have an account? '}</span>
                   <button
-                    onClick={() => setIsRegistering(!isRegistering)}
+                    onClick={isRegistering ? () => {
+                      setIsRegistering(false);
+                      setSelectedRole(null);
+                    } : handleCreateAccount}
                     className="text-green-600 hover:underline font-semibold"
                   >
                     {isRegistering ? 'Login' : 'Create now'}
@@ -397,20 +443,25 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
             <div className="bg-white rounded-xl w-full max-w-[400px] p-6 relative">
               <button
-                onClick={() => setShowRoleSelector(false)}
+                onClick={() => {
+                  setShowRoleSelector(false);
+                  if (!isRegistering) {
+                    setSelectedRole(null);
+                  }
+                }}
                 className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
               >
                 <X size={24} />
               </button>
 
               <div className="mb-6 text-center">
-                <h2 className="text-2xl text-black font-bold">Join as</h2>
-                <p className="text-gray-600 mt-2">Choose how you want to join Gigworks</p>
+                <h2 className="text-2xl text-black font-bold">Choose your role</h2>
+                <p className="text-gray-600 mt-2">Select how you want to join Gigworks</p>
               </div>
 
               <div className="space-y-4">
                 <button
-                  onClick={() => handleRoleSelect('business')}
+                  onClick={() => handleInitialRoleSelect('business')}
                   className="w-full p-4 border border-gray-200 rounded-lg hover:bg-green-500 hover:text-white transition-colors"
                 >
                   <h3 className="text-lg text-black font-semibold">Business Owner</h3>
@@ -418,7 +469,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
                 </button>
 
                 <button
-                  onClick={() => handleRoleSelect('partner')}
+                  onClick={() => handleInitialRoleSelect('partner')}
                   className="w-full p-4 border border-gray-200 rounded-lg hover:bg-green-500 hover:text-white transition-colors"
                 >
                   <h3 className="text-lg text-black font-semibold">Partner</h3>
@@ -479,6 +530,5 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
     </>
   );
 };
-
 
 export default LoginPopup;
