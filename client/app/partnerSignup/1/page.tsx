@@ -59,29 +59,35 @@ const ProfileForm = () => {
         const type = file.type;
         const category = name === 'uploadId' ? 'identity' : 'avatar';
 
-        const response: UploadResponse = await GetURL({
+        const response = await GetURL({
           type,
           category
         });
 
-        // ...rest of file upload logic...
-        console.log('GetURL Response:', response);
-        console.log('Asset Path:', response.assetpath);
+        // Use the flattened properties from the response
+        const uploadResult: UploadResponse = {
+          presignedUrl: response.presignedUrl,
+          assetpath: response.assetpath
+        };
 
-        axios.put(response.presignedUrl, file, {
+        // ...rest of file upload logic...
+        console.log('GetURL Response:', uploadResult);
+        console.log('Asset Path:', uploadResult.assetpath);
+
+        axios.put(uploadResult.presignedUrl, file, {
           headers: {
             'Content-Type': file.type,
           }
         }).then(() => {
-          console.log('File upload initiated for:', response.assetpath);
+          console.log('File upload initiated for:', uploadResult.assetpath);
         });
 
         setFormData(prev => {
           const newData = {
             ...prev,
-            [name]: response.assetpath
+            [name]: uploadResult.assetpath
           };
-          console.log(`Updated ${name} with assetpath:`, response.assetpath);
+          console.log(`Updated ${name} with assetpath:`, uploadResult.assetpath);
           return newData;
         });
 

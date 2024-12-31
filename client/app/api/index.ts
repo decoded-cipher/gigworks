@@ -39,7 +39,7 @@ export const fetchBusinessesByslug = async (slug: string) => {
 };
 
 
-export const fetchBusinessCount = async () =>{
+export const fetchBusinessCount = async () => {
   try {
     const response = await axios.get(
       `${BASE_URL}/api/v1/business/count`
@@ -54,12 +54,17 @@ export const fetchBusinessCount = async () =>{
 
 interface GetURLParams {
   type: string;
-  category: 'identity' | 'avatar' | 'license' | 'banner';
+  category: 'identity' | 'avatar' | 'license' | 'banner'; // Define exact literal types
 }
 
+// Update the response interface to match the expected structure
 interface GetURLResponse {
-  presignedUrl: string;
-  assetpath: string;
+  data: {
+    presignedUrl: string;
+    assetPath: string;
+  };
+  presignedUrl: string;  // Add this
+  assetpath: string;     // Add this
 }
 
 export const GetURL = async (params: GetURLParams): Promise<GetURLResponse> => {
@@ -73,13 +78,17 @@ export const GetURL = async (params: GetURLParams): Promise<GetURLResponse> => {
         }
       }
     );
-    return response.data;
+    // Transform the response to match both interfaces
+    return {
+      ...response.data,
+      presignedUrl: response.data.data.presignedUrl,
+      assetpath: response.data.data.assetPath
+    };
   } catch (error) {
     console.error('Error getting presigned URL:', error);
     throw error;  
   }
 };
-
 
 
 
@@ -140,20 +149,7 @@ export const uploadToPresignedUrl = async (presignedUrl: string, file: File) => 
   }
 };
 
-// no correct
 
-export const UploadMedia = async (data: any) => {
-  try {
-    const response = await axios.post(
-      `${BASE_URL}/auth/register`,
-      data
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching businesses:', error);
-    throw error;
-  }
-};
 
 export const UserRegister = async (data: any) => {
   try {

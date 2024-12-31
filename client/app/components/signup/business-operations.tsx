@@ -56,64 +56,52 @@ export default function BusinessOperations({
   const handleInputChange = async (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const target = e.target as HTMLInputElement
-    const { name, value, type } = target
-    const checked = type === 'checkbox' ? target.checked : undefined
-    const index = parseInt(target.dataset.index || "0")
-    const field = target.dataset.field
-
+    const target = e.target as HTMLInputElement;
+    const { name, value, type } = target;
+    
     if (type === 'file' && target.files?.[0]) {
-      const file = target.files[0]
+      const file = target.files[0];
+      const index = parseInt(target.dataset.index || "0");
       
       try {
-        setIsUploading(true)
+        setIsUploading(true);
         
-        // Get file type from the mime type
-        const fileType = file.type
-        
-        console.log('Uploading file:', {
-          name,
-          type: fileType,
-          category: 'license',
-          fileSize: file.size
-        })
-
-        // Get presigned URL
-        const response:any = await GetURL({
-          type: fileType,
+        // Use the literal type 'license' without type assertion
+        const response = await GetURL({
+          type: file.type,
           category: 'license'
-        })
+        });
 
-        console.log('GetURL Response:', response)
-
-        // Upload file to presigned URL
+        // Rest of upload handling
         const uploadResponse = await axios.put(response.data.presignedUrl, file, {
           headers: {
             'Content-Type': file.type,
           }
-        })
+        });
 
         if (uploadResponse.status !== 200) {
-          throw new Error(`HTTP error! status: ${uploadResponse.status}`)
+          throw new Error(`HTTP error! status: ${uploadResponse.status}`);
         }
 
-        console.log('File uploaded successfully')
-
-        const newLicenses = [...formData.otherLicenses]
+        const newLicenses = [...formData.otherLicenses];
         newLicenses[index] = {
           ...newLicenses[index],
-          certification: response.assetpath
-        }
-        updateFormData({ otherLicenses: newLicenses })
-        
+          certification: response.data.assetPath
+        };
+        updateFormData({ otherLicenses: newLicenses });
+
       } catch (error) {
-        console.error('Error uploading license:', error)
-        alert('Error uploading file. Please try again.')
+        console.error('Error uploading license:', error);
+        alert('Error uploading file. Please try again.');
       } finally {
-        setIsUploading(false)
+        setIsUploading(false);
       }
-      return
+      return;
     }
+
+    const checked = type === 'checkbox' ? target.checked : undefined
+    const index = parseInt(target.dataset.index || "0")
+    const field = target.dataset.field
 
     if (name === "otherLicenses") {
       const newLicenses = [...formData.otherLicenses]

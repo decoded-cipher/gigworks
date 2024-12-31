@@ -3,9 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { Textarea } from "@nextui-org/input";
 import type { FormData } from "../../signup/page";
-// import { handleAssetUpload } from "../../utils/assetUpload";  // Add this import
-import { GetURL } from "../../api/index";  // Add this import
-import axios from "axios";
+import { handleAssetUpload } from "../../utils/assetUpload";  // Add this import
+import { GetURL, uploadToPresignedUrl } from "../../api/index";  // Add this import
 import {
   fetchBusinessData,
   fetchsubCategoryByCategory,
@@ -90,11 +89,7 @@ export default function BusinessOverview({
       try {
         setIsUploading(true);
         const file = files[0];
-
-        // Get file type from the mime type
         const fileType = file.type;
-        
-        // Set category based on input field name
         const category = name === 'profileImage' ? 'avatar' : 'banner';
         
         console.log('Uploading file:', {
@@ -105,31 +100,27 @@ export default function BusinessOverview({
         });
 
         // Get presigned URL
-        const response:any = await GetURL({
+        const response = await GetURL({
           type: fileType,
           category: category as 'avatar' | 'identity'
         });
 
         console.log('GetURL Response:', response);
+        console.log('Asset Path:', response.data.assetPath);
 
         // Upload file to presigned URL
-        const uploadResponse = await axios.put(response.data.presignedUrl, file, {
-          headers: {
-            'Content-Type': file.type,
-            // 'x-amz-acl': 'public-read'
-          }
-        });
+        const uploadResponse = await uploadToPresignedUrl(response.data.presignedUrl, file);
+
         if (!uploadResponse) {
           throw new Error('Upload failed');
         }
 
         console.log('File uploaded successfully');
-        console.log('Asset path:', response.assetpath);
 
         // Update form data with file and asset path
         updateFormData({
           [name]: file,
-          [category]: response.assetpath
+          [category]: response.data.assetPath // Use the assetPath from response
         });
 
       } catch (error) {
