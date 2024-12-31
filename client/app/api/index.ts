@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-const BASE_URL = "https://gigworks-server.devmorphix.workers.dev";
-// const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+// const BASE_URL = "https://gigworks-server.devmorphix.workers.dev";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+export const ASSET_BASE_URL = 'https://pub-3aaf2182691d4cb6b5270a8f14ad704a.r2.dev';
+
 export const fetchBusinessData = async () => {
   try {
     const response = await axios.get(
@@ -199,6 +202,29 @@ export const CreatePartner = async (data: any) => {
 
     const response = await axios.post(
       `${BASE_URL}/api/v1/partner`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    throw error;
+  }
+};
+
+export const BisunessMedia = async (data: any) => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/media`,
       data,
       {
         headers: {

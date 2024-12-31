@@ -7,45 +7,69 @@ import { FooterSection } from "@/app/components/FooterSection";
 import { div } from "framer-motion/client";
 import DynamicQRCode from "@/app/components/QrSection";
 import ScrollToTopButton from "@/app/components/ScrollToTop";
-import { fetchBusinessesByslug } from "@/app/api";
+import { fetchBusinessesByslug , ASSET_BASE_URL } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
 
+interface License {
+  name: string;
+  number: string;
+  url: string;
+  description: string;
+}
+
+interface MediaItem {
+  _id: string;
+  url: string;
+  type: string;
+}
+
 interface BusinessProfile {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   email: string;
-  website: string;
   phone: string | null;
   address: string;
   city: string;
   state: string;
   country: string;
-  facebook: string | null;
-  instagram: string | null;
-  twitter: string | null;
-  linkedin: string | null;
-  youtube: string | null;
-  // ... add other fields as needed
+  operating_hours: {
+    [key: string]: string;
+  };
+  socials: {
+    website?: string;
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    linkedin?: string;
+    youtube?: string;
+  };
+  avatar: string;
+  banner: string;
+  type: string;
+  additional_services: string;
+  gstin: string;
 }
 
 interface BusinessData {
-    profile: BusinessProfile;
-    user: {
-      name: string;
-      phone: string;
-    };
-    category: string;
-    subCategory: string;
-    media: any;
-    license: any;
-    tags: any;
-    services?: string[]; // Add services to the interface
-  }
+  profile: BusinessProfile;
+  user: {
+    name: string;
+    phone: string;
+  };
+  category: string;
+  subCategory: string;
+  subCategoryOption: string;
+  licenses: License[];
+  media: MediaItem[];
+  tags: any[];
+}
 
-  export const runtime = 'edge';
+export const runtime = 'edge';
 
 const DevMorphixWebsite = () => {
+  console.log(ASSET_BASE_URL);
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,10 +85,20 @@ const DevMorphixWebsite = () => {
       try {
         setIsLoading(true);
         const response = await fetchBusinessesByslug(params.id as string);
-        if (response.status === 200 || response.status === 201) {
-          return;
+        if (response.message === "Business fetched successfully") {
+          setBusinessData(response.data);
+          // Log asset URLs with base URL
+          console.log('Avatar URL:', `${ASSET_BASE_URL}/${response.data.profile.avatar}`);
+          console.log('Banner URL:', `${ASSET_BASE_URL}/${response.data.profile.banner}`);
+          console.log('License Documents:', response.data.licenses?.map((license: License) =>
+            `${ASSET_BASE_URL}/${license.url}`
+          ));
+          console.log('Media Files:', response.data.media?.map((mediaItem: MediaItem) =>
+            `${ASSET_BASE_URL}/${mediaItem.url}`
+          ));
+        } else {
+          setError("Failed to load business data");
         }
-        setBusinessData(response.data);
       } catch (err) {
         const error = err as ApiError;
         if (error.status === 404) {
@@ -82,6 +116,31 @@ const DevMorphixWebsite = () => {
       fetchData();
     }
   }, [params.id, router]);
+
+  // Add share handlers
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: businessData?.profile.name,
+          text: businessData?.profile.description,
+          url: window.location.href,
+        });
+      } else {
+        // Fallback - copy to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard!');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  const handleWhatsApp = () => {
+    const text = `Check out ${businessData?.profile.name}: ${window.location.href}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(whatsappUrl, '_blank');
+  };
 
   if (isLoading) {
     return <div>Loading...</div>; // Add your loading component here
@@ -177,51 +236,33 @@ const DevMorphixWebsite = () => {
           <section className="relative py-8 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
             <div className="absolute top-0 left-0 right-0 h-72 overflow-hidden">
               <img
-                src="/15879.png"
+                src={businessData?.profile.banner ? `${ASSET_BASE_URL}/${businessData.profile.banner}` : "/15879.png"}
                 alt="Background"
                 className="w-full h-full object-cover"
               />
             </div>
 
             <div className="relative z-10 w-80 h-80 border border-white border-8 bg-black rounded-full flex items-center justify-center mb-8 mt-20">
-              {/* <h1 className="text-white text-4xl font-bold">DEV.X</h1> */}
-              <img src="/444.png" alt="Logo" width={200} height={200} />{" "}
-              {/*  if you want to zoom in or zoom out, change the width and height */}
+              <img 
+                src={businessData?.profile.avatar ? `${ASSET_BASE_URL}/${businessData.profile.avatar}` : "/444.png"} 
+                alt="Logo" 
+                width={200} 
+                height={200} 
+              />
             </div>
 
             <h2 className="sm:text-6xl text-4xl font-bold mb-4">
               {businessData?.profile.name}
             </h2>
             <p className="sm:text-xl text-sm font-medium mb-8">
-              {businessData?.profile.description || "No description available"}
+              {businessData?.subCategory || "No category available"}
             </p>
 
             <div className="flex gap-4 flex-wrap justify-center">
-              <button className="bg-white border-2 font-medium border-black rounded-full transition hover:scale-110  sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2">
-                <div className="flex space-x-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                  >
-                    <g clipPath="url(#clip0_462_696)">
-                      <path
-                        d="M10.0001 2.92919L2.92931 10L10.0001 17.0709L17.071 10L10.0001 2.92919ZM10.5893 1.16086L18.8393 9.41086C18.9955 9.56713 19.0833 9.77906 19.0833 10C19.0833 10.221 18.9955 10.4329 18.8393 10.5892L10.5893 18.8392C10.433 18.9954 10.2211 19.0832 10.0001 19.0832C9.77918 19.0832 9.56726 18.9954 9.41098 18.8392L1.16098 10.5892C1.00476 10.4329 0.916992 10.221 0.916992 10C0.916992 9.77906 1.00476 9.56713 1.16098 9.41086L9.41098 1.16086C9.56726 1.00463 9.77918 0.91687 10.0001 0.91687C10.2211 0.91687 10.433 1.00463 10.5893 1.16086ZM10.8335 8.33336V6.25003L13.7501 9.16669L10.8335 12.0834V10H8.33348V12.5H6.66681V9.16669C6.66681 8.94568 6.75461 8.73372 6.91089 8.57744C7.06717 8.42116 7.27913 8.33336 7.50015 8.33336H10.8335Z"
-                        fill="black"
-                      />
-                    </g>
-                    <defs>
-                      <clipPath id="clip0_462_696">
-                        <rect width="20" height="20" fill="white" />
-                      </clipPath>
-                    </defs>
-                  </svg>
-                  <span>Direction</span>
-                </div>
-              </button>
-              <button className="bg-white border-2 font-medium border-black rounded-full transition hover:scale-110 sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2">
+              <button 
+                onClick={handleShare}
+                className="bg-white border-2 font-medium border-black rounded-full transition hover:scale-110 sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2"
+              >
                 <div className="flex space-x-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -238,7 +279,10 @@ const DevMorphixWebsite = () => {
                   <span>Share</span>
                 </div>
               </button>
-              <button className="bg-white border-2 font-medium border-black rounded-full transition hover:scale-110 sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2">
+              <button 
+                onClick={handleWhatsApp}
+                className="bg-white border-2 font-medium border-black rounded-full transition hover:scale-110 sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2"
+              >
                 <div className="flex space-x-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -258,11 +302,14 @@ const DevMorphixWebsite = () => {
             </div>
           </section>
 
-          {/* <ImageGrid images={galleryItems} /> */}
-          {/* <ImageGrid/> */}
-          <section className="mt-7">
-            <ImageGrid className="bg-white shadow-lg rounded-lg  overflow-hidden border my-2  rounded-3xl" />
-          </section>
+          {businessData?.media && businessData.media.length > 0 && (
+            <section className="mt-7">
+              <ImageGrid 
+                media={businessData.media}
+                className="bg-white shadow-lg rounded-lg overflow-hidden border my-2 rounded-3xl" 
+              />
+            </section>
+          )}
 
           <section className="border my-7  rounded-3xl " id="service" style={{ scrollMarginTop: '100px' }}>
             <section className="bg-white rounded-full p-6 mb-8">
@@ -271,7 +318,7 @@ const DevMorphixWebsite = () => {
               </h2>
               <div className="max-w-4xl mx-auto">
                 <div className="flex flex-wrap gap-6 justify-center">
-                  {(businessData?.services || [
+                  {(businessData?.profile.additional_services.split(',') || [
                     "App Development",
                     "Web Development",
                     "Cloud Services",
@@ -367,31 +414,30 @@ const DevMorphixWebsite = () => {
               </div>
 
               <p className="text-[#111111] text-md text-justify font-medium leading-relaxed">
-                A Software Development Company specializes in creating custom
-                software, applications, and web solutions tailored to meet
-                unique business needs. By leveraging the latest technologies and
-                best practices, they help businesses streamline their
-                operations, optimize workflows, and drive digital growth. Their
-                expertise covers everything from developing intuitive mobile
-                apps and scalable web platforms to building complex software
-                systems that enhance productivity and efficiency. With a focus
-                on innovation, they empower businesses to stay ahead in the
-                competitive digital landscape, providing robust solutions that
-                align with their strategic goals and accelerate their digital
-                transformation journey.
+                {businessData?.profile.description || "No description available"}
               </p>
 
               <div className="mt-24">
                 <h2 className="text-xl font-medium mb-4">
                   Our Social Media Connects
                 </h2>
-                <div className="flex justify-center space-x-6 ">
-                  {businessData?.profile.facebook && (
-                    <a href={businessData.profile.facebook} target="_blank" rel="noopener noreferrer">
-                      {/* Facebook Icon */}
-                    </a>
-                  )}
-                  {/* Add similar conditions for other social media links */}
+                <div className="flex justify-center space-x-6">
+                  {Object.entries(businessData?.profile.socials || {}).map(([platform, url]) => {
+                    if (url) {
+                      return (
+                        <a 
+                          key={platform}
+                          href={url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-gray-600 hover:text-gray-800"
+                        >
+                          {platform}
+                        </a>
+                      );
+                    }
+                    return null;
+                  })}
                 </div>
               </div>
             </section>

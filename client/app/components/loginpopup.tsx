@@ -137,6 +137,28 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
     }
   };
 
+  // Add reset function
+  const resetForm = () => {
+    setPhoneNumber('');
+    setName('');
+    setOtp(['', '', '', '', '', '']);
+    setIsOtpVisible(false);
+    setIsRegistering(false);
+    setError('');
+    setResendTimer(0);
+    setShowProfileSelector(false);
+    setShowRoleSelector(false);
+    setUserProfiles([]);
+    setUserData(null);
+  };
+
+  // Modify onClose to include reset
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
+  // Modify handleSubmit to handle token-only response
   const handleSubmit = async () => {
     setError('');
     const otpValue = otp.join('');
@@ -162,45 +184,46 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
           otp: otpValue
         });
       }
-      console.log('OTP response:', response.status);
-      
+
       if (response?.status === 200 || response?.status === 201) {
-        if (!response?.data?.token) {
-          throw new Error('Invalid response from server');
-        }
-      
         // Save token in cookie
         setCookie('token', response.data.token, 7);
-      
-        const { profiles, isPartner } = response.data.user;
-      
-        // Save user data in localStorage
-        setLocalStorage('userProfiles', profiles);
-        setLocalStorage('userData', {
-          name: response.data.user.name,
-          phone: response.data.user.phone
-        });
-      
+
         toast.success(isRegistering ? 'Registration successful!' : 'Login successful!');
-      
+
+        // If there's only a token in the response, show role selector
+        if (!response.data.user || !response.data.user.profiles) {
+          setShowRoleSelector(true);
+          return;
+        }
+
+        const { profiles, isPartner } = response.data.user;
+
+        // Save user data in localStorage
+        if (profiles) {
+          setLocalStorage('userProfiles', profiles);
+          setLocalStorage('userData', {
+            name: response.data.user.name,
+            phone: response.data.user.phone
+          });
+        }
+
         // Handle redirect after successful login
         if (redirectAfterLogin) {
           router.push(redirectAfterLogin);
-          onClose();
+          handleClose();
           return;
         }
-      
-        // First check if user has any profile or is a partner
+
+        // Handle navigation based on user status
         if (profiles?.length > 0 || isPartner) {
-          // User has existing profiles or is a partner
           if (isPartner) {
             router.push('/partner/profile');
-            onClose();
+            handleClose();
           } else if (profiles.length === 1) {
             router.push(`/profile/${profiles[0].slug}`);
-            onClose();
+            handleClose();
           } else {
-            // Multiple profiles case
             setUserProfiles(profiles);
             setUserData({
               name: response.data.user.name,
@@ -209,38 +232,31 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
             setShowProfileSelector(true);
           }
         } else {
-          // No profiles and not a partner - show role selector
           setShowRoleSelector(true);
         }
-      } else {
-        router.push('/signup');
-        // setError('Invalid OTP. Please try again.');
       }
     } catch (error: any) {
-      router.push('/signup');
-      // setError(error.response?.data?.message || 'Invalid OTP. Please try again.');
+      setError(error.response?.data?.message || 'Invalid OTP. Please try again.');
     } finally {
       setIsLoading(false);
       setIsVerifying(false);
     }
   };
 
-  // Add role selection handler
+  // Update role selection handler to reset form
   const handleRoleSelect = (role: 'business' | 'partner') => {
     if (role === 'business') {
       router.push('/signup');
     } else {
-      router.push('/partner/signup');
+      router.push('/partnerSignup');
     }
-    setShowRoleSelector(false);
-    onClose();
+    handleClose();
   };
 
-  // Add profile selection handler
+  // Update profile selection handler to reset form
   const handleProfileSelect = (slug: string) => {
     router.push(`/profile/${slug}`);
-    setShowProfileSelector(false);
-    onClose();
+    handleClose();
   };
 
   if (!isOpen) {
@@ -252,7 +268,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
       <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4">
         <div className="bg-white p-4 sm:p-8 rounded-xl w-full max-w-[500px] flex flex-col items-center text-center space-y-4 sm:space-y-6 relative shadow-none">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute top-0 right-0 m-4 text-gray-500 hover:text-black transition"
           >
             <X size={28} />
@@ -397,16 +413,16 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
                   onClick={() => handleRoleSelect('business')}
                   className="w-full p-4 border border-gray-200 rounded-lg hover:bg-green-500 hover:text-white transition-colors"
                 >
-                  <h3 className="text-lg font-semibold">Business Owner</h3>
-                  <p className="text-sm text-gray-600">List your business and get more clients</p>
+                  <h3 className="text-lg text-black font-semibold">Business Owner</h3>
+                  <p className="text-sm text-gray-800">List your business and get more clients</p>
                 </button>
 
                 <button
                   onClick={() => handleRoleSelect('partner')}
                   className="w-full p-4 border border-gray-200 rounded-lg hover:bg-green-500 hover:text-white transition-colors"
                 >
-                  <h3 className="text-lg font-semibold">Partner</h3>
-                  <p className="text-sm text-gray-600">Join as a service provider</p>
+                  <h3 className="text-lg text-black font-semibold">Partner</h3>
+                  <p className="text-sm text-gray-800">Join as a service provider</p>
                 </button>
               </div>
             </div>
