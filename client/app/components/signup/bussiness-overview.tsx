@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Textarea } from "@nextui-org/input";
 import type { FormData } from "../../signup/page";
-import { handleAssetUpload } from "../../utils/assetUpload";  // Add this import
 import { GetURL, uploadToPresignedUrl } from "../../api/index";  // Add this import
 import {
   fetchBusinessData,
