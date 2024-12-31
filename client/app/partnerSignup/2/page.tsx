@@ -4,6 +4,7 @@ import React, { useState, ChangeEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CreatePartner } from "../../api";
+import { toast } from 'react-hot-toast';
 
 interface BankDetails {
   accountHolderName: string;
@@ -24,9 +25,12 @@ const BankDetailsForm = () => {
     bankName: "",  // Add this new field
   });
 
+  const [error, setError] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setError(''); // Clear error when user makes changes
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -36,37 +40,53 @@ const BankDetailsForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setIsSubmitting(true);
+    setError(''); // Clear any previous errors
+
     // Get the previous data from localStorage
     const previousData = JSON.parse(localStorage.getItem('partnerFormData') || '{}');
     
     if (!previousData.user || !previousData.partner) {
-      console.error('Missing user data from step 1');
+      setError('Missing profile information. Please go back and complete step 1.');
+      toast.error('Missing profile information');
       router.push("/partnerSignup/1");
       return;
     }
 
-    // Combine all data in the required format
-    const finalData = {
-      user: previousData.user,
-      partner: previousData.partner,
-      partnerBank: {
-        account_number: formData.accountNumber,
-        ifsc: formData.ifsc,
-        bank_name: formData.bankName,
-        branch_name: formData.branch,
-        account_holder: formData.accountHolderName,
-        upi_id: formData.upiId
-      }
-    };
+    // Validate required fields
+    if (!formData.accountHolderName || !formData.accountNumber || !formData.ifsc || 
+        !formData.branch || !formData.bankName) {
+      setError('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
+      // Combine all data in the required format
+      const finalData = {
+        user: previousData.user,
+        partner: previousData.partner,
+        partnerBank: {
+          account_number: formData.accountNumber,
+          ifsc: formData.ifsc,
+          bank_name: formData.bankName,
+          branch_name: formData.branch,
+          account_holder: formData.accountHolderName,
+          upi_id: formData.upiId
+        }
+      };
+
       const response = await CreatePartner(finalData);
-      console.log('Partner created:', response);
+      toast.success('Partner profile created successfully!');
       localStorage.removeItem('partnerFormData');
       router.push("/partnerProfile");
-    } catch (error) {
-      console.error('Error creating partner:', error);
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Error creating partner profile. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -106,6 +126,13 @@ const BankDetailsForm = () => {
       {/* Main Content */}
       <div className="flex-grow bg-white py-6 px-4 sm:px-8 md:px-20 pt-32 md:pt-20">
         <h1 className="text-2xl font-bold mb-6">Bank Details</h1>
+
+        {/* Show error message if exists */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -210,9 +237,10 @@ const BankDetailsForm = () => {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="bg-[#303030] text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors"
+              disabled={isSubmitting}
+              className="bg-[#303030] text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
             >
-              Create Profile
+              {isSubmitting ? 'Creating Profile...' : 'Create Profile'}
             </button>
           </div>
         </form>

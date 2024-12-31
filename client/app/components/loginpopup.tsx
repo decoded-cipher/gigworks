@@ -31,9 +31,14 @@ interface LoginPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onRegister?: () => void;
+  redirectAfterLogin?: string;
 }
 
-const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) => {
+const LoginPopup: React.FC<LoginPopupProps> = ({ 
+  isOpen, 
+  onClose, 
+  redirectAfterLogin 
+}) => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
@@ -142,14 +147,12 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
       let response;
 
       if (isRegistering) {
-        // Use VerifyRegisterOTP for registration
         response = await VerifyRegisterOTP({
           name,
           phone: phoneNumber,
           otp: otpValue
         });
       } else {
-        // Use VerifyLoginOTP for login
         response = await VerifyLoginOTP({
           phone: phoneNumber,
           otp: otpValue
@@ -168,6 +171,15 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
         phone: response.data.user.phone
       });
 
+      toast.success(isRegistering ? 'Registration successful!' : 'Login successful!');
+
+      // Handle redirect after successful login
+      if (redirectAfterLogin) {
+        router.push(redirectAfterLogin);
+        onClose();
+        return;
+      }
+
       if (profiles.length === 0) {
         router.push('/signup');
       } else if (profiles.length === 1) {
@@ -181,8 +193,6 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) 
         });
         setShowProfileSelector(true);
       }
-
-      toast.success(isRegistering ? 'Registration successful!' : 'Login successful!');
     } catch (error: any) {
       setError(error.response?.data?.message || 'Invalid OTP. Please try again.');
     } finally {

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { GetURL } from '../../api/index';
 import axios from "axios";
+import { toast } from 'react-hot-toast';  // Add this import
 
 interface FormData {
   fullName: string;
@@ -15,9 +16,10 @@ interface FormData {
   profileImage: string;  // Changed to string with empty default
 }
 
+// Update the UploadResponse interface to match the actual API response
 interface UploadResponse {
   presignedUrl: string;
-  assetpath: string;
+  assetpath: string;  // Note: lowercase 'path' to match API response
 }
 
 const ProfileForm = () => {
@@ -30,6 +32,9 @@ const ProfileForm = () => {
     profileImage: "",  // Initialize with empty string instead of null
   });
 
+  // Add error state
+  const [error, setError] = useState<string>('');
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -41,70 +46,53 @@ const ProfileForm = () => {
   }, [formData]);
 
   const handleInputChange = async (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>  // Updated type
   ) => {
+    setError('');
     const { name, value, type } = e.target;
-    const files = (e.target as HTMLInputElement).files;
-
-    if (type === "file" && files && files[0]) {
+    
+    // Check if the event target is an input element with files
+    if ('files' in e.target && type === "file" && e.target.files && e.target.files[0]) {
       try {
         setIsUploading(true);
-        const file = files[0];
-    
-        // Get file type from the mime type
+        const file = e.target.files[0];
         const type = file.type;
-    
-        // Set category based on input field name
         const category = name === 'uploadId' ? 'identity' : 'avatar';
-    
-        console.log('Uploading file:', {
-          name,
-          type,
-          category,
-          fileSize: file.size
-        });
-        // Get presigned URL
-        const response:any = await GetURL({
+
+        const response: UploadResponse = await GetURL({
           type,
           category
         });
 
+        // ...rest of file upload logic...
         console.log('GetURL Response:', response);
+        console.log('Asset Path:', response.assetpath);
 
-        // Upload file to presigned URL
-        const uploadResponse = await axios.put(response.data.presignedUrl, file, {
+        axios.put(response.presignedUrl, file, {
           headers: {
             'Content-Type': file.type,
-            // 'x-amz-acl': 'public-read'
           }
+        }).then(() => {
+          console.log('File upload initiated for:', response.assetpath);
         });
 
-        if (uploadResponse.status !== 200) {
-          throw new Error(`HTTP error! status: ${uploadResponse.status}`);
-        }
-
-        console.log('File uploaded successfully');
-
-        // Log the responseAttachment
-        console.log('ResponseAttachment:', `${name}-${response.assetpath}. URL: ${response.presignedUrl}`);
-
-        // Update form data with assetpath
         setFormData(prev => {
           const newData = {
             ...prev,
             [name]: response.assetpath
           };
-          console.log('Updated form data:', newData);
+          console.log(`Updated ${name} with assetpath:`, response.assetpath);
           return newData;
         });
 
       } catch (error) {
-        console.error('Error uploading file:', error);
-        alert('Error uploading file. Please try again.');
+        console.error('Error in file handling:', error);
+        toast.error('Error uploading file');
       } finally {
         setIsUploading(false);
       }
     } else {
+      // Handle regular input changes
       setFormData(prev => ({
         ...prev,
         [name]: value,
@@ -115,8 +103,17 @@ const ProfileForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(''); // Clear any previous errors
 
     console.log('Submitting form with data:', formData);
+
+    // Validate required fields
+    if (!formData.fullName || !formData.whatsAppNumber || !formData.address || !formData.idProof) {
+      setError('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       // Format the data according to the required structure
@@ -135,11 +132,15 @@ const ProfileForm = () => {
       // Store in localStorage
       localStorage.setItem('partnerFormData', JSON.stringify(formattedData));
       
+      // Show success message
+      toast.success('Profile details saved successfully!');
+      
       // Navigate to next step
       router.push("/partnerSignup/2");
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Error submitting form. Please try again.');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Error submitting form. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -192,6 +193,13 @@ const ProfileForm = () => {
       {/* Main Content */}
       <div className="flex-grow bg-white py-6 px-4 sm:px-8 md:px-20 pt-32 md:pt-20">
         <h1 className="text-2xl font-bold mb-6">Profile Overview</h1>
+
+        {/* Show error message if exists */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
