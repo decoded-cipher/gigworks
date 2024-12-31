@@ -1,7 +1,7 @@
 
 import { count, eq, sql } from "drizzle-orm";
 import { db } from '../config/database/connection';
-import { subCategory } from '../config/database/schema';
+import { subCategory, subCategoryOption } from '../config/database/schema';
 
 
 
@@ -59,21 +59,31 @@ export const getSubCategoryById = async (id: string) => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            // SQL Query : SELECT id, name FROM sub_category WHERE id = id AND status = 1
-
-            let result = await db
+            const results = await db
                 .select({
-                    id: subCategory.id,
-                    name: subCategory.name
+                    subCategoryId: subCategory.id,
+                    subCategoryName: subCategory.name,
+                    subCategoryOptionId: subCategoryOption.id,
+                    subCategoryOptionName: subCategoryOption.name
                 })
                 .from(subCategory)
-                .where(sql`${subCategory.id} = ${id} AND ${subCategory.status} = 1`);
+                .leftJoin(subCategoryOption, sql`${subCategoryOption.sub_category_id} = ${subCategory.id}`)
+                .where(sql`${subCategory.id} = ${id} AND ${subCategory.status} = 1 AND ${subCategoryOption.status} = 1`);
 
-            result = result[0];
+            const subCategoryResult = results.length > 0 ? {
+                id: results[0].subCategoryId,
+                name: results[0].subCategoryName
+            } : null;
 
-            // Todo : Fetch all the sub categories and sub category options associated with this category
-
-            resolve(result);
+            const subCategoryOptionResults = results.map(result => ({
+                id: result.subCategoryOptionId,
+                name: result.subCategoryOptionName
+            }));
+            
+            resolve({
+                subCategory: subCategoryResult,
+                subCategoryOption: subCategoryOptionResults
+            });
         } catch (error) {
             reject(error);
         }

@@ -65,7 +65,7 @@ router.post('/', async (c) => {
 router.get('/', async (c) => {
 
     const page = Number(c.req.query('page')) || 1;
-    const limit = Number(c.req.query('limit')) || 10;
+    const limit = Number(c.req.query('limit'));
     const search = c.req.query('search') || '';
 
     try {

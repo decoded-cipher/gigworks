@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Textarea } from "@nextui-org/input";
 import type { FormData } from "../../signup/page";
 import { handleAssetUpload } from "../../utils/assetUpload";  // Add this import
+import { GetURL, uploadToPresignedUrl } from "../../api/index";  // Add this import
 import {
   fetchBusinessData,
   fetchsubCategoryByCategory,
@@ -41,6 +42,7 @@ export default function BusinessOverview({
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [subCategoryOptions, setSubCategoryOptions] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Debounce function
   const debounce = (func: Function, wait: number) => {
@@ -80,22 +82,56 @@ export default function BusinessOverview({
   const handleInputChange = async (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value, type, files } = e.target as HTMLInputElement;
+    const { name, value, type } = e.target;
+    const files = (e.target as HTMLInputElement).files;
 
-    if (files && files[0]) {
+    if (type === "file" && files && files[0]) {
       try {
-        // Determine category based on input name
+        setIsUploading(true);
+        const file = files[0];
+
+        // Get file type from the mime type
+        const fileType = file.type;
+        
+        // Set category based on input field name
         const category = name === 'profileImage' ? 'avatar' : 'banner';
-        const assetPath = await handleAssetUpload(files[0], category);
         
-        updateFormData({
-          [name]: files[0],
-          [category]: assetPath // Store the returned asset path
+        console.log('Uploading file:', {
+          name,
+          type: fileType,
+          category,
+          fileSize: file.size
         });
-        
+
+        // Get presigned URL
+        const response = await GetURL({
+          type: fileType,
+          category: category as 'avatar' | 'identity'
+        });
+
+        console.log('GetURL Response:', response);
+
+        // Upload file to presigned URL
+        const uploadResponse = await uploadToPresignedUrl(response.presignedUrl, file);
+
+        if (!uploadResponse) {
+          throw new Error('Upload failed');
+        }
+
+        console.log('File uploaded successfully');
+        console.log('Asset path:', response.assetpath);
+
+        // Update form data with file and asset path
+        updateFormData({
+          [name]: file,
+          [category]: response.assetpath
+        });
+
       } catch (error) {
         console.error(`Error uploading ${name}:`, error);
-        // Consider adding error toast/notification here
+        alert('Error uploading file. Please try again.');
+      } finally {
+        setIsUploading(false);
       }
       return;
     }
@@ -185,10 +221,8 @@ export default function BusinessOverview({
   return (
     <div>
       <h1 className="text-2xl font-bold py-4">Business Overview</h1>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* First Row */}
           <div>
             <label className="block text-base font-bold pb-2 text-gray-700">
               Business Name<span className="text-red-500">*</span>
@@ -259,8 +293,6 @@ export default function BusinessOverview({
             </select>
           </div>
 
-          {/* Rest of your form fields */}
-          {/* Second Row */}
           <div>
             <label className="block text-base font-bold pb-2 text-gray-700">
               Owner&apos;s/Manager&apos;s Name
@@ -292,7 +324,6 @@ export default function BusinessOverview({
             />
           </div>
 
-          {/* Third Row */}
           <div>
             <label className="block text-base font-bold pb-2 text-gray-700">
               Email Address<span className="text-red-500">*</span>
@@ -383,7 +414,6 @@ export default function BusinessOverview({
             </div>
           </div>
 
-          {/* Business Description */}
           <div className="col-span-full">
             <label className="block text-base font-bold pb-2 text-gray-700">
               Business Description
@@ -398,7 +428,6 @@ export default function BusinessOverview({
             />
           </div>
 
-          {/* Media & Branding Section */}
           <div className="col-span-full">
             <h1 className="text-2xl font-bold py-1">Media & Branding</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -412,12 +441,22 @@ export default function BusinessOverview({
                     name="profileImage"
                     onChange={handleInputChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    disabled={isUploading}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <p className="text-sm text-gray-600">
-                      Drag and drop or click to upload
-                    </p>
+                    {isUploading ? (
+                      <p className="text-sm text-gray-600">Uploading...</p>
+                    ) : (
+                      <p className="text-sm text-gray-600">
+                        Drag and drop or click to upload
+                      </p>
+                    )}
                   </div>
+                  {formData.avatar && (
+                    <div className="mt-2 text-sm text-green-600">
+                      ✓ Uploaded successfully
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -431,12 +470,22 @@ export default function BusinessOverview({
                     name="coverImage"
                     onChange={handleInputChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    disabled={isUploading}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <p className="text-sm text-gray-600">
-                      Drag and drop or click to upload
-                    </p>
+                    {isUploading ? (
+                      <p className="text-sm text-gray-600">Uploading...</p>
+                    ) : (
+                      <p className="text-sm text-gray-600">
+                        Drag and drop or click to upload
+                      </p>
+                    )}
                   </div>
+                  {formData.banner && (
+                    <div className="mt-2 text-sm text-green-600">
+                      ✓ Uploaded successfully
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

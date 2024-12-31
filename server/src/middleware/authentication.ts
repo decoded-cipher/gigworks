@@ -1,53 +1,37 @@
 
-import { ne } from 'drizzle-orm';
-import { createMiddleware } from 'hono/factory'
-import jwt from 'jsonwebtoken';
+import { HonoContext, Next } from 'hono';
+import jwt, { TokenExpiredError } from 'jsonwebtoken';
 
 
-// Generate Bearer Token
-export const generateToken = (data, c) => {
-    return jwt.sign(data, c.env.JWT_TOKEN_SECRET, { expiresIn: c.env.JWT_TOKEN_EXPIRY });
+interface DecodedToken {
+    [key: string]: any;
 }
 
 
-// Verify token
-export const verifyToken = createMiddleware<{
-    Variables: {
-        token: string;
-        decoded: any;
+export const verifyToken = async (c: HonoContext, next: Next) => {
+    const authHeader = c.req.header('Authorization');
+    if (!authHeader) {
+        return c.json({
+            message: 'Access denied. No token provided'
+        }, 401);
     }
-  }>(async (c, next) => {
-    console.log('Verifying token');
-    await next();
-});
 
+    const bearerToken = authHeader.split(' ')[1];
 
-// ------------------------------------------------------------------------------------------------------
-
-
-// Verify Admin
-export const verifyAdmin = (c, next) => {
-    if (c.req.user.role !== 'admin') {
-        return c.res.status(403).json({ message: 'Forbidden' });
+    try {
+        const decoded = jwt.verify(bearerToken, c.env.JWT_TOKEN_SECRET) as DecodedToken;
+        c.req._user = decoded;
+        await next();
+    } catch (error) {
+        if (error instanceof TokenExpiredError) {
+            return c.json({
+                message: 'Token expired. Please login again',
+            }, 401);
+        }
+        return c.json({
+            message: 'Invalid token. Please login again',
+            // error: error.message,
+        }, 400);
     }
-    next();
-}
-
-
-// Verify Partner
-export const verifyPartner = (c, next) => {
-    if (c.req.user.role !== 'partner') {
-        return c.res.status(403).json({ message: 'Forbidden' });
-    }
-    next();
-}
-
-
-// Verify User
-export const verifyUser = (c, next) => {
-    if (c.req.user.role !== 'user') {
-        return c.res.status(403).json({ message: 'Forbidden' });
-    }
-    next();
-}
+};
 

@@ -4,6 +4,8 @@ import { sql, gte, lte } from "drizzle-orm";
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { timestamp } from 'drizzle-orm/mysql-core';
 
+import { partnerIdProofTypes } from './interfaces';
+
 
 
 // ------------------------------------------------------------------------------------------------------
@@ -55,7 +57,7 @@ export const tokenTable = sqliteTable('token', {
     user_id: text().references(() => user.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     admin_id: text().references(() => admin.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     token: text().notNull().unique(),
-    expires_at: text().notNull(),
+    expiry: text(),
     
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
@@ -141,13 +143,8 @@ export const partner = sqliteTable('partner', {
     id: text().primaryKey().$default(nanoid),
     user_id: text().notNull().references(() => user.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     avatar: text(),
-    referral_code: text().notNull().unique().$default(sql`
-        UPPER(SUBSTR(${user.name}, 1, 2)) || 
-        UPPER(SUBSTR(${user.phone}, 1, 2)) || 
-        UPPER(SUBSTR(HEX(RANDOMBLOB(1)), 1, 2)) || 
-        UPPER(SUBSTR(${user.phone}, -2))
-    `),
-
+    referral_code: text(),
+    address: text(),
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
@@ -166,11 +163,12 @@ export const partnerBank = sqliteTable('partner_bank', {
     id: text().primaryKey().$default(nanoid),
     partner_id: text().notNull().references(() => partner.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     
-    account_number: text().notNull().unique(),
-    ifsc: text().notNull(),
-    bank_name: text().notNull(),
-    branch_name: text().notNull(),
-    account_holder: text().notNull(),
+    account_number: text().unique(),
+    ifsc: text(),
+    bank_name: text(),
+    branch_name: text(),
+    account_holder: text(),
+    upi_id: text().unique(),
     
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
@@ -179,24 +177,8 @@ export const partnerBank = sqliteTable('partner_bank', {
     return {
         indexes: [
             { columns: ['partner_id'] },
-            { columns: ['account_number'] }
-        ]
-    }
-});
-
-
-// Partner Identity Proof Type
-export const partnerIdProofType = sqliteTable('partner_id_proof_type', {
-    id: text().primaryKey().$default(nanoid),
-    name: text().notNull().unique(),
-    description: text(),
-    status: integer().default(1).notNull(),
-    created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
-    updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
-}, (table) => {
-    return {
-        indexes: [
-            { columns: ['name'] }
+            { columns: ['account_number'] },
+            { columns: ['upi_id'] }
         ]
     }
 });
@@ -207,7 +189,7 @@ export const partnerIdProof = sqliteTable('partner_id_proof', {
     id: text().primaryKey().$default(nanoid),
     partner_id: text().notNull().references(() => partner.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     
-    proof_type_id: text().notNull().references(() => partnerIdProofType.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    proof_type_id: integer().$type('ENUM', partnerIdProofTypes.map((type) => type.id)).notNull(),
     proof_number: text().notNull().unique(),
     proof_url: text().notNull(),
     
@@ -239,17 +221,12 @@ export const profile = sqliteTable('profile', {
     slug: text().notNull().unique(),
     description: text(),
     email: text(),
-    website: text(),
     phone: text().unique(), // Extra phone number other than owner phone number
-
-    // Registration Details
-    registration_number: text().unique(),
-    gstin: text().unique(),
 
     // Category
     category_id: text().notNull().references(() => category.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     sub_category_id: text().notNull().references(() => subCategory.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
-    // sub_category_option_id: text().notNull().references(() => subCategoryOption.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    sub_category_option_id: text().notNull().references(() => subCategoryOption.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
 
     // Location
     address: text(),
@@ -258,22 +235,15 @@ export const profile = sqliteTable('profile', {
     zip: text(),  // pin code
     country: text().default('India'),
 
-    // Operating Hours
-    // open_time: text(),
-    // close_time: text(),
-
-    // Social Media
-    facebook: text(),
-    instagram: text(),
-    twitter: text(),
-    linkedin: text(),
-    youtube: text(),
+    operating_hours: text(),
+    socials: text(),
 
     // Additional details
     avatar: text(),
     banner: text(),
     type: integer().$type('ENUM', [1, 2, 3]).default(1).notNull(), // 1: online, 2: offline, 3: hybrid
     additional_services: text(),
+    gstin: text(),
     
     partner_id: text().references(() => partner.id, {onDelete: 'SET NULL', onUpdate: 'CASCADE'}),
 
@@ -289,7 +259,7 @@ export const profile = sqliteTable('profile', {
             { columns: ['phone'] },
             { columns: ['category_id'] },
             { columns: ['sub_category_id'] },
-            // { columns: ['sub_category_option_id'] },
+            { columns: ['sub_category_option_id'] },
             { columns: ['city'] },
             { columns: ['state'] },
             { columns: ['zip'] },
@@ -309,9 +279,10 @@ export const profilePayment = sqliteTable('profile_payment', {
 
     amount: integer().notNull(),
     payment_mode: text().notNull().$type('ENUM', ['cash', 'debit_card', 'credit_card', 'net_banking', 'upi', 'wallet']).default('cash'),
-    payment_status: text().notNull().$type('ENUM', ['pending', 'success', 'failed']),
+    payment_status: text().notNull().$type('ENUM', ['pending', 'success', 'failed']).default('pending'),
     transaction_id: text(),
     payment_date: text(),   // Date from payment gateway
+
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
@@ -374,7 +345,7 @@ export const profileLicense = sqliteTable('profile_license', {
     id: text().primaryKey().$default(nanoid),
     profile_id: text().notNull().references(() => profile.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     license_type_id: text().notNull().references(() => licenseType.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
-    license_number: text().notNull().unique(),
+    license_number: text().notNull(),
     license_url: text(),
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),

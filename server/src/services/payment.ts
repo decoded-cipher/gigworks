@@ -5,16 +5,6 @@ import { profilePayment, profile } from '../config/database/schema';
 import { ProfilePayment, Profile } from '../config/database/interfaces';
 
 
-export interface ProfilePayment {
-    profile_id: string;
-    amount: number;
-    payment_mode: string;
-    payment_status: string;
-    payment_id?: string;
-    payment_date: string;
-}
-
-
 
 // Create Payment
 export const createPayment = async (data: ProfilePayment) => {
