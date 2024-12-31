@@ -17,12 +17,16 @@ import { NumberTicker } from "./components/ui/AnimatedNumberTicket";
 import { FooterSection } from "./components/FooterSection";
 import ScrollToTopButton from "./components/ScrollToTop";
 import { fetchBusinessCount } from "./api";
+import { useRouter } from 'next/navigation';
+import { GetPartner } from "./api";
 
 export default function GigWorkLandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [count, setCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
+  const [redirectPath, setRedirectPath] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -41,13 +45,50 @@ export default function GigWorkLandingPage() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const headerHeight = 200;
+      const headerHeight = 300;
       setIsScrolled(window.scrollY > headerHeight);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const isLoggedIn = () => {
+    return document.cookie.includes('token=');
+  };
+
+  const handleJoinClick = () => {
+    if (!isLoggedIn()) {
+      setRedirectPath('/explore');
+      setIsLoginPopupOpen(true);
+    } else {
+      router.push('/explore');
+    }
+  };
+
+  const handlePartnerClick = async () => {
+    if (!isLoggedIn()) {
+      setRedirectPath('/signup');
+      setIsLoginPopupOpen(true);
+      return;
+    }
+
+    try {
+      // Check if user has partner profile
+      const response = await GetPartner();
+      if (response.data) {
+        // If partner profile exists, redirect to partner profile
+        router.push('/partnerProfile');
+      } else {
+        // If no partner profile, redirect to partner signup
+        router.push('/signup');
+      }
+    } catch (error) {
+      console.error('Error checking partner status:', error);
+      // If error occurs (likely no partner profile), redirect to signup
+      router.push('/signup');
+    }
+  };
 
   const features = [
     {
@@ -77,7 +118,11 @@ export default function GigWorkLandingPage() {
       {/* Single LoginPopup instance at the root level */}
       <LoginPopup
         isOpen={isLoginPopupOpen}
-        onClose={() => setIsLoginPopupOpen(false)}
+        onClose={() => {
+          setIsLoginPopupOpen(false);
+          setRedirectPath(null);
+        }}
+        redirectAfterLogin={redirectPath}
       />
 
       {/* Navbar */}
@@ -460,10 +505,16 @@ export default function GigWorkLandingPage() {
             enterprise, Gig Work offers the tools you need to succeed.
           </p>
           <div className="flex justify-center space-x-4">
-            <button className="bg-tertiary hover:bg-green-500 text-white px-6 py-2 rounded-md transition duration-300">
+            <button 
+              onClick={handleJoinClick}
+              className="bg-tertiary hover:bg-green-500 text-white px-6 py-2 rounded-md transition duration-300"
+            >
               Join with us
             </button>
-            <button className="border border-green-500 text-white hover:bg-green-600 px-6 py-2 rounded-md transition duration-300">
+            <button 
+              onClick={handlePartnerClick}
+              className="border border-green-500 text-white hover:bg-green-600 px-6 py-2 rounded-md transition duration-300"
+            >
               Partner with us
             </button>
           </div>

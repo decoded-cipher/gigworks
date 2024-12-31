@@ -1,8 +1,19 @@
 import { GetURL, uploadToPresignedUrl } from '../api';
 
+// Define valid category types to match the API
+type AssetCategory = 'identity' | 'avatar' | 'banner' | 'license';
+
+// Create a mapping for API categories
+const categoryMapping = {
+  avatar: 'avatar' as const,
+  banner: 'avatar' as const,  // Map banner to avatar category for API
+  license: 'identity' as const,  // Map license to identity category for API
+  identity: 'identity' as const,
+} as const;
+
 export const handleAssetUpload = async (
   file: File,
-  category: 'avatar' | 'banner' | 'license' | 'identity'
+  category: AssetCategory
 ): Promise<string> => {
   try {
     console.log('Starting asset upload process:', {
@@ -12,15 +23,18 @@ export const handleAssetUpload = async (
       fileSize: file.size
     });
 
+    // Map the category to API expected value
+    const apiCategory = categoryMapping[category];
+
     // Get presigned URL
     const response = await GetURL({
       type: file.type,
-      category: category
+      category: apiCategory
     });
 
     console.log('Received presigned URL:', {
       url: response.presignedUrl,
-      assetPath: response.assetpath
+      assetpath: response.assetpath
     });
 
     if (!response?.presignedUrl) {
@@ -32,7 +46,7 @@ export const handleAssetUpload = async (
     
     console.log('Upload result:', {
       success: uploaded,
-      assetPath: response.assetpath
+      assetpath: response.assetpath
     });
 
     if (!uploaded) {

@@ -81,6 +81,8 @@ export const GetURL = async (params: GetURLParams): Promise<GetURLResponse> => {
 };
 
 
+
+
 // export const GetURL = async (category: 'avatar' | 'banner' | 'license' | 'identity', fileType: string) => {
 //   try {
 //     // Check if API URL is defined
@@ -202,6 +204,55 @@ export const CreatePartner = async (data: any) => {
   }
 };
 
+export const GetPartner = async () => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    const response = await axios.get(
+      `${BASE_URL}/api/v1/partner`,
+      
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    throw error;
+  }
+};
+
+export const GetPartnerAnalytics = async (start?: string, end?: string) => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    const response = await axios.get(
+      `${BASE_URL}/api/v1/partner/analytics`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          start,
+          end
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching analytics:', error);
+    throw error;
+  }
+};
+
 export const VerifyRegisterOTP = async (data: any) => {
   try {
     const response = await axios.post(
@@ -283,6 +334,8 @@ export const fetchsubCategoryByCategory = async (categoryId: string) => {
     throw error;
   }
 }
+
+
 
 
 export const fetchDataBySubCategory = async (subCategoryId: string) => {
