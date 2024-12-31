@@ -182,7 +182,7 @@ const DevMorphixWebsite = () => {
             </p>
             <div className="flex justify-center items-center w-full">
               <div className="inline-flex items-center gap-2">
-                <p className="text-xl font-medium mb-8">
+                <p className="text-xl font-medium ">
                   {partnerData?.referral_code || "Loading..."}
                 </p>
                 <button

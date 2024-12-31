@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Textarea } from "@nextui-org/input";
 import type { FormData } from "../../signup/page";
+
 import { GetURL, uploadToPresignedUrl } from "../../api/index";  // Add this import
 import {
   fetchBusinessData,
@@ -212,6 +213,26 @@ export default function BusinessOverview({
     e.preventDefault();
     onNext();
   };
+
+  // Add this useEffect to load owner's name from localStorage
+  useEffect(() => {
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      try {
+        const userData = JSON.parse(userDataString);
+        if (userData.name) {
+          updateFormData({
+            ownerName: userData.name,
+            // You can also auto-fill other fields if needed, for example:
+            whatsAppNumber: userData.phone || formData.whatsAppNumber,
+            emailAddress: userData.email || formData.emailAddress
+          });
+        }
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+      }
+    }
+  }, []);
 
   return (
     <div>
