@@ -172,6 +172,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
   const handleSubmit = async () => {
     setError('');
     const otpValue = otp.join('');
+    
     if (otpValue.length !== 6) {
       setError('Please enter a valid 6-digit OTP');
       return;
@@ -180,96 +181,22 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
     try {
       setIsLoading(true);
       setIsVerifying(true);
-      let response;
+      
+      const response = await (isRegistering 
+        ? VerifyRegisterOTP({ name, phone: phoneNumber, otp: otpValue })
+        : VerifyLoginOTP({ phone: phoneNumber, otp: otpValue }));
   
-      if (isRegistering) {
-        response = await VerifyRegisterOTP({
-          name,
-          phone: phoneNumber,
-          otp: otpValue
-        });
-        console.log('Registration Response:', response);
-        
-        // For registration, proceed if response exists
-        if (response?.status === 201 || response?.status === 200) {
-          // Store token in cookie
-          if (response?.data?.data?.token) {
-            setCookie('token', response.data.data.token, 7);
-          }
-          
-          setLocalStorage('userData', {
-            name: name,
-            phone: phoneNumber
-          });
-          
-          toast.success('Registration successful!');
-          
-          if (selectedRole === 'business') {
-            router.push('/signup');
-          } else if (selectedRole === 'partner') {
-            router.push('/partnerSignup/1');
-          }
-          handleClose();
-          return;
+      if (response?.status === 200 || response?.status === 201) {
+        if (isRegistering) {
+          handleRegistrationSuccess();
+        } else {
+          await handleLoginSuccess(response);
         }
-      } else {
-        response = await VerifyLoginOTP({
-          phone: phoneNumber,
-          otp: otpValue
-        });
-  
-        console.log('Login Response:', response);
-  
-        if (response?.status === 200 || response?.status === 201) {
-          // Store token in cookie
-          if (response?.data?.data?.token) {
-            setCookie('token', response.data.data.token, 7);
-          }
-  
-          // Store user data first
-          setLocalStorage('userData', {
-            name: response?.data?.user?.name || '',
-            phone: phoneNumber
-          });
-  
-          toast.success('Login successful!');
-  
-          // Check for isPartner first
-          if (response?.data?.user?.isPartner) {
-            router.push('/partner/profile');
-            handleClose();
-            return;
-          }
-  
-          // Then check for profiles
-          if (response?.data?.user?.profiles?.length > 0) {
-            const profiles = response.data.user.profiles;
-            setLocalStorage('userProfiles', profiles);
-            
-            if (profiles.length === 1) {
-              router.push(`/profile/${profiles[0].slug}`);
-              handleClose();
-            } else {
-              setUserProfiles(profiles);
-              setUserData({
-                name: response.data.user.name,
-                phone: response.data.user.phone
-              });
-              setShowProfileSelector(true);
-            }
-            return;
-          }
-  
-          // If neither isPartner nor profiles exist, redirect to signup
-          router.push('/signup');
-          handleClose();
-          return;
-        }
-  
-        // If we get here, something went wrong
-        console.error('Unexpected response:', response);
-        setError('Authentication failed. Please try again.');
+        return;
       }
+  
+      throw new Error('Unexpected response status');
+      
     } catch (error: any) {
       console.error('Error details:', error);
       setError(
@@ -282,6 +209,54 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
       setIsLoading(false);
       setIsVerifying(false);
     }
+  };
+  
+  const handleRegistrationSuccess = () => {
+    toast.success('Registration successful! Please login to continue.');
+    setOtp(['', '', '', '', '', '']);
+    setIsRegistering(false);
+    setIsOtpVisible(false);
+  };
+  
+  const handleLoginSuccess = async (response: any) => {
+    const { token, user } = response?.data?.data || {};
+    
+    if (token) {
+      setCookie('token', token, 7);
+    }
+  
+    setLocalStorage('userData', {
+      name: user?.name || '',
+      phone: phoneNumber
+    });
+  
+    toast.success('Login successful!');
+  
+    if (user?.partner) {
+      router.push('/partnerProfile');
+      handleClose();
+      return;
+    }
+  
+    const profiles = user?.profiles || [];
+    
+    if (profiles.length > 0) {
+      setLocalStorage('userProfiles', profiles);
+      
+      if (profiles.length === 1) {
+        router.push(`/profile/${profiles[0].slug}`);
+        handleClose();
+      } else {
+        setUserProfiles(profiles);
+        setUserData({ name: user.name, phone: user.phone });
+        setShowProfileSelector(true);
+      }
+      return;
+    }
+  
+    // No profiles found - redirect to signup
+    router.push('/signup');
+    handleClose();
   };
 
   // Update role selection handler to reset form
