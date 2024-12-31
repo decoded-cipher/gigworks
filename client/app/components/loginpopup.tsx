@@ -192,6 +192,11 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
         
         // For registration, proceed if response exists
         if (response?.status === 201 || response?.status === 200) {
+          // Store token in cookie
+          if (response?.data?.data?.token) {
+            setCookie('token', response.data.data.token, 7);
+          }
+          
           setLocalStorage('userData', {
             name: name,
             phone: phoneNumber
@@ -216,6 +221,11 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
         console.log('Login Response:', response);
   
         if (response?.status === 200 || response?.status === 201) {
+          // Store token in cookie
+          if (response?.data?.data?.token) {
+            setCookie('token', response.data.data.token, 7);
+          }
+  
           // Store user data first
           setLocalStorage('userData', {
             name: response?.data?.user?.name || '',
