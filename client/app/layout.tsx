@@ -17,7 +17,7 @@ export const metadata: Metadata = {
         description: 'Transform your business with WhatsApp integration. Connect with customers seamlessly on India\'s growing business platform.',
         images: [
             {
-                url: 'https://gigwork.co.in/assets/media/og-image.png',
+                url: 'https://gigwork.co.in/assets/og-image.png',
                 width: 1200,
                 height: 630,
                 alt: 'Gigwork - WhatsApp Business Integration Platform',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: 'Gigwork - WhatsApp Business Integration Platform',
         description: 'Transform your business with WhatsApp integration. Connect with customers seamlessly on India\'s growing business platform.',
-        images: ['https://gigwork.co.in/assets/media/og-image.png'],
+        images: ['https://gigwork.co.in/assets/og-image.png'],
         creator: '@DevMorphix',
     },
     robots: {
@@ -76,6 +76,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />
                 <meta property="og:image:type" content="image/png" />
+
+                <meta property="og:image:url" content="https://gigwork.co.in/assets/og-image.png" />
+                <meta property="og:image:secure_url" content="https://gigwork.co.in/assets/og-image.png" />
+                <meta property="og:image:alt" content="Gigwork - WhatsApp Business Integration Platform" />
                 
                 <script
                     type="application/ld+json"
