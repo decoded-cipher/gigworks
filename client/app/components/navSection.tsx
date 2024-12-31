@@ -17,7 +17,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           <Link href="/" className="text-white text-xl font-bold">
             <Image
-              src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
+              src="/assets/media/gigworksblk.svg"
               alt="Logo"
               width={150}
               height={50}

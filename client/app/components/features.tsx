@@ -51,7 +51,7 @@ const FeatureCardsWithImage = () => {
           {/* Center image container */}
           <div className="absolute left-1/2 -translate-x-1/2 w-[600px] h-full flex items-end">
             <Image 
-              src="/women.svg"
+              src="/assets/media/women.svg"
               alt="Women illustration"
               fill
               style={{ objectFit: 'contain' }}

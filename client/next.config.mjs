@@ -1,20 +1,65 @@
+
 import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev';
 
-// Here we use the @cloudflare/next-on-pages next-dev module to allow us to use bindings during local development
-// (when running the application with `next dev`), for more information see:
-// https://github.com/cloudflare/next-on-pages/blob/main/internal-packages/next-dev/README.md
 if (process.env.NODE_ENV === 'development') {
   await setupDevPlatform();
 }
 
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverRuntimeConfig: {
-    runtime: 'edge'
-  },
-  publicRuntimeConfig: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL, // Makes this available to both server and client
+    serverRuntimeConfig: {
+      runtime: 'edge'
+    },
+    reactStrictMode: true,
+    swcMinify: true,
+    async headers() {
+      return [
+        {
+          source: '/(.*)',
+          headers: [
+            {
+              key: 'X-Content-Type-Options',
+              value: 'nosniff',
+            },
+            {
+              key: 'X-Frame-Options',
+              value: 'DENY',
+            },
+            {
+              key: 'X-XSS-Protection',
+              value: '1; mode=block',
+            },
+            {
+              key: 'Referrer-Policy',
+              value: 'same-origin',
+            }
+          ],
+        },
+      ]
+    },
+    // async redirects() {
+    //   return [
+    //     {
+    //       source: '/home',
+    //       destination: '/',
+    //       permanent: true
+    //     }
+    //   ]
+    // },
+    i18n: {
+        locales: ['en'],
+        defaultLocale: 'en',
+    },
+    webpack: (config, { isServer }) => {
+      if (isServer) {
+        config.module.rules.push({
+          test: /\.xml$/,
+          use: 'raw-loader',
+        })
+      }
+      return config
+    }
 }
-};
-
-export default nextConfig;
+  
+export default nextConfig  

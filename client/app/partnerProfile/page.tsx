@@ -156,7 +156,7 @@ const DevMorphixWebsite = () => {
           <section className="relative py-8 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
             <div className="absolute top-0 left-0 right-0 h-72 overflow-hidden">
               <img
-                src="/back.png"
+                src="/assets/media/back.png"
                 alt="Background"
                 className="w-full h-full object-cover"
               />
