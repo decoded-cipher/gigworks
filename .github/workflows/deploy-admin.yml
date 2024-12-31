@@ -2,6 +2,15 @@ name: Deploy Admin Panel
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Choose environment to deploy (STAGE or PROD)"
+        required: true
+        default: "STAGE"
+        type: choice
+        options:
+          - STAGE
+          - PROD
 
 jobs:
   deploy:
@@ -27,12 +36,17 @@ jobs:
       - name: Deploy to Cloudflare Pages
         working-directory: ./admin
         env:
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN_STAGE }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID_STAGE }}
           CF_PROJECT_NAME: gigworks-admin
         run: |
           npm install -g @cloudflare/wrangler
+          if [[ "${{ github.event.inputs.environment }}" == "PROD" ]]; then
+            export CF_API_TOKEN=${{ secrets.CF_API_TOKEN_PROD }}
+            export CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID_PROD }}
+            export CF_PROJECT_NAME=${{ secrets.CF_PROJECT_NAME_PROD }}
+          fi
           npm run deploy
 
       - name: Notify success
-        run: echo "Deployment successful"
+        run: echo "Deployment to ${{ github.event.inputs.environment }} successful!"
