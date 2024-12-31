@@ -299,7 +299,10 @@ export const getProfileBySlug = async (slug: string) => {
 
                 let profileResult = await db
                     .select({
-                        profile: profile,
+                        profile: {
+                            _id: profile.id,
+                            ...profile
+                        },
                         user: {
                             name: user.name,
                             phone: user.phone
@@ -341,6 +344,7 @@ export const getProfileBySlug = async (slug: string) => {
                             profile_license.profile_id = profileResult.profile.id
                     */
                     
+                    
                     db.select({
                         name: licenseType.name,
                         number: profileLicense.license_number,
@@ -352,9 +356,17 @@ export const getProfileBySlug = async (slug: string) => {
                     .where(sql`${profileLicense.profile_id} = ${profileResult.profile.id}`)
                     .all(),
                     
+                    
                     // SQL Query : SELECT * FROM profile_media WHERE profile_id = profileResult.profile.id
-                    db.select().from(profileMedia).where(sql`${profileMedia.profile_id} = ${profileResult.profile.id}`).all(),
+                    db.select({
+                        url: profileMedia.url,
+                        description: profileMedia.description,
+                    })
+                    .from(profileMedia)
+                    .where(sql`${profileMedia.profile_id} = ${profileResult.profile.id}`)
+                    .all(),
 
+                    
                     // SQL Query : SELECT * FROM profile_tag WHERE profile_id = profileResult.profile.id
                     db.select().from(profileTag).where(sql`${profileTag.profile_id} = ${profileResult.profile.id}`).all()
                     

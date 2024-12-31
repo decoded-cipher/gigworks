@@ -101,16 +101,17 @@ router.post('/verify/:mode', async (c) => {
             case 'login':
                 const token = await createAuthToken(user, c.env);
                 const profiles = await getProfilesByUser(user.id);
-                return successRes(c, 'User logged in successfully', 201, {
-                    data: {
-                        token,
-                        user: {
-                            name: user.name,
-                            phone: user.phone,
-                            profiles
-                        }
+
+                const data = {
+                    token,
+                    user: {
+                        name: user.name,
+                        phone: user.phone,
+                        ...(user.role === 1 ? { partner: true } : { profiles: profiles })
                     }
-                });
+                };
+                
+                return successRes(c, 'User logged in successfully', 201, { data });
 
             default:
                 return errorRes(c, 'Invalid mode. Please provide a valid mode', 400);
