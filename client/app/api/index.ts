@@ -3,7 +3,8 @@ import axios from 'axios';
 // const BASE_URL = "https://gigworks-server.devmorphix.workers.dev";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export const ASSET_BASE_URL = 'https://pub-3aaf2182691d4cb6b5270a8f14ad704a.r2.dev';
+export const ASSET_BASE_URL = process.env.NEXT_PUBLIC_ASSET_BASE_URL;
+// export const ASSET_BASE_URL = 'https://pub-3aaf2182691d4cb6b5270a8f14ad704a.r2.dev';
 
 export const fetchBusinessData = async () => {
   try {
@@ -173,7 +174,7 @@ export const UserLogin = async (data: any) => {
       `${BASE_URL}/auth/login`,
       data
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error during login:', error);
     throw error;
@@ -186,7 +187,7 @@ export const VerifyLoginOTP = async (data: any) => {
       `${BASE_URL}/auth/verify/login`,
       data
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error verifying OTP:', error);
     throw error;

@@ -59,16 +59,10 @@ export default function GigWorkLandingPage() {
 
   const handleJoinClick = () => {
     if (!isLoggedIn()) {
-      <LoginPopup
-        isOpen={isLoginPopupOpen}
-        onClose={() => {
-          setIsLoginPopupOpen(false);
-          setRedirectPath(undefined);
-        }}
-        redirectAfterLogin={redirectPath}
-      />
+      setIsLoginPopupOpen(true);
+      setRedirectPath('/signup');
     } else {
-      // check if the profile in loacl storage is empty or not
+      // check if the profile in local storage is empty or not
       const profile = localStorage.getItem('profile');
       if (profile) {
         // fetch slug from profile and redirect to profile page
@@ -83,17 +77,8 @@ export default function GigWorkLandingPage() {
 
   const handlePartnerClick = async () => {
     if (!isLoggedIn()) {
-      <LoginPopup
-        isOpen={isLoginPopupOpen}
-        onClose={() => {
-          setIsLoginPopupOpen(false);
-          setRedirectPath(undefined);
-        }}
-        redirectAfterLogin={redirectPath}
-      />
-    }
-      else {
-      setRedirectPath('/partnerSignup');
+      setIsLoginPopupOpen(true);
+      setRedirectPath('/partnerSignup/1');
       return;
     }
 
@@ -105,12 +90,12 @@ export default function GigWorkLandingPage() {
         router.push('/partnerProfile');
       } else {
         // If no partner profile, redirect to partner signup
-        router.push('/signup');
+        router.push('/partnerSignup/1');
       }
     } catch (error) {
       console.error('Error checking partner status:', error);
-      // If error occurs (likely no partner profile), redirect to signup
-      router.push('/signup');
+      // If error occurs, redirect to partner signup
+      router.push('/partnerSignup/1');
     }
   };
 
