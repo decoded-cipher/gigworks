@@ -102,7 +102,7 @@ const DevMorphixWebsite = () => {
       } catch (err) {
         const error = err as ApiError;
         if (error.status === 404) {
-          // router.push('/404');
+          router.push('/404');
           return;
         }
         console.error("Error fetching business data:", error);
