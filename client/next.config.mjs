@@ -12,6 +12,9 @@ const nextConfig = {
   serverRuntimeConfig: {
     runtime: 'edge'
   },
+  publicRuntimeConfig: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL, // Makes this available to both server and client
+}
 };
 
 export default nextConfig;
