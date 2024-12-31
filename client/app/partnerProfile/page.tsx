@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { MapPin, Clock, Phone, Briefcase, Dribbble } from "lucide-react";
 import ImageGrid from "../components/imgsec";
 import { FooterSection } from "../components/FooterSection";
@@ -29,10 +30,12 @@ interface AnalyticsData {
 }
 
 const DevMorphixWebsite = () => {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [copied, setCopied] = React.useState(false);
   const [partnerData, setPartnerData] = useState<PartnerData | null>(null);
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  
   const [dateRange, setDateRange] = useState({
     start: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0], // First day of current year
     end: new Date(new Date().getFullYear(), 11, 31).toISOString().split('T')[0]  // Last day of current year
@@ -49,11 +52,15 @@ const DevMorphixWebsite = () => {
         setAnalyticsData(analyticsResponse.data);
       } catch (error) {
         console.error('Error fetching data:', error);
+        if(error?.response?.data?.error == "Cannot read properties of undefined (reading 'avatar')") {
+          router.push('/partnerSignup/1');
+        }
+        console.error('Error fetching data:', error?.response?.data?.error);
       }
     };
 
     fetchPartnerData();
-  }, [dateRange]); // Re-fetch when date range changes
+  }, [dateRange, router]); // Re-fetch when date range changes
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
