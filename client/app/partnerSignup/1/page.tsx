@@ -4,7 +4,6 @@ import React, { useState, ChangeEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { GetURL } from '../../api/index';
-import axios from "axios";
 
 interface FormData {
   fullName: string;
@@ -37,11 +36,11 @@ const ProfileForm = () => {
 
   // Debug log for form data changes
   React.useEffect(() => {
-    console.log('Current Form Data:', formData);
+    console.log('Form data changed:', formData);
   }, [formData]);
 
   const handleInputChange = async (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
     const files = (e.target as HTMLInputElement).files;
@@ -51,6 +50,9 @@ const ProfileForm = () => {
         setIsUploading(true);
         const file = files[0];
     
+        // Log file details
+        console.log('File selected:', file.name, file.type, file.size);
+
         // Get file type from the mime type
         const type = file.type;
     
@@ -63,8 +65,10 @@ const ProfileForm = () => {
           category,
           fileSize: file.size
         });
+
         // Get presigned URL
-        const response:any = await GetURL({
+        console.log('Requesting presigned URL...');
+        const response = await GetURL({
           type,
           category
         });
@@ -72,11 +76,13 @@ const ProfileForm = () => {
         console.log('GetURL Response:', response);
 
         // Upload file to presigned URL
-        const uploadResponse: any = await axios.put(response.data.presignedUrl, file, {
+        console.log('Uploading file to presigned URL...');
+        const uploadResponse = await fetch(response.presignedUrl, {
+          method: 'PUT',
+          body: file,
           headers: {
             'Content-Type': file.type,
-            // 'x-amz-acl': 'public-read'
-          }
+          },
         });
 
         if (!uploadResponse.ok) {
@@ -89,6 +95,7 @@ const ProfileForm = () => {
         console.log('ResponseAttachment:', `${name}-${response.assetpath}. URL: ${response.presignedUrl}`);
 
         // Update form data with assetpath
+        console.log('Updating form data...');
         setFormData(prev => {
           const newData = {
             ...prev,
@@ -98,6 +105,8 @@ const ProfileForm = () => {
           return newData;
         });
 
+        console.log('Form data update completed');
+
       } catch (error) {
         console.error('Error uploading file:', error);
         alert('Error uploading file. Please try again.');
@@ -105,10 +114,15 @@ const ProfileForm = () => {
         setIsUploading(false);
       }
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value,
-      }));
+      console.log('Updating non-file input:', name, value);
+      setFormData(prev => {
+        const newData = {
+          ...prev,
+          [name]: value,
+        };
+        console.log('Updated form data:', newData);
+        return newData;
+      });
     }
   };
 
@@ -236,7 +250,7 @@ const ProfileForm = () => {
                 name="address"
                 value={formData.address}
                 onChange={handleInputChange}
-                placeholder="Business Description"
+                placeholder="Business Address"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 h-36"
               />
             </div>
