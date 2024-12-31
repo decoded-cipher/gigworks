@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "Choose environment to deploy (STAGE or PROD)"
+        description: "Select environment (STAGE or PROD)"
         required: true
         default: "STAGE"
         type: choice
