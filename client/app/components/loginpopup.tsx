@@ -329,7 +329,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
           {!isOtpVisible ? (
             <>
               <Image
-                src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
+                src="/assets/media/gigworksblk.svg"
                 alt="Gigworks Logo"
                 width={306}
                 height={336}
@@ -391,7 +391,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
           ) : (
             <>
               <Image
-                src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
+                src="/assets/media/gigworksblk.svg"
                 alt="Gigworks Logo"
                 width={306}
                 height={336}

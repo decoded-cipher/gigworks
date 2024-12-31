@@ -236,7 +236,7 @@ const DevMorphixWebsite = () => {
           <section className="relative py-8 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
             <div className="absolute top-0 left-0 right-0 h-72 overflow-hidden">
               <img
-                src={businessData?.profile.banner ? `${ASSET_BASE_URL}/${businessData.profile.banner}` : "/15879.png"}
+                src={businessData?.profile.banner ? `${ASSET_BASE_URL}/${businessData.profile.banner}` : "/assets/media/15879.png"}
                 alt="Background"
                 className="w-full h-full object-cover"
               />
