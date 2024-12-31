@@ -1,7 +1,15 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { FormData } from '../../signup/page'
+import { fetchLicenseData } from '../../api/index'
+import { handleAssetUpload } from '../../utils/assetUpload'
+
+interface LicenseType {
+  id: string;
+  name: string;
+  description?: string;
+}
 
 interface BusinessOperationsProps {
   formData: FormData
@@ -17,15 +25,60 @@ export default function BusinessOperations({
   onPrevious
 }: BusinessOperationsProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [licenseTypes, setLicenseTypes] = useState<LicenseType[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleInputChange = (
+  useEffect(() => {
+    const fetchLicenses = async () => {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const response = await fetchLicenseData()
+        if (response.data && Array.isArray(response.data)) {
+          setLicenseTypes(response.data)
+        } else {
+          setError('Invalid license data format')
+        }
+      } catch (error) {
+        console.error('Error fetching license types:', error)
+        setError('Failed to fetch license types')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchLicenses()
+  }, [])
+
+
+  const handleInputChange = async (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const target = e.target as HTMLInputElement  // Type assertion to HTMLInputElement to access checked property
+    const target = e.target as HTMLInputElement
     const { name, value, type } = target
     const checked = type === 'checkbox' ? target.checked : undefined
     const index = parseInt(target.dataset.index || "0")
     const field = target.dataset.field
+
+    if (type === 'file' && target.files?.[0]) {
+      const file = target.files[0]
+      
+      try {
+        const assetPath = await handleAssetUpload(file, 'license')
+        
+        const newLicenses = [...formData.otherLicenses]
+        newLicenses[index] = {
+          ...newLicenses[index],
+          certification: assetPath
+        }
+        updateFormData({ otherLicenses: newLicenses })
+        
+      } catch (error) {
+        console.error('Error uploading license:', error)
+        // Handle error (show toast, etc.)
+      }
+      return
+    }
 
     if (name === "otherLicenses") {
       const newLicenses = [...formData.otherLicenses]
@@ -46,7 +99,7 @@ export default function BusinessOperations({
       updateFormData({ [name]: value })
     }
   }
-  
+
 
   const addLicense = () => {
     updateFormData({
@@ -128,11 +181,13 @@ export default function BusinessOperations({
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030]"
                   >
                     <option value="">Select License Type</option>
-                    <option value="Business">Business License</option>
-                    <option value="Professional">Professional License</option>
-                    <option value="Trade">Trade License</option>
-                    <option value="Special">Special Permit</option>
-                    <option value="Industry">Industry Certificate</option>
+                    {isLoading && <option disabled>Loading...</option>}
+                    {error && <option disabled>{error}</option>}
+                    {licenseTypes.map((type) => (
+                      <option key={type.id} value={type.id} title={type.description}>
+                        {type.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -151,7 +206,7 @@ export default function BusinessOperations({
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030]"
                   />
                 </div>
-                
+
                 <div className="w-full relative">
                   <label className="block text-lg font-bold mb-2">
                     Upload Certificate

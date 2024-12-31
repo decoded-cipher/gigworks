@@ -76,24 +76,69 @@ export const GetURL = async (params: GetURLParams): Promise<GetURLResponse> => {
     return response.data;
   } catch (error) {
     console.error('Error getting presigned URL:', error);
-    throw error;
+    throw error;  
   }
 };
 
-// no correct
 
-export const UploadMedia = async (data: any) => {
+// export const GetURL = async (category: 'avatar' | 'banner' | 'license' | 'identity', fileType: string) => {
+//   try {
+//     // Check if API URL is defined
+//     if (!process.env.NEXT_PUBLIC_API_URL) {
+//       throw new Error('API URL is not defined');
+//     }
+
+//     const response = await axios.get(
+//       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/get-presigned-url`,
+//       {
+//         params: {
+//           type: fileType,
+//           category: category
+//         }
+//       }
+//     );
+//     return response.data;
+//   } catch (error: any) {
+//     // Better error handling
+//     if (error.code === 'ERR_NAME_NOT_RESOLVED') {
+//       console.error('API URL could not be resolved. Check your environment variables and API server.');
+//     }
+//     throw error;
+//   }
+// };
+
+export const uploadToPresignedUrl = async (presignedUrl: string, file: File) => {
   try {
-    const response = await axios.post(
-      `${BASE_URL}/auth/register`,
-      data
-    );
-    return response.data;
+    console.log('Uploading to:', presignedUrl);
+    console.log('File details:', {
+      name: file.name,
+      type: file.type,
+      size: file.size
+    });
+
+    const response = await axios.put(presignedUrl, file, {
+      headers: {
+        'Content-Type': file.type,
+      },
+    });
+
+    console.log('Upload response:', response.status);
+    return true;
   } catch (error) {
-    console.error('Error fetching businesses:', error);
+    console.error('Error uploading file:', {
+      error,
+      url: presignedUrl.split('?')[0],
+      fileInfo: {
+        name: file.name,
+        type: file.type,
+        size: file.size
+      }
+    });
     throw error;
   }
 };
+
+
 
 export const UserRegister = async (data: any) => {
   try {

@@ -3,12 +3,24 @@
 import { useState, useEffect, useCallback } from "react";
 import { Textarea } from "@nextui-org/input";
 import type { FormData } from "../../signup/page";
+import { handleAssetUpload } from "../../utils/assetUpload";  // Add this import
+import { GetURL, uploadToPresignedUrl } from "../../api/index";  // Add this import
 import {
   fetchBusinessData,
   fetchsubCategoryByCategory,
   checkSlug,
   fetchDataBySubCategory
 } from "../../api/index";
+
+interface Category {
+  id: string;
+  name: string;
+}
+
+interface SubCategory {
+  id: string;
+  name: string;
+}
 
 interface BusinessOverviewProps {
   formData: FormData;
@@ -22,14 +34,15 @@ export default function BusinessOverview({
   onNext,
 }: BusinessOverviewProps) {
   const [slugFocused, setSlugFocused] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [subCategories, setSubCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   const [slugError, setSlugError] = useState<string | null>(null);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [subCategoryOptions, setSubCategoryOptions] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Debounce function
   const debounce = (func: Function, wait: number) => {
@@ -66,15 +79,62 @@ export default function BusinessOverview({
     []
   );
 
-  console.log("form data anu",formData);
-  
-
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+  const handleInputChange = async (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value, files } = e.target as HTMLInputElement;
+    const { name, value, type } = e.target;
+    const files = (e.target as HTMLInputElement).files;
+
+    if (type === "file" && files && files[0]) {
+      try {
+        setIsUploading(true);
+        const file = files[0];
+
+        // Get file type from the mime type
+        const fileType = file.type;
+        
+        // Set category based on input field name
+        const category = name === 'profileImage' ? 'avatar' : 'banner';
+        
+        console.log('Uploading file:', {
+          name,
+          type: fileType,
+          category,
+          fileSize: file.size
+        });
+
+        // Get presigned URL
+        const response = await GetURL({
+          type: fileType,
+          category: category as 'avatar' | 'identity'
+        });
+
+        console.log('GetURL Response:', response);
+
+        // Upload file to presigned URL
+        const uploadResponse = await uploadToPresignedUrl(response.presignedUrl, file);
+
+        if (!uploadResponse) {
+          throw new Error('Upload failed');
+        }
+
+        console.log('File uploaded successfully');
+        console.log('Asset path:', response.assetpath);
+
+        // Update form data with file and asset path
+        updateFormData({
+          [name]: file,
+          [category]: response.assetpath
+        });
+
+      } catch (error) {
+        console.error(`Error uploading ${name}:`, error);
+        alert('Error uploading file. Please try again.');
+      } finally {
+        setIsUploading(false);
+      }
+      return;
+    }
 
     if (name === "slug") {
       const slugValue = value
@@ -91,7 +151,7 @@ export default function BusinessOverview({
       }
     } else {
       updateFormData({
-        [name]: files ? files[0] : value,
+        [name]: value,
       });
     }
   };
@@ -109,16 +169,21 @@ export default function BusinessOverview({
     fetchData();
   }, []);
 
-  const handleCategoryChange = async (event: any) => {
+  const handleCategoryChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const categoryId = event.target.value;
     setSelectedCategory(categoryId);
+    
+    // Update form data with category ID
+    updateFormData({
+      businessCategory: categoryId
+    });
 
     try {
       const data = await fetchsubCategoryByCategory(categoryId);
-      setSubCategories(data.data.subCategory); // Adjust according to the structure of your data
-      console.log(data.data.subCategory);
+      setSubCategories(data.data.subCategory || []);
     } catch (error) {
       console.error("Error fetching subcategories:", error);
+      setSubCategories([]);
     }
   };
 
@@ -126,17 +191,27 @@ export default function BusinessOverview({
     const subCategoryId = event.target.value;
     setSelectedSubCategory(subCategoryId);
 
+    // Update form data with subcategory ID
+    updateFormData({
+      subCategory: subCategoryId
+    });
+
     try {
       const data = await fetchDataBySubCategory(subCategoryId);
-      // Handle the fetched data as needed
       setSubCategoryOptions(data.data.subCategoryOption);
-      console.log("data aney",data.data.subCategoryOption);
     } catch (error) {
       console.error("Error fetching data by subcategory:", error);
     }
   };
 
-  
+  const handleSubCategoryOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const optionId = event.target.value;
+    
+    // Update form data with subcategory option ID
+    updateFormData({
+      subCategoryOption: optionId
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,10 +221,8 @@ export default function BusinessOverview({
   return (
     <div>
       <h1 className="text-2xl font-bold py-4">Business Overview</h1>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* First Row */}
           <div>
             <label className="block text-base font-bold pb-2 text-gray-700">
               Business Name<span className="text-red-500">*</span>
@@ -171,7 +244,7 @@ export default function BusinessOverview({
             </label>
             <select
               name="businessCategory"
-              value={formData.businessCategory = selectedCategory} 
+              value={selectedCategory}
               onChange={handleCategoryChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
               required
@@ -186,32 +259,34 @@ export default function BusinessOverview({
           </div>
 
           <div>
-              <label className="block text-base font-bold pb-2 text-gray-700">
-                SubCategory<span className="text-red-500">*</span>
-              </label>
-              <select
-                name="subCategory"
-                value={selectedSubCategory}
-                onChange={handleSubCategoryChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                required
-              >
-                <option value="">Select SubCategory</option>
-                {subCategories.map((subCategory: any) => (
-                  <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
-                ))}
-              </select>
-            </div>
-          {/* Second Row */}
+            <label className="block text-base font-bold pb-2 text-gray-700">
+              SubCategory<span className="text-red-500">*</span>
+            </label>
+            <select
+              name="subCategory"
+              value={selectedSubCategory}
+              onChange={handleSubCategoryChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+              required
+            >
+              <option value="">Select SubCategory</option>
+              {subCategories.map((subCategory: any) => (
+                <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label className="block text-base font-bold pb-2 text-gray-700">
               Sub Category Options<span className="text-red-500">*</span>
             </label>
             <select
-              name="subCategoryOptions"
+              name="subCategoryOption"
+              value={formData.subCategoryOption}
+              onChange={handleSubCategoryOptionChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
-              <option value="">Select Sub Category</option>
+              <option value="">Select Sub Category Option</option>
               {subCategoryOptions.map((option: any) => (
                 <option key={option.id} value={option.id}>{option.name}</option>
               ))}
@@ -249,7 +324,6 @@ export default function BusinessOverview({
             />
           </div>
 
-          {/* Third Row */}
           <div>
             <label className="block text-base font-bold pb-2 text-gray-700">
               Email Address<span className="text-red-500">*</span>
@@ -340,7 +414,6 @@ export default function BusinessOverview({
             </div>
           </div>
 
-          {/* Business Description */}
           <div className="col-span-full">
             <label className="block text-base font-bold pb-2 text-gray-700">
               Business Description
@@ -355,7 +428,6 @@ export default function BusinessOverview({
             />
           </div>
 
-          {/* Media & Branding Section */}
           <div className="col-span-full">
             <h1 className="text-2xl font-bold py-1">Media & Branding</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -369,12 +441,22 @@ export default function BusinessOverview({
                     name="profileImage"
                     onChange={handleInputChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    disabled={isUploading}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <p className="text-sm text-gray-600">
-                      Drag and drop or click to upload
-                    </p>
+                    {isUploading ? (
+                      <p className="text-sm text-gray-600">Uploading...</p>
+                    ) : (
+                      <p className="text-sm text-gray-600">
+                        Drag and drop or click to upload
+                      </p>
+                    )}
                   </div>
+                  {formData.avatar && (
+                    <div className="mt-2 text-sm text-green-600">
+                      ✓ Uploaded successfully
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -388,12 +470,22 @@ export default function BusinessOverview({
                     name="coverImage"
                     onChange={handleInputChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    disabled={isUploading}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <p className="text-sm text-gray-600">
-                      Drag and drop or click to upload
-                    </p>
+                    {isUploading ? (
+                      <p className="text-sm text-gray-600">Uploading...</p>
+                    ) : (
+                      <p className="text-sm text-gray-600">
+                        Drag and drop or click to upload
+                      </p>
+                    )}
                   </div>
+                  {formData.banner && (
+                    <div className="mt-2 text-sm text-green-600">
+                      ✓ Uploaded successfully
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
