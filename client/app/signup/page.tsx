@@ -273,7 +273,7 @@ export default function SignupPage() {
         <nav className="flex flex-col sm:flex-row justify-between items-center p-4 w-full">
           <div className="flex justify-center sm:justify-start w-full sm:w-auto mb-4 sm:mb-0">
             <Image
-              src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
+              src="/assets/media/gigworksblk.svg"
               alt="Logo"
               width={150}
               height={50}

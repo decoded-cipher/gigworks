@@ -44,7 +44,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           const validBusinesses = response.data?.profiles?.map((business: any) => ({
             title: business.title || business.name || 'Untitled',
             slug: business.slug || business.title?.toLowerCase().replace(/\s+/g, '-') || 'untitled',  // Added fallback for slug
-            src: business.src || "/img/defaultbusiness.png",
+            src: business.src || "/assets/media/defaultbusiness.png",
             location: business.location,
             type: business.type
           })) || [];
@@ -111,7 +111,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
             >
               <div className="w-16 h-16 mb-2">
                 <Image 
-                  src={s.src || "/img/defaultbusiness.png"} 
+                  src={s.src || "/assets/media/img/defaultbusiness.png"} 
                   alt={s.title} 
                   width={64} 
                   height={64} 

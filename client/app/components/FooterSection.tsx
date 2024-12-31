@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import gigworks from "../../public/gigworks.svg";
+import gigworks from "../../public/assets/media/gigworks.svg";
 
 
 export  function FooterSection() {
