@@ -48,10 +48,7 @@ export const metadata: Metadata = {
             'en-IN': 'https://gigwork.co.in'
         },
     },
-    authors: [{
-        name: 'DevMorphix',
-        website: 'https://devmorphix.com'
-    }],
+    authors: [{ name: 'DevMorphix' }],
     applicationName: 'Gigwork',
     generator: 'Next.js',
     referrer: 'origin-when-cross-origin',
