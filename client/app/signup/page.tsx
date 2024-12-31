@@ -182,7 +182,8 @@ export default function SignupPage() {
         },
         profile: profileData,
         payment: {
-          amount: 250
+          amount: 250,
+          payment_status: 'pending'  // Add this required field
         },
         license: formData.otherLicenses
           .filter(license => license.type && license.registrationNumber)
