@@ -3,8 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { Textarea } from "@nextui-org/input";
 import type { FormData } from "../../signup/page";
-import { handleAssetUpload } from "../../utils/assetUpload";  // Add this import
-import { GetURL, uploadToPresignedUrl } from "../../api/index";  // Add this import
+// import { handleAssetUpload } from "../../utils/assetUpload";  // Add this import
+import { GetURL } from "../../api/index";  // Add this import
+import axios from "axios";
 import {
   fetchBusinessData,
   fetchsubCategoryByCategory,
@@ -104,7 +105,7 @@ export default function BusinessOverview({
         });
 
         // Get presigned URL
-        const response = await GetURL({
+        const response:any = await GetURL({
           type: fileType,
           category: category as 'avatar' | 'identity'
         });
@@ -112,8 +113,12 @@ export default function BusinessOverview({
         console.log('GetURL Response:', response);
 
         // Upload file to presigned URL
-        const uploadResponse = await uploadToPresignedUrl(response.presignedUrl, file);
-
+        const uploadResponse = await axios.put(response.data.presignedUrl, file, {
+          headers: {
+            'Content-Type': file.type,
+            // 'x-amz-acl': 'public-read'
+          }
+        });
         if (!uploadResponse) {
           throw new Error('Upload failed');
         }

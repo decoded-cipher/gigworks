@@ -1,4 +1,5 @@
-import { GetURL, uploadToPresignedUrl } from '../api';
+import { GetURL } from '../api';
+import axios from 'axios';
 
 export const handleAssetUpload = async (
   file: File,
@@ -13,7 +14,7 @@ export const handleAssetUpload = async (
     });
 
     // Get presigned URL
-    const response = await GetURL({
+    const response:any = await GetURL({
       type: file.type,
       category: category
     });
@@ -28,8 +29,12 @@ export const handleAssetUpload = async (
     }
 
     // Upload file
-    const uploaded = await uploadToPresignedUrl(response.presignedUrl, file);
-    
+    const uploaded = await axios.put(response.data.presignedUrl, file, {
+      headers: {
+        'Content-Type': file.type,
+        // 'x-amz-acl': 'public-read'
+      }
+    });
     console.log('Upload result:', {
       success: uploaded,
       assetPath: response.assetpath

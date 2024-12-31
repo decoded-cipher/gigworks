@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import type { FormData } from '../../signup/page'
-import { fetchLicenseData } from '../../api/index'
-import { handleAssetUpload } from '../../utils/assetUpload'
+import { fetchLicenseData,GetURL } from '../../api/index'
+// import { handleAssetUpload } from '../../utils/assetUpload'
+import axios from 'axios';
 
 interface LicenseType {
   id: string;
@@ -28,6 +29,7 @@ export default function BusinessOperations({
   const [licenseTypes, setLicenseTypes] = useState<LicenseType[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false) // Added isUploading state
 
   useEffect(() => {
     const fetchLicenses = async () => {
@@ -64,18 +66,51 @@ export default function BusinessOperations({
       const file = target.files[0]
       
       try {
-        const assetPath = await handleAssetUpload(file, 'license')
+        setIsUploading(true)
         
+        // Get file type from the mime type
+        const fileType = file.type
+        
+        console.log('Uploading file:', {
+          name,
+          type: fileType,
+          category: 'license',
+          fileSize: file.size
+        })
+
+        // Get presigned URL
+        const response:any = await GetURL({
+          type: fileType,
+          category: 'license'
+        })
+
+        console.log('GetURL Response:', response)
+
+        // Upload file to presigned URL
+        const uploadResponse = await axios.put(response.data.presignedUrl, file, {
+          headers: {
+            'Content-Type': file.type,
+          }
+        })
+
+        if (uploadResponse.status !== 200) {
+          throw new Error(`HTTP error! status: ${uploadResponse.status}`)
+        }
+
+        console.log('File uploaded successfully')
+
         const newLicenses = [...formData.otherLicenses]
         newLicenses[index] = {
           ...newLicenses[index],
-          certification: assetPath
+          certification: response.assetpath
         }
         updateFormData({ otherLicenses: newLicenses })
         
       } catch (error) {
         console.error('Error uploading license:', error)
-        // Handle error (show toast, etc.)
+        alert('Error uploading file. Please try again.')
+      } finally {
+        setIsUploading(false)
       }
       return
     }
@@ -219,9 +254,14 @@ export default function BusinessOperations({
                       data-field="certification"
                       onChange={handleInputChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      disabled={isUploading} // Added disabled prop
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <p className="text-sm text-gray-600">Drag and drop or click to upload</p>
+                      {isUploading ? (
+                        <p className="text-sm text-gray-600">Uploading...</p>
+                      ) : (
+                        <p className="text-sm text-gray-600">click to upload</p>
+                      )}
                     </div>
                   </div>
                   {formData.otherLicenses.length > 1 && (
