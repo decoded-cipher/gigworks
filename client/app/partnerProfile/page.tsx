@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { AxiosError } from 'axios';
 import { MapPin, Clock, Phone, Briefcase, Dribbble } from "lucide-react";
 import ImageGrid from "../components/imgsec";
 import { FooterSection } from "../components/FooterSection";
@@ -51,11 +52,12 @@ const DevMorphixWebsite = () => {
         setPartnerData(partnerResponse.data);
         setAnalyticsData(analyticsResponse.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
-        if(error?.response?.data?.error == "Cannot read properties of undefined (reading 'avatar')") {
+        const axiosError = error as AxiosError<{ error: string }>;
+        console.error('Error fetching data:', axiosError);
+        if(axiosError.response?.data?.error === "Cannot read properties of undefined (reading 'avatar')") {
           router.push('/partnerSignup/1');
         }
-        console.error('Error fetching data:', error?.response?.data?.error);
+        console.error('Error fetching data:', axiosError.response?.data?.error);
       }
     };
 
