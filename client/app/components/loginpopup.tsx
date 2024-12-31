@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { UserLogin, VerifyLoginOTP, UserRegister, VerifyRegisterOTP } from '../api';  // Add VerifyRegisterOTP
 import { toast } from 'react-hot-toast';
+import Loader from './loader';
 
 // Add the cookie utility function at the top
 const setCookie = (name: string, value: string, days: number) => {
@@ -52,6 +53,8 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
   const [showProfileSelector, setShowProfileSelector] = useState<boolean>(false);
   const [userProfiles, setUserProfiles] = useState<Profile[]>([]);
   const [userData, setUserData] = useState<{ name: string, phone: string } | null>(null);
+  const [showRoleSelector, setShowRoleSelector] = useState<boolean>(false);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
 
   React.useEffect(() => {
     if (isOpen) {
@@ -144,6 +147,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
 
     try {
       setIsLoading(true);
+      setIsVerifying(true);
       let response;
 
       if (isRegistering) {
@@ -158,46 +162,78 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
           otp: otpValue
         });
       }
-
-      // Save token in cookie
-      setCookie('token', response.data.token, 7);
-
-      const profiles = response.data.user.profiles;
-
-      // Save profiles and user data in localStorage
-      setLocalStorage('userProfiles', profiles);
-      setLocalStorage('userData', {
-        name: response.data.user.name,
-        phone: response.data.user.phone
-      });
-
-      toast.success(isRegistering ? 'Registration successful!' : 'Login successful!');
-
-      // Handle redirect after successful login
-      if (redirectAfterLogin) {
-        router.push(redirectAfterLogin);
-        onClose();
-        return;
-      }
-
-      if (profiles.length === 0) {
-        router.push('/signup');
-      } else if (profiles.length === 1) {
-        router.push(`/profile/${profiles[0].slug}`);
-        onClose();
-      } else {
-        setUserProfiles(profiles);
-        setUserData({
+      console.log('OTP response:', response.status);
+      
+      if (response?.status === 200 || response?.status === 201) {
+        if (!response?.data?.token) {
+          throw new Error('Invalid response from server');
+        }
+      
+        // Save token in cookie
+        setCookie('token', response.data.token, 7);
+      
+        const { profiles, isPartner } = response.data.user;
+      
+        // Save user data in localStorage
+        setLocalStorage('userProfiles', profiles);
+        setLocalStorage('userData', {
           name: response.data.user.name,
           phone: response.data.user.phone
         });
-        setShowProfileSelector(true);
+      
+        toast.success(isRegistering ? 'Registration successful!' : 'Login successful!');
+      
+        // Handle redirect after successful login
+        if (redirectAfterLogin) {
+          router.push(redirectAfterLogin);
+          onClose();
+          return;
+        }
+      
+        // First check if user has any profile or is a partner
+        if (profiles?.length > 0 || isPartner) {
+          // User has existing profiles or is a partner
+          if (isPartner) {
+            router.push('/partner/profile');
+            onClose();
+          } else if (profiles.length === 1) {
+            router.push(`/profile/${profiles[0].slug}`);
+            onClose();
+          } else {
+            // Multiple profiles case
+            setUserProfiles(profiles);
+            setUserData({
+              name: response.data.user.name,
+              phone: response.data.user.phone
+            });
+            setShowProfileSelector(true);
+          }
+        } else {
+          // No profiles and not a partner - show role selector
+          setShowRoleSelector(true);
+        }
+      } else {
+        router.push('/signup');
+        // setError('Invalid OTP. Please try again.');
       }
     } catch (error: any) {
-      setError(error.response?.data?.message || 'Invalid OTP. Please try again.');
+      router.push('/signup');
+      // setError(error.response?.data?.message || 'Invalid OTP. Please try again.');
     } finally {
       setIsLoading(false);
+      setIsVerifying(false);
     }
+  };
+
+  // Add role selection handler
+  const handleRoleSelect = (role: 'business' | 'partner') => {
+    if (role === 'business') {
+      router.push('/signup');
+    } else {
+      router.push('/partner/signup');
+    }
+    setShowRoleSelector(false);
+    onClose();
   };
 
   // Add profile selection handler
@@ -211,49 +247,105 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
     return null;
   }
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="bg-white p-4 sm:p-8 rounded-xl w-full max-w-[500px] flex flex-col items-center text-center space-y-4 sm:space-y-6 relative shadow-none">
-        <button
-          onClick={onClose}
-          className="absolute top-0 right-0 m-4 text-gray-500 hover:text-black transition"
-        >
-          <X size={28} />
-        </button>
-        {!isOtpVisible ? (
-          <>
-            <Image
-              src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
-              alt="Gigworks Logo"
-              width={306}
-              height={336}
-              className="mx-auto mb-2 sm:mb-4 w-48 sm:w-auto"
-            />
-            <h2 className="text-2xl text-black font-bold">{isRegistering ? 'Register' : 'Verify your number'}</h2>
-            <p className="text-gray-400 mb-4">
-              {isRegistering ? 'Please enter your name and WhatsApp number to register.' : 'Please enter your WhatsApp number for verification to proceed.'}
-            </p>
-            <div className="w-full space-y-3 sm:space-y-4">
-              {isRegistering && (
-                <input
-                  type="text"
-                  className="w-full text-black border border-gray-300 rounded-full px-3 sm:px-5 py-2 sm:py-4 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="Name"
-                  value={name}
-                  onChange={handleNameChange}
-                />
-              )}
-              <div className="flex items-center space-x-2 sm:space-x-4">
-                <div className="bg-gray-100 rounded-full px-3 sm:px-4 py-2 sm:py-3 text-gray-600 text-base sm:text-lg">
-                  +91
+    <>
+      {isVerifying && <Loader />}
+      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div className="bg-white p-4 sm:p-8 rounded-xl w-full max-w-[500px] flex flex-col items-center text-center space-y-4 sm:space-y-6 relative shadow-none">
+          <button
+            onClick={onClose}
+            className="absolute top-0 right-0 m-4 text-gray-500 hover:text-black transition"
+          >
+            <X size={28} />
+          </button>
+          {!isOtpVisible ? (
+            <>
+              <Image
+                src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
+                alt="Gigworks Logo"
+                width={306}
+                height={336}
+                className="mx-auto mb-2 sm:mb-4 w-48 sm:w-auto"
+              />
+              <h2 className="text-2xl text-black font-bold">{isRegistering ? 'Register' : 'Verify your number'}</h2>
+              <p className="text-gray-400 mb-4">
+                {isRegistering ? 'Please enter your name and WhatsApp number to register.' : 'Please enter your WhatsApp number for verification to proceed.'}
+              </p>
+              <div className="w-full space-y-3 sm:space-y-4">
+                {isRegistering && (
+                  <input
+                    type="text"
+                    className="w-full text-black border border-gray-300 rounded-full px-3 sm:px-5 py-2 sm:py-4 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="Name"
+                    value={name}
+                    onChange={handleNameChange}
+                  />
+                )}
+                <div className="flex items-center space-x-2 sm:space-x-4">
+                  <div className="bg-gray-100 rounded-full px-3 sm:px-4 py-2 sm:py-3 text-gray-600 text-base sm:text-lg">
+                    +91
+                  </div>
+                  <input
+                    type="tel"
+                    className="flex-1 text-black border border-gray-300 rounded-full px-3 sm:px-5 py-2 sm:py-4 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="WhatsApp number"
+                    maxLength={10}
+                    value={phoneNumber}
+                    onChange={handlePhoneNumberChange}
+                  />
                 </div>
-                <input
-                  type="tel"
-                  className="flex-1 text-black border border-gray-300 rounded-full px-3 sm:px-5 py-2 sm:py-4 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="WhatsApp number"
-                  maxLength={10}
-                  value={phoneNumber}
-                  onChange={handlePhoneNumberChange}
-                />
+                {error && (
+                  <p className="text-red-500 text-sm font-medium text-center">
+                    {error}
+                  </p>
+                )}
+                <button
+                  className="bg-green-500 text-white rounded-full px-6 py-4 w-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 font-semibold text-lg disabled:opacity-50"
+                  onClick={handleSendOtp}
+                  disabled={isLoading || phoneNumber.length !== 10 || (isRegistering && !name)}
+                >
+                  {isLoading ? 'Sending...' : 'Send OTP'}
+                </button>
+                <div className="text-center mt-4">
+                  <span className="text-gray-600">{isRegistering ? 'Already have an account? ' : 'I have an account? '}</span>
+                  <button
+                    onClick={() => setIsRegistering(!isRegistering)}
+                    className="text-green-600 hover:underline font-semibold"
+                  >
+                    {isRegistering ? 'Login' : 'Create now'}
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <Image
+                src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
+                alt="Gigworks Logo"
+                width={306}
+                height={336}
+                className="mx-auto mb-2 sm:mb-4 w-48 sm:w-auto"
+              />
+              <h2 className="text-2xl sm:text-4xl text-black font-bold">Enter OTP</h2>
+              <p className="text-gray-500 mb-4">
+                Please enter the 6-digit OTP sent to your WhatsApp number.
+              </p>
+              <div className="grid grid-cols-6 gap-2 sm:gap-3 w-full px-2 sm:px-8">
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => {
+                      if (el) {
+                        otpInputRefs.current[index] = el;
+                      }
+                    }}
+                    type="tel"
+                    className="border border-gray-300 rounded-md text-black px-1 sm:px-3 py-2 sm:py-4 focus:outline-none focus:ring-2 focus:ring-green-500 w-full text-center text-lg sm:text-2xl"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                  />
+                ))}
               </div>
               {error && (
                 <p className="text-red-500 text-sm font-medium text-center">
@@ -261,131 +353,114 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
                 </p>
               )}
               <button
-                className="bg-green-500 text-white rounded-full px-6 py-4 w-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 font-semibold text-lg disabled:opacity-50"
-                onClick={handleSendOtp}
-                disabled={isLoading || phoneNumber.length !== 10 || (isRegistering && !name)}
+                className="bg-green-500 text-white rounded-full px-6 py-4 w-full mt-6 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 font-semibold text-lg disabled:opacity-50"
+                onClick={handleSubmit}
+                disabled={isLoading || otp.join('').length !== 6}
               >
-                {isLoading ? 'Sending...' : 'Send OTP'}
+                {isLoading ? 'Verifying...' : 'Verify'}
               </button>
               <div className="text-center mt-4">
-                <span className="text-gray-600">{isRegistering ? 'Already have an account? ' : 'Don&apos;t have an account? '}</span>
+                <span className="text-gray-600">Didn&apos;t receive code? </span>
+                {resendTimer > 0 ? (
+                  <span className="text-gray-500">Resend in {resendTimer}s</span>
+                ) : (
+                  <button
+                    onClick={handleSendOtp}
+                    className="text-green-600 hover:underline font-semibold disabled:opacity-50"
+                    disabled={isLoading}
+                  >
+                    Resend
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+        {/* Add the role selector popup */}
+        {showRoleSelector && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+            <div className="bg-white rounded-xl w-full max-w-[400px] p-6 relative">
+              <button
+                onClick={() => setShowRoleSelector(false)}
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+
+              <div className="mb-6 text-center">
+                <h2 className="text-2xl text-black font-bold">Join as</h2>
+                <p className="text-gray-600 mt-2">Choose how you want to join Gigworks</p>
+              </div>
+
+              <div className="space-y-4">
                 <button
-                  onClick={() => setIsRegistering(!isRegistering)}
-                  className="text-green-600 hover:underline font-semibold"
+                  onClick={() => handleRoleSelect('business')}
+                  className="w-full p-4 border border-gray-200 rounded-lg hover:bg-green-500 hover:text-white transition-colors"
                 >
-                  {isRegistering ? 'Login' : 'Create now'}
+                  <h3 className="text-lg font-semibold">Business Owner</h3>
+                  <p className="text-sm text-gray-600">List your business and get more clients</p>
+                </button>
+
+                <button
+                  onClick={() => handleRoleSelect('partner')}
+                  className="w-full p-4 border border-gray-200 rounded-lg hover:bg-green-500 hover:text-white transition-colors"
+                >
+                  <h3 className="text-lg font-semibold">Partner</h3>
+                  <p className="text-sm text-gray-600">Join as a service provider</p>
                 </button>
               </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <Image
-              src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
-              alt="Gigworks Logo"
-              width={306}
-              height={336}
-              className="mx-auto mb-2 sm:mb-4 w-48 sm:w-auto"
-            />
-            <h2 className="text-2xl sm:text-4xl text-black font-bold">Enter OTP</h2>
-            <p className="text-gray-500 mb-4">
-              Please enter the 6-digit OTP sent to your WhatsApp number.
-            </p>
-            <div className="grid grid-cols-6 gap-2 sm:gap-3 w-full px-2 sm:px-8">
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => {
-                    if (el) {
-                      otpInputRefs.current[index] = el;
-                    }
-                  }}
-                  type="tel"
-                  className="border border-gray-300 rounded-md text-black px-1 sm:px-3 py-2 sm:py-4 focus:outline-none focus:ring-2 focus:ring-green-500 w-full text-center text-lg sm:text-2xl"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                />
-              ))}
-            </div>
-            {error && (
-              <p className="text-red-500 text-sm font-medium text-center">
-                {error}
-              </p>
-            )}
-            <button
-              className="bg-green-500 text-white rounded-full px-6 py-4 w-full mt-6 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 font-semibold text-lg disabled:opacity-50"
-              onClick={handleSubmit}
-              disabled={isLoading || otp.join('').length !== 6}
-            >
-              {isLoading ? 'Verifying...' : 'Verify'}
-            </button>
-            <div className="text-center mt-4">
-              <span className="text-gray-600">Didn&apos;t receive code? </span>
-              {resendTimer > 0 ? (
-                <span className="text-gray-500">Resend in {resendTimer}s</span>
-              ) : (
-                <button
-                  onClick={handleSendOtp}
-                  className="text-green-600 hover:underline font-semibold disabled:opacity-50"
-                  disabled={isLoading}
-                >
-                  Resend
-                </button>
-              )}
-            </div>
-          </>
-        )}
-      </div>
-      {/* Add the profile selector popup */}
-      {showProfileSelector && userData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-[400px] p-6 relative">
-            <button
-              onClick={() => setShowProfileSelector(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-            >
-              <X size={24} />
-            </button>
-
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-center">Select Profile</h2>
-              <div className="text-gray-600 text-center mt-2">
-                {/* <p>{userData.name}</p> */}
-                <h2 className="text-2xl text-black font-bold">Hi <span className='text-green-600'> {userData.name} </span> </h2>
-                <h2 className="text-xl text-black font-bold"> choose your profile </h2>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {userProfiles.map((profile) => (
-                <button
-                  key={profile.slug}
-                  onClick={() => handleProfileSelect(profile.slug)}
-                  className="w-full p-4 border border-gray-200 rounded-lg hover:bg-green-500 transition-colors flex items-center space-x-4"
-                >
-                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                    {profile.avatar ? (
-                      <img
-                        src={profile.avatar}
-                        alt={profile.name}
-                        className="w-full h-full rounded-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-xl text-gray-600">
-                        {profile.name.charAt(0)}
-                      </span>
-                    )}
-                  </div>
-                  <span className="font-medium text-gray-800">{profile.name}</span>
-                </button>
-              ))}
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+        {/* Add the profile selector popup */}
+        {showProfileSelector && userData && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+            <div className="bg-white rounded-xl w-full max-w-[400px] p-6 relative">
+              <button
+                onClick={() => setShowProfileSelector(false)}
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-center">Select Profile</h2>
+                <div className="text-gray-600 text-center mt-2">
+                  {/* <p>{userData.name}</p> */}
+                  <h2 className="text-2xl text-black font-bold">Hi <span className='text-green-600'> {userData.name} </span> </h2>
+                  <h2 className="text-xl text-black font-bold"> choose your profile </h2>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {userProfiles.map((profile) => (
+                  <button
+                    key={profile.slug}
+                    onClick={() => handleProfileSelect(profile.slug)}
+                    className="w-full p-4 border border-gray-200 rounded-lg hover:bg-green-500 transition-colors flex items-center space-x-4"
+                  >
+                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                      {profile.avatar ? (
+                        <img
+                          src={profile.avatar}
+                          alt={profile.name}
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xl text-gray-600">
+                          {profile.name.charAt(0)}
+                        </span>
+                      )}
+                    </div>
+                    <span className="font-medium text-gray-800">{profile.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

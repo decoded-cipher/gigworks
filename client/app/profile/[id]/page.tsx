@@ -61,8 +61,7 @@ const DevMorphixWebsite = () => {
       try {
         setIsLoading(true);
         const response = await fetchBusinessesByslug(params.id as string);
-        if (response.status === 404) {
-          router.push('/404');
+        if (response.status === 200 || response.status === 201) {
           return;
         }
         setBusinessData(response.data);
