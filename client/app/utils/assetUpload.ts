@@ -1,4 +1,5 @@
-import { GetURL, uploadToPresignedUrl } from '../api';
+import { GetURL } from '../api';
+import axios from 'axios';
 
 // Define valid category types to match the API
 type AssetCategory = 'identity' | 'avatar' | 'banner' | 'license';
@@ -27,7 +28,7 @@ export const handleAssetUpload = async (
     const apiCategory = categoryMapping[category];
 
     // Get presigned URL
-    const response = await GetURL({
+    const response:any = await GetURL({
       type: file.type,
       category: apiCategory
     });
@@ -42,8 +43,12 @@ export const handleAssetUpload = async (
     }
 
     // Upload file
-    const uploaded = await uploadToPresignedUrl(response.presignedUrl, file);
-    
+    const uploaded = await axios.put(response.data.presignedUrl, file, {
+      headers: {
+        'Content-Type': file.type,
+        // 'x-amz-acl': 'public-read'
+      }
+    });
     console.log('Upload result:', {
       success: uploaded,
       assetpath: response.assetpath

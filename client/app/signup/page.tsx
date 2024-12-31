@@ -8,7 +8,6 @@ import BusinessOverview from "../components/signup/bussiness-overview";
 import LocationDetails from "../components/signup/location-details";
 import BusinessOperations from "../components/signup/business-operations";
 import { createBusiness } from "../api/index";
-import { log } from "node:console";
 
 // Define the main form data interface
 export interface FormData {
@@ -175,7 +174,7 @@ export default function SignupPage() {
         referral_code: formData.referral_code
       };
 
-      const payload = {
+      const payload:any = {
         user: {
           name: formData.ownerName,
           phone: formData.whatsAppNumber

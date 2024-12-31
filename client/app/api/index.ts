@@ -54,7 +54,7 @@ export const fetchBusinessCount = async () =>{
 
 interface GetURLParams {
   type: string;
-  category: 'identity' | 'avatar';
+  category: 'identity' | 'avatar' | 'license' | 'banner';
 }
 
 interface GetURLResponse {
@@ -140,7 +140,20 @@ export const uploadToPresignedUrl = async (presignedUrl: string, file: File) => 
   }
 };
 
+// no correct
 
+export const UploadMedia = async (data: any) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/auth/register`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching businesses:', error);
+    throw error;
+  }
+};
 
 export const UserRegister = async (data: any) => {
   try {
