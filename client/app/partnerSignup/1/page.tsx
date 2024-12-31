@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";  // Add useEffect import
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { GetURL } from '../../api/index';
@@ -31,6 +31,24 @@ const ProfileForm = () => {
     uploadId: "",  // Initialize with empty string instead of null
     profileImage: "",  // Initialize with empty string instead of null
   });
+
+  // Add useEffect to load user data from localStorage
+  useEffect(() => {
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      try {
+        const userData = JSON.parse(userDataString);
+        setFormData(prevData => ({
+          ...prevData,
+          fullName: userData.name || prevData.fullName,
+          whatsAppNumber: userData.phone || prevData.whatsAppNumber,
+          // Add any other fields you want to auto-fill
+        }));
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+      }
+    }
+  }, []);
 
   // Add error state
   const [error, setError] = useState<string>('');
