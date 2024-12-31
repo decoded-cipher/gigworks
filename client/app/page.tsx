@@ -59,17 +59,41 @@ export default function GigWorkLandingPage() {
 
   const handleJoinClick = () => {
     if (!isLoggedIn()) {
-      setRedirectPath('/explore');
-      setIsLoginPopupOpen(true);
+      <LoginPopup
+        isOpen={isLoginPopupOpen}
+        onClose={() => {
+          setIsLoginPopupOpen(false);
+          setRedirectPath(undefined);
+        }}
+        redirectAfterLogin={redirectPath}
+      />
     } else {
-      router.push('/explore');
+      // check if the profile in loacl storage is empty or not
+      const profile = localStorage.getItem('profile');
+      if (profile) {
+        // fetch slug from profile and redirect to profile page
+        const { slug } = JSON.parse(profile);
+        router.push(`/profile/${slug}`);
+      } else {
+        // redirect to the signup page
+        router.push('/signup');
+      }
     }
   };
 
   const handlePartnerClick = async () => {
     if (!isLoggedIn()) {
-      setRedirectPath('/signup');
-      setIsLoginPopupOpen(true);
+      <LoginPopup
+        isOpen={isLoginPopupOpen}
+        onClose={() => {
+          setIsLoginPopupOpen(false);
+          setRedirectPath(undefined);
+        }}
+        redirectAfterLogin={redirectPath}
+      />
+    }
+      else {
+      setRedirectPath('/partnerSignup');
       return;
     }
 

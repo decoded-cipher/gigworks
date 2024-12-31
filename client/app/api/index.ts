@@ -268,7 +268,7 @@ export const VerifyRegisterOTP = async (data: any) => {
       `${BASE_URL}/auth/verify/register`,
       data
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error verifying OTP:', error);
     throw error;
