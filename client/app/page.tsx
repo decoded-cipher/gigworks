@@ -25,7 +25,7 @@ export default function GigWorkLandingPage() {
   const [count, setCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
-  const [redirectPath, setRedirectPath] = useState<string | null>(null);
+  const [redirectPath, setRedirectPath] = useState<string | undefined>(undefined);
   const router = useRouter();
 
   useEffect(() => {
@@ -120,7 +120,7 @@ export default function GigWorkLandingPage() {
         isOpen={isLoginPopupOpen}
         onClose={() => {
           setIsLoginPopupOpen(false);
-          setRedirectPath(null);
+          setRedirectPath(undefined);
         }}
         redirectAfterLogin={redirectPath}
       />
