@@ -32,15 +32,15 @@ jobs:
       - name: Deploy to Cloudflare Workers
         working-directory: ./server
         env:
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN_STAGE }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID_STAGE }}
-          CF_PROJECT_NAME: gigworks-server
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN_STAGE }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID_STAGE }}
+          CLOUDFLARE_PROJECT_NAME: gigworks-server
         run: |
           npm install -g wrangler
           if [[ "${{ github.event.inputs.environment }}" == "PROD" ]]; then
-            export CF_API_TOKEN=${{ secrets.CF_API_TOKEN_PROD }}
-            export CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID_PROD }}
-            export CF_PROJECT_NAME=${{ secrets.CF_PROJECT_NAME_PROD }}
+            export CLOUDFLARE_API_TOKEN=${{ secrets.CF_API_TOKEN_PROD }}
+            export CLOUDFLARE_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID_PROD }}
+            export CLOUDFLARE_PROJECT_NAME=${{ secrets.CF_PROJECT_NAME_PROD }}
           fi
           npm run deploy
 
