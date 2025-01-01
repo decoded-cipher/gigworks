@@ -68,7 +68,6 @@ interface BusinessData {
 export const runtime = 'edge';
 
 const DevMorphixWebsite = () => {
-  console.log(ASSET_BASE_URL);
   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
@@ -382,6 +381,21 @@ const DevMorphixWebsite = () => {
                           </span>
                         </span>
                       </div>
+                      <div>
+                        <span className="font-light text-md text-black">
+                          Operating Hours:
+                        </span>
+                        <div className="ml-2">
+                          {businessData?.profile.operating_hours && 
+                            Object.entries(businessData.profile.operating_hours).map(([day, hours]) => (
+                              <div key={day} className="flex justify-between">
+                                <span className="capitalize">{day}:</span>
+                                <span>{hours}</span>
+                              </div>
+                            ))
+                          }
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -394,7 +408,7 @@ const DevMorphixWebsite = () => {
               <h2 className="text-xl font-medium mb-2">About Us</h2>
               <div className="hidden md:block flex flex-col items-center justify-center">
               {/* <h2 className="text-xl font-medium mb-2">Contact us</h2> */}
-                <p className="text-4xl font-mediu mb-2">+91 9876543210</p>
+                <p className="text-4xl font-mediu mb-2">{businessData?.user.phone || "Not available"}</p>
                 <div className="flex justify-center pb-11">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
