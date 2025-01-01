@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from 'react-hot-toast';
+import { Inter } from 'next/font/google'; // Ensure you have this import
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: "Gigworks",
-  description: "place where tesk get done",
+export const metadata = {
+  title: "Gigwork",
+  description: "place where tasks get done",
+  icons: {
+    icon: "./favicon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -17,6 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+      </head>
       <body className={inter.className}>
         <Toaster position="top-center" />
         {children}

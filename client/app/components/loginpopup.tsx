@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { UserLogin, VerifyLoginOTP, UserRegister, VerifyRegisterOTP } from '../api';  // Add VerifyRegisterOTP
+import { UserLogin, VerifyLoginOTP, UserRegister } from '../api';
 import { toast } from 'react-hot-toast';
 
 // Add the cookie utility function at the top
@@ -31,14 +31,9 @@ interface LoginPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onRegister?: () => void;
-  redirectAfterLogin?: string;
 }
 
-const LoginPopup: React.FC<LoginPopupProps> = ({ 
-  isOpen, 
-  onClose, 
-  redirectAfterLogin 
-}) => {
+const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onRegister }) => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
@@ -144,41 +139,22 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
 
     try {
       setIsLoading(true);
-      let response;
-
-      if (isRegistering) {
-        response = await VerifyRegisterOTP({
-          name,
-          phone: phoneNumber,
-          otp: otpValue
-        });
-      } else {
-        response = await VerifyLoginOTP({
-          phone: phoneNumber,
-          otp: otpValue
-        });
-      }
+      const response = await VerifyLoginOTP({
+        phone: phoneNumber,
+        otp: otpValue
+      });
 
       // Save token in cookie
       setCookie('token', response.data.token, 7);
 
       const profiles = response.data.user.profiles;
 
-      // Save profiles and user data in localStorage
+      // Save profiles in localStorage
       setLocalStorage('userProfiles', profiles);
       setLocalStorage('userData', {
         name: response.data.user.name,
         phone: response.data.user.phone
       });
-
-      toast.success(isRegistering ? 'Registration successful!' : 'Login successful!');
-
-      // Handle redirect after successful login
-      if (redirectAfterLogin) {
-        router.push(redirectAfterLogin);
-        onClose();
-        return;
-      }
 
       if (profiles.length === 0) {
         router.push('/signup');
@@ -193,6 +169,8 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
         });
         setShowProfileSelector(true);
       }
+
+      toast.success('Login successful!');
     } catch (error: any) {
       setError(error.response?.data?.message || 'Invalid OTP. Please try again.');
     } finally {
