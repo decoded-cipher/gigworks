@@ -2,6 +2,7 @@
 import { Hono } from 'hono';
 const router = new Hono();
 
+import { seedCategory } from '../../seeder/category';
 import {
     createCategory,
     getCategories,
@@ -239,6 +240,35 @@ router.patch('/:id/:mode', async (c) => {
         }, 500);
     }
 });
+
+
+
+/**
+ * @route   GET /api/v1/category/seed
+ * @desc    Seed data for testing
+ * @access  Public
+ * @params  void
+ * @return  message, data
+ * @error   400, { error }
+ * @status  200, 400
+ * 
+ * @example /api/v1/category/seed
+ **/
+
+// router.post('/seed', async (c) => {
+//     try {
+//         await seedCategory();
+//         return c.json({
+//             message: 'Data seeded successfully'
+//         }, 201);
+
+//     } catch (error) {
+//         return c.json({
+//             message: 'Internal Server Error',
+//             error: error.message
+//         }, 500);
+//     }
+// });
 
 
 export default router;
