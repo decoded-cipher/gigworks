@@ -143,6 +143,27 @@ export default function SignupPage() {
 
   const handleFinalSubmit = async () => {
     try {
+      // Helper function to format time
+      const formatOperatingHours = (hours: Array<{ day: string; startTime: string; endTime: string }>) => {
+        const daysMap: { [key: string]: string } = {
+          'Monday': 'mon',
+          'Tuesday': 'tue',
+          'Wednesday': 'web',
+          'Thursday': 'thu',
+          'Friday': 'fri',
+          'Saturday': 'sat',
+          'Sunday': 'sun'
+        };
+
+        const formattedHours: { [key: string]: string } = {};
+        hours.forEach(({ day, startTime, endTime }) => {
+          if (startTime && endTime) {
+            formattedHours[daysMap[day]] = `${startTime}-${endTime}`;
+          }
+        });
+        return formattedHours;
+      };
+
       const profileData = {
         name: formData.businessName,
         slug: formData.slug,
@@ -157,14 +178,16 @@ export default function SignupPage() {
         state: formData.address.state,
         zip: formData.address.pinCode,
         socials: {
+          website: formData.websiteURL || "",
           facebook: formData.socialMediaHandles.find(h => h.platform === "Facebook")?.link || "",
           instagram: formData.socialMediaHandles.find(h => h.platform === "Instagram")?.link || "",
           twitter: formData.socialMediaHandles.find(h => h.platform === "Twitter")?.link || "",
           linkedin: formData.socialMediaHandles.find(h => h.platform === "LinkedIn")?.link || "",
           youtube: formData.socialMediaHandles.find(h => h.platform === "YouTube")?.link || ""
         },
-        avatar: formData.profileImage ? "avatar/path-to-uploaded-image.png" : "",
-        banner: formData.coverImage ? "banner/path-to-uploaded-image.png" : "",
+        operating_hours: formatOperatingHours(formData.operatingHours),
+        avatar: formData.avatar || "",
+        banner: formData.banner || "",
         type: formData.businessType.toLowerCase(),
         additional_services: Object.entries(formData.additionalServices)
           .filter(([_, value]) => value)
@@ -250,7 +273,7 @@ export default function SignupPage() {
         <nav className="flex flex-col sm:flex-row justify-between items-center p-4 w-full">
           <div className="flex justify-center sm:justify-start w-full sm:w-auto mb-4 sm:mb-0">
             <Image
-              src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
+              src="/assets/media/gigworksblk.svg"
               alt="Logo"
               width={150}
               height={50}

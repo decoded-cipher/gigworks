@@ -24,7 +24,7 @@ import { User } from '../config/database/interfaces';
 
 router.post('/register', async (c) => {
     try {
-        const { phone, name } = await c.req.json();
+        const { phone, name, isPartner } = await c.req.json();
 
         if (!phone || !name) {
             return c.json({
@@ -42,7 +42,8 @@ router.post('/register', async (c) => {
                 }, 400);
             }
         } else {
-            user = await createUser({ phone, name } as User);
+            const role = isPartner ? 1 : 2;
+            user = await createUser({ phone, name, role } as User);
         }
 
         // await sendMessage(phone, `Your OTP is ${otp}`);
@@ -101,16 +102,17 @@ router.post('/verify/:mode', async (c) => {
             case 'login':
                 const token = await createAuthToken(user, c.env);
                 const profiles = await getProfilesByUser(user.id);
-                return successRes(c, 'User logged in successfully', 201, {
-                    data: {
-                        token,
-                        user: {
-                            name: user.name,
-                            phone: user.phone,
-                            profiles
-                        }
+
+                const data = {
+                    token,
+                    user: {
+                        name: user.name,
+                        phone: user.phone,
+                        ...(user.role === 1 ? { partner: true } : { profiles: profiles })
                     }
-                });
+                };
+                
+                return successRes(c, 'User logged in successfully', 201, { data });
 
             default:
                 return errorRes(c, 'Invalid mode. Please provide a valid mode', 400);

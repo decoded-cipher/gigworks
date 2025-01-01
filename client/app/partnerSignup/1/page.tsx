@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";  // Add useEffect import
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { GetURL } from '../../api/index';
@@ -32,6 +32,24 @@ const ProfileForm = () => {
     profileImage: "",  // Initialize with empty string instead of null
   });
 
+  // Add useEffect to load user data from localStorage
+  useEffect(() => {
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      try {
+        const userData = JSON.parse(userDataString);
+        setFormData(prevData => ({
+          ...prevData,
+          fullName: userData.name || prevData.fullName,
+          whatsAppNumber: userData.phone || prevData.whatsAppNumber,
+          // Add any other fields you want to auto-fill
+        }));
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+      }
+    }
+  }, []);
+
   // Add error state
   const [error, setError] = useState<string>('');
   
@@ -59,29 +77,35 @@ const ProfileForm = () => {
         const type = file.type;
         const category = name === 'uploadId' ? 'identity' : 'avatar';
 
-        const response: UploadResponse = await GetURL({
+        const response = await GetURL({
           type,
           category
         });
 
-        // ...rest of file upload logic...
-        console.log('GetURL Response:', response);
-        console.log('Asset Path:', response.assetpath);
+        // Use the flattened properties from the response
+        const uploadResult: UploadResponse = {
+          presignedUrl: response.presignedUrl,
+          assetpath: response.assetpath
+        };
 
-        axios.put(response.presignedUrl, file, {
+        // ...rest of file upload logic...
+        console.log('GetURL Response:', uploadResult);
+        console.log('Asset Path:', uploadResult.assetpath);
+
+        axios.put(uploadResult.presignedUrl, file, {
           headers: {
             'Content-Type': file.type,
           }
         }).then(() => {
-          console.log('File upload initiated for:', response.assetpath);
+          console.log('File upload initiated for:', uploadResult.assetpath);
         });
 
         setFormData(prev => {
           const newData = {
             ...prev,
-            [name]: response.assetpath
+            [name]: uploadResult.assetpath
           };
-          console.log(`Updated ${name} with assetpath:`, response.assetpath);
+          console.log(`Updated ${name} with assetpath:`, uploadResult.assetpath);
           return newData;
         });
 
@@ -164,7 +188,7 @@ const ProfileForm = () => {
         <nav className="flex flex-col sm:flex-row justify-between items-center p-4 w-full">
           <div className="mb-4 sm:mb-0">
             <Image
-              src="https://pub-5c418d5b44bb4631a94f83fb5c3b463d.r2.dev/gigworksblk.svg"
+              src="/assets/media/gigworksblk.svg"
               alt="Logo"
               width={150}
               height={50}

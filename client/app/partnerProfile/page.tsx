@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { AxiosError } from 'axios';
 import { MapPin, Clock, Phone, Briefcase, Dribbble } from "lucide-react";
 import ImageGrid from "../components/imgsec";
 import { FooterSection } from "../components/FooterSection";
 import { div } from "framer-motion/client";
 import DynamicQRCode from "../components/QrSection";
 import ScrollToTopButton from "../components/ScrollToTop";
-import { GetPartner, GetPartnerAnalytics } from "../api";
+import { GetPartner, GetPartnerAnalytics, ASSET_BASE_URL } from "../api";
 
 interface PartnerData {
   name: string;
@@ -29,10 +31,12 @@ interface AnalyticsData {
 }
 
 const DevMorphixWebsite = () => {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [copied, setCopied] = React.useState(false);
   const [partnerData, setPartnerData] = useState<PartnerData | null>(null);
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  
   const [dateRange, setDateRange] = useState({
     start: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0], // First day of current year
     end: new Date(new Date().getFullYear(), 11, 31).toISOString().split('T')[0]  // Last day of current year
@@ -48,12 +52,17 @@ const DevMorphixWebsite = () => {
         setPartnerData(partnerResponse.data);
         setAnalyticsData(analyticsResponse.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        const axiosError = error as AxiosError<{ error: string }>;
+        console.error('Error fetching data:', axiosError);
+        if(axiosError.response?.data?.error === "Cannot read properties of undefined (reading 'avatar')") {
+          router.push('/partnerSignup/1');
+        }
+        console.error('Error fetching data:', axiosError.response?.data?.error);
       }
     };
 
     fetchPartnerData();
-  }, [dateRange]); // Re-fetch when date range changes
+  }, [dateRange, router]); // Re-fetch when date range changes
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -62,13 +71,13 @@ const DevMorphixWebsite = () => {
     setIsMenuOpen(false);
   };
 
-  const textToCopy = "#ABC23SK";
-
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(textToCopy);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+      if (partnerData?.referral_code) {
+        await navigator.clipboard.writeText(partnerData.referral_code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+      }
     } catch (err) {
       console.error("Failed to copy text: ", err);
     }
@@ -80,7 +89,6 @@ const DevMorphixWebsite = () => {
     { label: "Contact", href: "#contact" },
     { label: "QR", href: "#qr" },
   ];
-
   const renderAnalyticsChart = () => {
     if (!analyticsData) return null;
 
@@ -147,7 +155,7 @@ const DevMorphixWebsite = () => {
           <section className="relative py-8 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
             <div className="absolute top-0 left-0 right-0 h-72 overflow-hidden">
               <img
-                src="/back.png"
+                src="/assets/media/back.png"
                 alt="Background"
                 className="w-full h-full object-cover"
               />
@@ -156,7 +164,7 @@ const DevMorphixWebsite = () => {
             <div className="relative z-10 w-80 h-80 border border-white border-8 bg-black rounded-full flex items-center justify-center mb-8 mt-20">
               {partnerData?.avatar ? (
                 <img 
-                  src={partnerData.avatar} 
+                  src={`${ASSET_BASE_URL}/${partnerData.avatar}`} 
                   alt="Profile" 
                   className="w-full h-full rounded-full object-cover"
                 />
@@ -173,7 +181,7 @@ const DevMorphixWebsite = () => {
             </p>
             <div className="flex justify-center items-center w-full">
               <div className="inline-flex items-center gap-2">
-                <p className="text-xl font-medium mb-8">
+                <p className="text-xl font-medium ">
                   {partnerData?.referral_code || "Loading..."}
                 </p>
                 <button

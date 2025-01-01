@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X } from 'lucide-react';
-import gigworks from "../public/gigworks.svg";
+import { Menu, X } from "lucide-react";
+import gigworks from "../public/assets/media/gigworks.svg";
 import LoginPopup from "./components/loginpopup";
-import man from "../public/man.svg";
-import whatsapp from "../public/whatsapp.png";
+import man from "../public/assets/media/man.svg";
+import whatsapp from "../public/assets/media/whatsapp.png";
 import { ContactForm } from "./components/ContactForm";
 import { SearchSection } from "./components/SearchSection";
 import AnimatedGridPattern from "./components/ui/AnimatedGridPattern";
@@ -25,7 +25,7 @@ export default function GigWorkLandingPage() {
   const [count, setCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
-  const [redirectPath, setRedirectPath] = useState<string | null>(null);
+  const [redirectPath, setRedirectPath] = useState<string | undefined>(undefined);
   const router = useRouter();
 
   useEffect(() => {
@@ -59,17 +59,26 @@ export default function GigWorkLandingPage() {
 
   const handleJoinClick = () => {
     if (!isLoggedIn()) {
-      setRedirectPath('/profile');
       setIsLoginPopupOpen(true);
+      setRedirectPath('/signup');
     } else {
-      router.push('/profile');
+      // check if the profile in local storage is empty or not
+      const profile = localStorage.getItem('profile');
+      if (profile) {
+        // fetch slug from profile and redirect to profile page
+        const { slug } = JSON.parse(profile);
+        router.push(`/profile/${slug}`);
+      } else {
+        // redirect to the signup page
+        router.push('/signup');
+      }
     }
   };
 
   const handlePartnerClick = async () => {
     if (!isLoggedIn()) {
-      setRedirectPath('/partnerProfile');
       setIsLoginPopupOpen(true);
+      setRedirectPath('/partnerSignup/1');
       return;
     }
 
@@ -78,11 +87,13 @@ export default function GigWorkLandingPage() {
       if (response.data) {
         router.push('/partnerProfile');
       } else {
-        router.push('/signup');
+        // If no partner profile, redirect to partner signup
+        router.push('/partnerSignup/1');
       }
     } catch (error) {
       console.error('Error checking partner status:', error);
-      router.push('/signup');
+      // If error occurs, redirect to partner signup
+      router.push('/partnerSignup/1');
     }
   };
 
@@ -116,7 +127,7 @@ export default function GigWorkLandingPage() {
         isOpen={isLoginPopupOpen}
         onClose={() => {
           setIsLoginPopupOpen(false);
-          setRedirectPath(null);
+          setRedirectPath(undefined);
         }}
         redirectAfterLogin={redirectPath}
       />

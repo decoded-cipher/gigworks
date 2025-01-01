@@ -2,6 +2,15 @@ name: Deploy Backend
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Select environment (STAGE or PROD)"
+        required: true
+        default: "STAGE"
+        type: choice
+        options:
+          - STAGE
+          - PROD
 
 jobs:
   deploy:
@@ -23,13 +32,17 @@ jobs:
       - name: Deploy to Cloudflare Workers
         working-directory: ./server
         env:
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          CF_PROJECT_NAME: gigworks-server
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN_STAGE }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID_STAGE }}
+          CLOUDFLARE_PROJECT_NAME: gigworks-server
         run: |
           npm install -g wrangler
+          if [[ "${{ github.event.inputs.environment }}" == "PROD" ]]; then
+            export CLOUDFLARE_API_TOKEN=${{ secrets.CF_API_TOKEN_PROD }}
+            export CLOUDFLARE_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID_PROD }}
+            export CLOUDFLARE_PROJECT_NAME=${{ secrets.CF_PROJECT_NAME_PROD }}
+          fi
           npm run deploy
 
       - name: Notify success
-        run: echo "Deployment successful"
-        
+        run: echo "Deployment to ${{ github.event.inputs.environment }} successful!"
