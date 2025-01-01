@@ -71,13 +71,13 @@ const DevMorphixWebsite = () => {
     setIsMenuOpen(false);
   };
 
-  const textToCopy = "#ABC23SK";
-
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(textToCopy);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+      if (partnerData?.referral_code) {
+        await navigator.clipboard.writeText(partnerData.referral_code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+      }
     } catch (err) {
       console.error("Failed to copy text: ", err);
     }
