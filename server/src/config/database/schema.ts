@@ -84,7 +84,7 @@ export const tokenTable = sqliteTable('token', {
 // Category
 export const category = sqliteTable('category', {
     id: text().primaryKey().$default(nanoid),
-    name: text().notNull().unique(),
+    name: text().notNull(),
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
@@ -100,7 +100,7 @@ export const category = sqliteTable('category', {
 // Sub Category
 export const subCategory = sqliteTable('sub_category', {
     id: text().primaryKey().$default(nanoid),
-    name: text().notNull().unique(),
+    name: text().notNull(),
     category_id: text().notNull().references(() => category.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
@@ -118,7 +118,7 @@ export const subCategory = sqliteTable('sub_category', {
 // Sub Category Option
 export const subCategoryOption = sqliteTable('sub_category_option', {
     id: text().primaryKey().$default(nanoid),
-    name: text().notNull().unique(),
+    name: text().notNull(),
     sub_category_id: text().notNull().references(() => subCategory.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
