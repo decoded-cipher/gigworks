@@ -7,7 +7,8 @@ import { createPayment } from '../../services/payment';
 import { saveProfileLicense } from '../../services/profileLicense';
 
 import { 
-    createProfile, 
+    createProfile,
+    updateProfile,
     getProfileCount, 
     getRenewalProfiles, 
     getProfileBySlug, 
@@ -16,6 +17,7 @@ import {
 } from '../../services/profile';
 
 import { User, Profile, ProfilePayment, ProfileMedia, ProfileLicense, ProfileTag } from '../../config/database/interfaces';
+import { verifyToken } from '../../middleware/authentication';
 
 
 
@@ -47,14 +49,14 @@ router.post('/', async (c) => {
             }, 400);
         }
         
-        let payment: ProfilePayment | null = null;
-        if (data.payment) {
-            payment = await createPayment({ ...data.payment, profile_id: profile.id });
-        }
-
         let license: License | null = null;
         if (data.license) {
             license = await saveProfileLicense(profile.id, data.license);
+        }
+        
+        let payment: ProfilePayment | null = null;
+        if (data.payment) {
+            payment = await createPayment({ ...data.payment, profile_id: profile.id });
         }
     
         return c.json({
@@ -62,8 +64,8 @@ router.post('/', async (c) => {
             data: {
                 user,
                 profile,
-                payment,
-                license
+                license,
+                payment
             }
         }, 201);
     } catch (error) {
@@ -284,6 +286,45 @@ router.get('/', async (c) => {
                     next: result.data.length === limit ? `/api/v1/sub_category?page=${page + 1}&limit=${limit}` : null
                 }
             }
+        }, 200);
+
+    } catch (error) {
+        return c.json({
+            message: 'Internal Server Error',
+            error: error.message
+        }, 500);
+    }
+});
+
+
+
+/**
+ * @route   PATCH /api/v1/business/:id
+ * @desc    Update a business by id
+ * @access  Authenticated
+ * @params  id
+ * @return  message, data
+ * @error   400, { error }
+ * @status  200, 400
+ * 
+ * @example /api/v1/business/:id
+ **/
+
+router.patch('/:id', verifyToken, async (c) => {
+    try {
+        const { id } = c.req.param();
+        const data = await c.req.json();
+
+        let profile = await updateProfile(id, data);
+        if (!profile) {
+            return c.json({
+                message: 'Business update failed',
+            }, 400);
+        }
+
+        return c.json({
+            message: 'Business updated successfully',
+            data: profile
         }, 200);
 
     } catch (error) {
