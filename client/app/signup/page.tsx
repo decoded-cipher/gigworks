@@ -226,7 +226,7 @@ export default function SignupPage() {
       toast.success("Business created successfully!");
       
       // Redirect to the profile page with the slug
-      router.push(`/profile/${profileSlug}`);
+      router.push(`/${profileSlug}`);
       
     } catch (error: any) {
       console.error("Error creating business:", error);

@@ -430,17 +430,18 @@ export default function BusinessOverview({
             </div>
           </div>
 
-          <div className="col-span-full">
-            <label className="block text-base font-bold pb-2 text-gray-700">
+            <div className="mb-6">
+            <label htmlFor="businessDescription" className="block text-lg font-bold mb-2">
               Business Description
             </label>
-            <Textarea
+            <textarea
+              id="businessDescription"
               name="businessDescription"
               value={formData.businessDescription}
               onChange={handleInputChange}
-              placeholder="Business Description"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-0 h-24"
-              required
+              placeholder="Tell us about your business..."
+              rows={4}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030] resize-none"
             />
           </div>
 

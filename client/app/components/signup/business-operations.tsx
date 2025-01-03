@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import type { FormData } from '../../signup/page'
 import { fetchLicenseData,GetURL } from '../../api/index'
-// import { handleAssetUpload } from '../../utils/assetUpload'
 import axios from 'axios';
 
 interface LicenseType {

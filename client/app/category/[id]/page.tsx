@@ -29,21 +29,23 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   const [visibleEmploys, setVisibleEmploys] = useState(16);
   const [categoryId, setCategoryId] = useState("");
   const [employs, setEmploys] = useState<employ[]>([]);
+  const [categoryName, setCategoryName] = useState(""); // Added state for category name
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const categoriesResponse = await fetchBusinessData();
         const category = categoriesResponse.data.categories.find(
-          (cat: any) => cat.name.toLowerCase().replace(/\s+/g, '-') === id
+          (cat: any) => cat.id === id  // Changed to match by id instead of name
         );
         
         if (category?.id) {
+          setCategoryName(category.name); // Store the category name
           const response = await fetchBusinessesByCategory(category.id);
           
           const validBusinesses = response.data?.profiles?.map((business: any) => ({
             title: business.title || business.name || 'Untitled',
-            slug: business.slug || business.title?.toLowerCase().replace(/\s+/g, '-') || 'untitled',  // Added fallback for slug
+            slug: business.slug || business.title?.toLowerCase().replace(/\s+/g, '-') || 'untitled',
             src: business.src || "/assets/media/defaultbusiness.png",
             location: business.location,
             type: business.type
@@ -71,7 +73,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     <div>
       <Navbar/>
       <div className="py-16 flex justify-center items-center flex-col px-4">
-        <h1 className="text-center text-2xl font-bold mb-6 uppercase">{id}</h1>
+        <h1 className="text-center text-2xl font-bold mb-6 uppercase">{categoryName}</h1> {/* Display category name */}
         
         <div className="w-full max-w-md mb-8 px-4">
           <div className="relative">
@@ -105,7 +107,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5 w-full md:px-24">
           {filteredEmploys.slice(0, visibleEmploys).map((s, index) => (
             <Link 
-              href={`/profile/${s.slug}`}  // Removed redundant toLowerCase() and replace since it's handled in the data transformation
+              href={`/${s.slug}`}  // Removed redundant toLowerCase() and replace since it's handled in the data transformation
               key={index}
               className="flex flex-col items-center justify-center py-16 border border-green-500 rounded-xl hover:shadow-md hover:bg-green-500/10 transition-all duration-300 ease-in-out"
             >
