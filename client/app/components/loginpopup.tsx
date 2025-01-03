@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { UserLogin, VerifyLoginOTP, UserRegister } from '../api';
+import { UserLogin, VerifyLoginOTP, UserRegister, VerifyRegisterOTP } from '../api';
 import { toast } from 'react-hot-toast';
 import Loader from './loader';
 
