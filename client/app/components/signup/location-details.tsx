@@ -129,6 +129,7 @@ export default function LocationDetails({
                   onChange={handleAddressChange}
                   placeholder="Street Address"
                   className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                  required
                 />
                 <input
                   type="text"
@@ -137,6 +138,7 @@ export default function LocationDetails({
                   onChange={handleAddressChange}
                   placeholder="City/Town"
                   className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                  required
                 />
                 <input
                   type="text"
@@ -145,6 +147,7 @@ export default function LocationDetails({
                   onChange={handleAddressChange}
                   placeholder="State"
                   className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                  required
                 />
                 <input
                   type="text"
@@ -153,6 +156,7 @@ export default function LocationDetails({
                   onChange={handleAddressChange}
                   placeholder="Pin Code"
                   className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                  required
                 />
               </div>
             </div>

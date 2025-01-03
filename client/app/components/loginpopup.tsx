@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { UserLogin, VerifyLoginOTP, UserRegister, VerifyRegisterOTP } from '../api';  // Add VerifyRegisterOTP
+import { UserLogin, VerifyLoginOTP, UserRegister, VerifyRegisterOTP } from '../api';
 import { toast } from 'react-hot-toast';
 import Loader from './loader';
 
@@ -32,13 +32,12 @@ interface LoginPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onRegister?: () => void;
-  redirectAfterLogin?: string;
 }
 
 const LoginPopup: React.FC<LoginPopupProps> = ({
   isOpen,
   onClose,
-  redirectAfterLogin
+  // redirectAfterLogin
 }) => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [name, setName] = useState<string>('');

@@ -1,7 +1,7 @@
-
 import "./globals.css";
 import { Metadata } from 'next'
 import { Toaster } from 'react-hot-toast';
+import { Inter } from 'next/font/google'; // Ensure you have this import
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://gigwork.co.in'),

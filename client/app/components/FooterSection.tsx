@@ -270,7 +270,7 @@ export  function FooterSection() {
                       />
                     </svg>
                     <a href="#" className="hover:underline">
-                      Kurusumood ,  Chethipuzha P.O, Chanaganassery
+                      Kottayam, Kerala
                     </a>
                   </li>
                 </ul>
