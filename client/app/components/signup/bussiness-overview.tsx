@@ -431,8 +431,8 @@ export default function BusinessOverview({
             </div>
           </div>
 
-            <div className="mb-6">
-            <label htmlFor="businessDescription" className="block text-lg font-bold mb-2">
+            <div className="mb-6 col-span-3">
+            <label htmlFor="businessDescription" className="block text-lg font-bold mb-2 ">
               Business Description
             </label>
             <textarea
@@ -443,6 +443,7 @@ export default function BusinessOverview({
               placeholder="Tell us about your business..."
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030] resize-none"
+              required
             />
           </div>
 
