@@ -67,7 +67,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
         const user = JSON.parse(userData);
 
         if (profiles.length === 1) {
-          router.push(`/profile/${profiles[0].slug}`);
+          router.push(`/${profiles[0].slug}`);
           onClose();
         } else if (profiles.length > 1) {
           setUserProfiles(profiles);
@@ -77,6 +77,18 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
       }
     }
   }, [isOpen, router, onClose]);
+
+  // Add useEffect to load data from localStorage when component mounts
+  React.useEffect(() => {
+    if (isOpen) {
+      const savedFormData = getLocalStorage('partnerFormData');
+      if (savedFormData) {
+        // Autofill name and phone from localStorage if available
+        setName(savedFormData.user?.name || '');
+        setPhoneNumber(savedFormData.user?.phone || '');
+      }
+    }
+  }, [isOpen]);
 
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const numericValue = e.target.value.replace(/\D/g, '');
@@ -244,7 +256,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
       setLocalStorage('userProfiles', profiles);
       
       if (profiles.length === 1) {
-        router.push(`/profile/${profiles[0].slug}`);
+        router.push(`/${profiles[0].slug}`);
         handleClose();
       } else {
         setUserProfiles(profiles);
@@ -271,7 +283,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
 
   // Update profile selection handler to reset form
   const handleProfileSelect = (slug: string) => {
-    router.push(`/profile/${slug}`);
+    router.push(`/${slug}`);
     handleClose();
   };
 

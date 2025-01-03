@@ -381,21 +381,6 @@ const DevMorphixWebsite = () => {
                           </span>
                         </span>
                       </div>
-                      <div>
-                        <span className="font-light text-md text-black">
-                          Operating Hours:
-                        </span>
-                        <div className="ml-2">
-                          {businessData?.profile.operating_hours && 
-                            Object.entries(businessData.profile.operating_hours).map(([day, hours]) => (
-                              <div key={day} className="flex justify-between">
-                                <span className="capitalize">{day}:</span>
-                                <span>{hours}</span>
-                              </div>
-                            ))
-                          }
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
