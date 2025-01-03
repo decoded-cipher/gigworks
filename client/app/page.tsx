@@ -67,7 +67,7 @@ export default function GigWorkLandingPage() {
       if (profile) {
         // fetch slug from profile and redirect to profile page
         const { slug } = JSON.parse(profile);
-        router.push(`/profile/${slug}`);
+        router.push(`/${slug}`);
       } else {
         // redirect to the signup page
         router.push('/signup');
