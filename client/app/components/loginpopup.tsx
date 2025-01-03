@@ -37,7 +37,7 @@ interface LoginPopupProps {
 const LoginPopup: React.FC<LoginPopupProps> = ({
   isOpen,
   onClose,
-  redirectAfterLogin
+  // redirectAfterLogin
 }) => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [name, setName] = useState<string>('');

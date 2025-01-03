@@ -301,6 +301,7 @@ export default function BusinessOverview({
               value={formData.subCategoryOption}
               onChange={handleSubCategoryOptionChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+              required
             >
               <option value="">Select Sub Category Option</option>
               {subCategoryOptions.map((option: any) => (

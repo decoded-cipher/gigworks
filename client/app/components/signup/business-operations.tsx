@@ -174,6 +174,7 @@ export default function BusinessOperations({
                 onChange={handleInputChange}
                 placeholder="22AAA*********5"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                required
               />
             </div>
           </div>
@@ -202,6 +203,7 @@ export default function BusinessOperations({
                     value={license.type}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                    required 
                   >
                     <option value="">Select License Type</option>
                     {isLoading && <option disabled>Loading...</option>}
@@ -227,6 +229,7 @@ export default function BusinessOperations({
                     onChange={handleInputChange}
                     placeholder="KL0520*******08"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                    required
                   />
                 </div>
 
@@ -243,6 +246,7 @@ export default function BusinessOperations({
                       onChange={handleInputChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                       disabled={isUploading} // Added disabled prop
+                      required
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
                       {isUploading ? (

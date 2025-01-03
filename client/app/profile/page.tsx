@@ -18,7 +18,6 @@ const DevMorphixWebsite = () => {
     setIsMenuOpen(false);
   };
 
-
   const navItems = [
     { label: "Home", href: "#" },
     { label: "About", href: "#about" },
@@ -30,66 +29,66 @@ const DevMorphixWebsite = () => {
   return (
     <div className="font-circular">
       <nav className="bg-white border-gray-200 dark:bg-gray-900 fixed top-0 left-0 right-0 z-50 shadow-md">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a
-          href=""
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-            DevMorphix
-          </span>
-        </a>
-
-        {/* Hamburger button */}
-        <button
-          onClick={toggleMenu}
-          type="button"
-          className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-          aria-controls="navbar-default"
-          aria-expanded={isMenuOpen}
-        >
-          <span className="sr-only">Open main menu</span>
-          <svg
-            className="w-5 h-5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 17 14"
+        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+          <a
+            href=""
+            className="flex items-center space-x-3 rtl:space-x-reverse"
           >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M1 1h15M1 7h15M1 13h15"
-            />
-          </svg>
-        </button>
+            <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+              DevMorphix
+            </span>
+          </a>
 
-        {/* Navigation menu */}
-        <div
-          className={`w-full md:block md:w-auto ${
-            isMenuOpen ? "block" : "hidden"
-          }`}
-          id="navbar-default"
-        >
-          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-            {navItems.map((item, index) => (
-              <li key={index}>
-                <a
-                  href={item.href}
-                  onClick={handleNavItemClick}
-                  className="block py-2 px-3 rounded text-gray-900 hover:bg-gray-400 md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0 dark:text-white md:dark:hover:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-                  aria-current={item.label === "Home" ? "page" : undefined}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+          {/* Hamburger button */}
+          <button
+            onClick={toggleMenu}
+            type="button"
+            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+            aria-controls="navbar-default"
+            aria-expanded={isMenuOpen}
+          >
+            <span className="sr-only">Open main menu</span>
+            <svg
+              className="w-5 h-5"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 17 14"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M1 1h15M1 7h15M1 13h15"
+              />
+            </svg>
+          </button>
+
+          {/* Navigation menu */}
+          <div
+            className={`w-full md:block md:w-auto ${
+              isMenuOpen ? "block" : "hidden"
+            }`}
+            id="navbar-default"
+          >
+            <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+              {navItems.map((item, index) => (
+                <li key={index}>
+                  <a
+                    href={item.href}
+                    onClick={handleNavItemClick}
+                    className="block py-2 px-3 rounded text-gray-900 hover:bg-gray-400 md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0 dark:text-white md:dark:hover:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                    aria-current={item.label === "Home" ? "page" : undefined}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
 
       <div className="px-4 sm:px-6 lg:px-52">
         <main>
@@ -102,12 +101,13 @@ const DevMorphixWebsite = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-
             <div className="relative z-10 w-80 h-80 border border-white border-8 bg-black rounded-full flex items-center justify-center mb-8 mt-20">
-              {/* <h1 className="text-white text-4xl font-bold">DEV.X</h1> */}
-              <img src="/444.png" alt="Logo" width={200} height={200} />{" "}
-              {/*  if you want to zoom in or zoom out, change the width and height */}
-            </div>
+        <img
+          src="/assets/media/back.png"
+          alt="Logo"
+          className="w-full h-full object-cover rounded-full"
+        />
+      </div>
 
             <h2 className="sm:text-6xl text-4xl font-bold mb-4">DEVMORPHIX</h2>
             <p className="sm:text-xl text-sm font-medium mb-8">
@@ -182,7 +182,11 @@ const DevMorphixWebsite = () => {
             <ImageGrid className="bg-white shadow-lg rounded-lg  overflow-hidden border my-2  rounded-3xl" />
           </section>
 
-          <section className="border my-7  rounded-3xl " id="service" style={{ scrollMarginTop: '100px' }}>
+          <section
+            className="border my-7  rounded-3xl "
+            id="service"
+            style={{ scrollMarginTop: "100px" }}
+          >
             <section className="bg-white rounded-full p-6 mb-8">
               <h2 className="text-2xl font-bold text-center mb-6">
                 Services Provides
@@ -211,7 +215,11 @@ const DevMorphixWebsite = () => {
 
             <hr className="my-4 mx-10 "></hr>
 
-            <section className="flex flex-col md:flex-row gap-6 mb-8" id="contact" style={{ scrollMarginTop: '100px' }}>
+            <section
+              className="flex flex-col md:flex-row gap-6 mb-8"
+              id="contact"
+              style={{ scrollMarginTop: "100px" }}
+            >
               {/* Map Section - Left Side */}
               <div className="md:w-1/2">
                 <div className="bg-white  rounded-lg p-6 h-full">
@@ -282,10 +290,14 @@ const DevMorphixWebsite = () => {
 
             <hr className="my-4 mx-10 "></hr>
 
-            <section className="bg-white  rounded-lg p-6 mb-8 text-center" id="about" style={{ scrollMarginTop: '100px' }}  >
+            <section
+              className="bg-white  rounded-lg p-6 mb-8 text-center"
+              id="about"
+              style={{ scrollMarginTop: "100px" }}
+            >
               <h2 className="text-xl font-medium mb-2">About Us</h2>
               <div className="hidden md:block flex flex-col items-center justify-center">
-              {/* <h2 className="text-xl font-medium mb-2">Contact us</h2> */}
+                {/* <h2 className="text-xl font-medium mb-2">Contact us</h2> */}
                 <p className="text-4xl font-mediu mb-2">+91 9876543210</p>
                 <div className="flex justify-center pb-11">
                   <svg
@@ -304,21 +316,13 @@ const DevMorphixWebsite = () => {
                   </svg>
                 </div>
               </div>
-
-              <p className="text-[#111111] text-md text-justify font-medium leading-relaxed">
-                A Software Development Company specializes in creating custom
-                software, applications, and web solutions tailored to meet
-                unique business needs. By leveraging the latest technologies and
-                best practices, they help businesses streamline their
-                operations, optimize workflows, and drive digital growth. Their
-                expertise covers everything from developing intuitive mobile
-                apps and scalable web platforms to building complex software
-                systems that enhance productivity and efficiency. With a focus
-                on innovation, they empower businesses to stay ahead in the
-                competitive digital landscape, providing robust solutions that
-                align with their strategic goals and accelerate their digital
-                transformation journey.
-              </p>
+              <div className="flex items-center justify-center">
+                <p className="text-[#111111] text-md text-justify text-center font-medium leading-relaxed">
+                  A Software company focused on innovation, they align with
+                  their strategic goals and accelerate their digital
+                  transformation journey.
+                </p>
+              </div>
 
               <div className="mt-24">
                 <h2 className="text-xl font-medium mb-4">
@@ -444,7 +448,11 @@ const DevMorphixWebsite = () => {
             </div>
           </section> */}
 
-          <section className="my-7" id="qr" style={{ scrollMarginTop: '100px' }}>
+          <section
+            className="my-7"
+            id="qr"
+            style={{ scrollMarginTop: "100px" }}
+          >
             <DynamicQRCode />
           </section>
         </main>

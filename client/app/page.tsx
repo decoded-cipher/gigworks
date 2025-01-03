@@ -129,7 +129,7 @@ export default function GigWorkLandingPage() {
           setIsLoginPopupOpen(false);
           setRedirectPath(undefined);
         }}
-        redirectAfterLogin={redirectPath}
+        // redirectAfterLogin={redirectPath}
       />
 
       {/* Navbar */}
