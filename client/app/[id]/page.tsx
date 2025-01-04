@@ -7,7 +7,7 @@ import { FooterSection } from "@/app/components/FooterSection";
 import { div } from "framer-motion/client";
 import DynamicQRCode from "@/app/components/QrSection";
 import ScrollToTopButton from "@/app/components/ScrollToTop";
-import { fetchBusinessesByslug , ASSET_BASE_URL } from "@/app/api";
+import { fetchBusinessesByslug, ASSET_BASE_URL,GetURL} from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
 
 interface License {
@@ -65,10 +65,9 @@ interface BusinessData {
   tags: any[];
 }
 
-export const runtime = 'edge';
+export const runtime = "edge";
 
 const DevMorphixWebsite = () => {
-  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -87,21 +86,33 @@ const DevMorphixWebsite = () => {
         if (response.message === "Business fetched successfully") {
           setBusinessData(response.data);
           // Log asset URLs with base URL
-          console.log('Avatar URL:', `${ASSET_BASE_URL}/${response.data.profile.avatar}`);
-          console.log('Banner URL:', `${ASSET_BASE_URL}/${response.data.profile.banner}`);
-          console.log('License Documents:', response.data.licenses?.map((license: License) =>
-            `${ASSET_BASE_URL}/${license.url}`
-          ));
-          console.log('Media Files:', response.data.media?.map((mediaItem: MediaItem) =>
-            `${ASSET_BASE_URL}/${mediaItem.url}`
-          ));
+          console.log(
+            "Avatar URL:",
+            `${ASSET_BASE_URL}/${response.data.profile.avatar}`
+          );
+          console.log(
+            "Banner URL:",
+            `${ASSET_BASE_URL}/${response.data.profile.banner}`
+          );
+          console.log(
+            "License Documents:",
+            response.data.licenses?.map(
+              (license: License) => `${ASSET_BASE_URL}/${license.url}`
+            )
+          );
+          console.log(
+            "Media Files:",
+            response.data.media?.map(
+              (mediaItem: MediaItem) => `${ASSET_BASE_URL}/${mediaItem.url}`
+            )
+          );
         } else {
           setError("Failed to load business data");
         }
       } catch (err) {
         const error = err as ApiError;
         if (error.status === 404) {
-          router.push('/404');
+          router.push("/pending");
           return;
         }
         console.error("Error fetching business data:", error);
@@ -128,17 +139,17 @@ const DevMorphixWebsite = () => {
       } else {
         // Fallback - copy to clipboard
         await navigator.clipboard.writeText(window.location.href);
-        alert('Link copied to clipboard!');
+        alert("Link copied to clipboard!");
       }
     } catch (error) {
-      console.error('Error sharing:', error);
+      console.error("Error sharing:", error);
     }
   };
 
   const handleWhatsApp = () => {
     const text = `Check out ${businessData?.profile.name}: ${window.location.href}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(whatsappUrl, '_blank');
+    window.open(whatsappUrl, "_blank");
   };
 
   if (isLoading) {
@@ -235,18 +246,26 @@ const DevMorphixWebsite = () => {
           <section className="relative py-8 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
             <div className="absolute top-0 left-0 right-0 h-72 overflow-hidden">
               <img
-                src={businessData?.profile.banner ? `${ASSET_BASE_URL}/${businessData.profile.banner}` : "/assets/media/15879.png"}
+                src={
+                  businessData?.profile.banner
+                    ? `${ASSET_BASE_URL}/${businessData.profile.banner}`
+                    : "/assets/media/15879.png"
+                }
                 alt="Background"
                 className="w-full h-full object-cover"
               />
             </div>
 
             <div className="relative z-10 w-80 h-80 border border-white border-8 bg-black rounded-full flex items-center justify-center mb-8 mt-20">
-              <img 
-                src={businessData?.profile.avatar ? `${ASSET_BASE_URL}/${businessData.profile.avatar}` : "/444.png"} 
-                alt="Logo" 
-                width={200} 
-                height={200} 
+              <img
+                src={
+                  businessData?.profile.avatar
+                    ? `${ASSET_BASE_URL}/${businessData.profile.avatar}`
+                    : "/444.png"
+                }
+                alt="Logo"
+                width={200}
+                height={200}
               />
             </div>
 
@@ -258,7 +277,7 @@ const DevMorphixWebsite = () => {
             </p>
 
             <div className="flex gap-4 flex-wrap justify-center">
-              <button 
+              <button
                 onClick={handleShare}
                 className="bg-white border-2 font-medium border-black rounded-full transition hover:scale-110 sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2"
               >
@@ -278,7 +297,7 @@ const DevMorphixWebsite = () => {
                   <span>Share</span>
                 </div>
               </button>
-              <button 
+              <button
                 onClick={handleWhatsApp}
                 className="bg-white border-2 font-medium border-black rounded-full transition hover:scale-110 sm:px-6 px-4 sm:py-2 py-1 flex items-center gap-2"
               >
@@ -301,29 +320,41 @@ const DevMorphixWebsite = () => {
             </div>
           </section>
 
+          <section>
+
+            
+          </section>
+
           {businessData?.media && businessData.media.length > 0 && (
             <section className="mt-7">
-              <ImageGrid 
-                media={businessData.media}
-                className="bg-white shadow-lg rounded-lg overflow-hidden border my-2 rounded-3xl" 
+              <ImageGrid
+                  media={businessData.media}
+                className="bg-white shadow-lg rounded-lg overflow-hidden border my-2 rounded-3xl"
               />
             </section>
           )}
 
-          <section className="border my-7  rounded-3xl " id="service" style={{ scrollMarginTop: '100px' }}>
+
+          <section
+            className="border my-7  rounded-3xl "
+            id="service"
+            style={{ scrollMarginTop: "100px" }}
+          >
             <section className="bg-white rounded-full p-6 mb-8">
               <h2 className="text-2xl font-bold text-center mb-6">
                 Services Provides
               </h2>
               <div className="max-w-4xl mx-auto">
                 <div className="flex flex-wrap gap-6 justify-center">
-                  {(businessData?.profile.additional_services.split(',') || [
-                    "App Development",
-                    "Web Development",
-                    "Cloud Services",
-                    "UI/UX Design",
-                    "Digital Marketing",
-                  ]).map((service: string, index: number) => (
+                  {(
+                    businessData?.profile.additional_services.split(",") || [
+                      "App Development",
+                      "Web Development",
+                      "Cloud Services",
+                      "UI/UX Design",
+                      "Digital Marketing",
+                    ]
+                  ).map((service: string, index: number) => (
                     <button
                       key={index}
                       className="w-[250px] bg-stone-800 border-2 text-white border-stone-800 rounded-full px-6 py-2.5 flex items-center justify-center gap-2 hover:bg-white hover:text-black transition-colors duration-300"
@@ -339,7 +370,11 @@ const DevMorphixWebsite = () => {
 
             <hr className="my-4 mx-10 "></hr>
 
-            <section className="flex flex-col md:flex-row gap-6 mb-8" id="contact" style={{ scrollMarginTop: '100px' }}>
+            <section
+              className="flex flex-col md:flex-row gap-6 mb-8"
+              id="contact"
+              style={{ scrollMarginTop: "100px" }}
+            >
               {/* Map Section - Left Side */}
               <div className="md:w-1/2">
                 <div className="bg-white  rounded-lg p-6 h-full">
@@ -362,7 +397,9 @@ const DevMorphixWebsite = () => {
                 <div className="gap-4 p-6 ">
                   {/* Company Info Card */}
                   <div className="bg-white rounded-lg mt-6 ">
-                    <h3 className="text-xl font-light mb-4">{businessData?.profile.name}</h3>
+                    <h3 className="text-xl font-light mb-4">
+                      {businessData?.profile.name}
+                    </h3>
                     <div className="space-y-4">
                       <div>
                         <span className="font-light text-md text-black">
@@ -371,12 +408,16 @@ const DevMorphixWebsite = () => {
                       </div>
                       <div>
                         <span className="font-light text-md text-black">
-                          Phone: <span>{businessData?.user.phone || "Not available"}</span>
+                          Phone:{" "}
+                          <span>
+                            {businessData?.user.phone || "Not available"}
+                          </span>
                         </span>
                       </div>
                       <div>
                         <span className="font-light text-md text-black">
-                          Address: <span>
+                          Address:{" "}
+                          <span>
                             {`${businessData?.profile.address}, ${businessData?.profile.city}, ${businessData?.profile.state}, ${businessData?.profile.country}`}
                           </span>
                         </span>
@@ -389,11 +430,17 @@ const DevMorphixWebsite = () => {
 
             <hr className="my-4 mx-10 "></hr>
 
-            <section className="bg-white  rounded-lg p-6 mb-8 text-center" id="about" style={{ scrollMarginTop: '100px' }}  >
+            <section
+              className="bg-white  rounded-lg p-6 mb-8 text-center"
+              id="about"
+              style={{ scrollMarginTop: "100px" }}
+            >
               <h2 className="text-xl font-medium mb-2">About Us</h2>
               <div className="hidden md:block flex flex-col items-center justify-center">
-              {/* <h2 className="text-xl font-medium mb-2">Contact us</h2> */}
-                <p className="text-4xl font-mediu mb-2">{businessData?.user.phone || "Not available"}</p>
+                {/* <h2 className="text-xl font-medium mb-2">Contact us</h2> */}
+                <p className="text-4xl font-mediu mb-2">
+                  {businessData?.user.phone || "Not available"}
+                </p>
                 <div className="flex justify-center pb-11">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -411,32 +458,35 @@ const DevMorphixWebsite = () => {
                   </svg>
                 </div>
               </div>
-
-              <p className="text-[#111111] text-md text-justify font-medium leading-relaxed">
-                {businessData?.profile.description || "No description available"}
-              </p>
-
+              <div className="flex items-center justify-center">
+                <p className="text-[#111111] text-md text-justify text-center font-medium leading-relaxed">
+                  {businessData?.profile.description ||
+                    "No description available"}
+                </p>
+              </div>
               <div className="mt-24">
                 <h2 className="text-xl font-medium mb-4">
                   Our Social Media Connects
                 </h2>
                 <div className="flex justify-center space-x-6">
-                  {Object.entries(businessData?.profile.socials || {}).map(([platform, url]) => {
-                    if (url) {
-                      return (
-                        <a 
-                          key={platform}
-                          href={url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-gray-600 hover:text-gray-800"
-                        >
-                          {platform}
-                        </a>
-                      );
+                  {Object.entries(businessData?.profile.socials || {}).map(
+                    ([platform, url]) => {
+                      if (url) {
+                        return (
+                          <a
+                            key={platform}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-600 hover:text-gray-800"
+                          >
+                            {platform}
+                          </a>
+                        );
+                      }
+                      return null;
                     }
-                    return null;
-                  })}
+                  )}
                 </div>
               </div>
             </section>
@@ -466,7 +516,11 @@ const DevMorphixWebsite = () => {
             </div>
           </section> */}
 
-          <section className="my-7" id="qr" style={{ scrollMarginTop: '100px' }}>
+          <section
+            className="my-7"
+            id="qr"
+            style={{ scrollMarginTop: "100px" }}
+          >
             <DynamicQRCode />
           </section>
         </main>
