@@ -33,7 +33,7 @@ export const removeProfileTag = async (profileId: string, tagId: string) => {
 
             let result = await db
                 .delete(profileTag)
-                .where(sql`${eq("profile_id", profileId)} AND ${eq("tag_id", tagId)}`)
+                .where(sql`profile_id = ${profileId} AND id = ${tagId}`)
                 .returning();
             
             result = result[0];
