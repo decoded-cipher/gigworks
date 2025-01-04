@@ -7,6 +7,7 @@ import { Pencil, Save, X } from "lucide-react";
 import ImageGrid from "@/app/components/imgsec";
 import ImageUploadButton from "@/app/components/ImageUploadButton";
 import MediaGallery from "@/app/components/MediaGallery";
+import OperatingHours from "@/app/components/OperatingHours";
 // import { deleteBusinessMedia } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
 
@@ -182,6 +183,32 @@ export default function EditBusinessPage() {
     // }
   };
 
+  const handleOperatingHoursUpdate = async (newHours: { [key: string]: string }) => {
+    try {
+      if (!businessData?.profile.id) return;
+
+      await updateBusiness(businessData.profile.id, {
+        operating_hours: newHours
+      });
+      toast.success('Operating hours updated successfully');
+      
+      // Update local state
+      setBusinessData(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          profile: {
+            ...prev.profile,
+            operating_hours: newHours
+          }
+        };
+      });
+    } catch (error) {
+      console.error('Error updating operating hours:', error);
+      toast.error('Failed to update operating hours');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -346,6 +373,15 @@ export default function EditBusinessPage() {
                 </div>
               ))}
             </div>
+          </section>
+
+          {/* Operating Hours */}
+          <section className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-xl font-semibold mb-4">Operating Hours</h2>
+            <OperatingHours
+              hours={businessData.profile.operating_hours}
+              onUpdate={handleOperatingHoursUpdate}
+            />
           </section>
 
           {/* Tags */}

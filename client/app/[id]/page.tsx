@@ -376,10 +376,10 @@ const DevMorphixWebsite = () => {
               style={{ scrollMarginTop: "100px" }}
             >
               {/* Map Section - Left Side */}
-              <div className="md:w-1/2">
-                <div className="bg-white  rounded-lg p-6 h-full">
+              {/* <div className="md:w-1/2">
+                <div className="bg-white  rounded-lg p-6 h-full"> */}
                   {/* <h2 className="text-xl font-bold mb-4">Our Location</h2> */}
-                  <div className="h-[400px] rounded-lg overflow-hidden">
+                  {/* <div className="h-[400px] rounded-lg overflow-hidden">
                     <iframe
                       src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.4985632429584!2d88.34671491498358!3d22.572175985181594!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a027703ef804be5%3A0xea29c7e2b2efccc3!2sDevMorphix!5e0!3m2!1sen!2sin!4v1624281837702!5m2!1sen!2sin"
                       width="100%"
@@ -390,7 +390,7 @@ const DevMorphixWebsite = () => {
                     ></iframe>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Services Grid - Right Side */}
               <div className="md:w-1/2">
