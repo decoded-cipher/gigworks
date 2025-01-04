@@ -50,7 +50,7 @@ router.post('/', async (c) => {
         }
         
         let license: License | null = null;
-        if (data.license) {
+        if (data.license && data.license.length > 0) {
             license = await saveProfileLicense(profile.id, data.license);
         }
         
