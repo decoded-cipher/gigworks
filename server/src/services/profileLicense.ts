@@ -8,7 +8,7 @@ import { ProfileLicense } from '../config/database/interfaces';
 
 
 // Save Profile License Data
-export const saveProfileLicense = async (profile_id: string, data: any): Promise<any> => {
+export const addProfileLicense = async (profile_id: string, data: any): Promise<any> => {
     return new Promise(async (resolve, reject) => {
         try {
 
@@ -51,3 +51,25 @@ export const saveProfileLicense = async (profile_id: string, data: any): Promise
     });
 }
 
+
+
+// Remove Profile License Data
+export const removeProfileLicense = async (profile_id: string, license_id: string): Promise<any> => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : DELETE FROM profile_license WHERE profile_id = profile_id AND license_id = license_id
+
+            let result = await db
+                .delete(profileLicense)
+                .where(sql`${eq("profile_id", profile_id)} AND ${eq("license_id", license_id)}`)
+                .returning();
+            
+            result = result[0];
+
+            resolve(result);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}

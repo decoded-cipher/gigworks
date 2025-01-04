@@ -1,7 +1,6 @@
 
 import { count, eq, sql } from "drizzle-orm";
 import { db } from '../config/database/connection';
-import { profileMedia } from "../config/database/schema";
 
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { S3Client, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
@@ -32,23 +31,3 @@ export const generatePreSignedUrl = async (name: string, type: string, env: Env)
         resolve(url);
     });
 };
-
-
-
-// Save profile media
-export const saveProfileMedia = async (data: ProfileMedia) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-
-            // SQL Query : INSERT INTO profile_media (profile_id, media_id, type) VALUES (profile_id, media_id, type)
-
-            let result = await db.insert(profileMedia).values(data).returning();
-            result = result[0];
-
-            resolve(result);
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-

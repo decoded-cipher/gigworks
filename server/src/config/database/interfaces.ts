@@ -37,6 +37,14 @@ export interface User {
     status?: string;
 }
 
+export interface Admin {
+    name: string;
+    email: string;
+    password: string;
+    role?: string;
+    status?: string;
+}
+
 
 export interface Profile {
     user_id: string;

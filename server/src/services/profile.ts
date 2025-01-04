@@ -208,6 +208,28 @@ export const getProfilesByUser = async (user_id: string) => {
 
 
 
+// Check if profile exists
+export const getProfileById = async (id: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : SELECT * FROM profile WHERE id = id
+
+            let result = await db
+                .select()
+                .from(profile)
+                .where(sql`${profile.id} = ${id}`)
+                .get();
+
+            resolve(result);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+
+
 // Get total number of profiles (businesses)
 export const getProfileCount = async () => {
     return new Promise(async (resolve, reject) => {
@@ -334,10 +356,7 @@ export const getProfileBySlug = async (slug: string) => {
 
                 let profileResult = await db
                     .select({
-                        profile: {
-                            _id: profile.id,
-                            ...profile
-                        },
+                        profile: profile,
                         user: {
                             name: user.name,
                             phone: user.phone
@@ -391,6 +410,7 @@ export const getProfileBySlug = async (slug: string) => {
                     
                     // SQL Query : SELECT * FROM profile_media WHERE profile_id = profileResult.profile.id
                     db.select({
+                        id: profileMedia.id,
                         url: profileMedia.url,
                         description: profileMedia.description,
                     })
@@ -409,7 +429,7 @@ export const getProfileBySlug = async (slug: string) => {
                 data.profile.socials = JSON.parse(data.profile.socials);
 
                 
-                const fieldsToRemove = ['id', 'user_id', 'category_id', 'sub_category_id', 'sub_category_option_id', 'partner_id', 'role', 'updated_at', 'created_at', 'status'];
+                const fieldsToRemove = ['user_id', 'category_id', 'sub_category_id', 'sub_category_option_id', 'partner_id', 'role', 'updated_at', 'created_at', 'status'];
                 const result = removeFields(data, fieldsToRemove);
                 
                 resolve(result);
