@@ -1,5 +1,5 @@
 "use client";
-
+export const runtime = "edge";
 import React, { useState, useEffect } from "react";
 import { fetchBusinessesByslug, ASSET_BASE_URL, updateBusiness } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
