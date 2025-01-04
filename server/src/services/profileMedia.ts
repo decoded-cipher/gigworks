@@ -29,11 +29,11 @@ export const removeProfileMedia = async (profileId: string, mediaId: string) => 
     return new Promise(async (resolve, reject) => {
         try {
 
-            // SQL Query : DELETE FROM profile_media WHERE profile_id = profileId AND media_id = mediaId
+            // SQL Query : DELETE FROM profile_media WHERE profile_id = profileId AND id = mediaId
 
             let result = await db
                 .delete(profileMedia)
-                .where(sql`${profileMedia.profile_id} = ${profileId} AND ${profileMedia.media_id} = ${mediaId}`)
+                .where(sql`profile_id = ${profileId} AND id = ${mediaId}`)
                 .returning();
             
             result = result[0];
