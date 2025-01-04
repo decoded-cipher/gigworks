@@ -199,7 +199,7 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
                       alt={image.alt} 
                       className={cn(
                         "w-full h-full rounded-lg object-cover transition-transform duration-300",
-                        isExpanded ? "object-contain" : "group-hover:scale-105"
+                        isExpanded ? "object-contain" : ""
                       )}
                       loading="lazy"
                     />

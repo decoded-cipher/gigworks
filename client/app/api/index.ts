@@ -58,7 +58,7 @@ export const fetchBusinessCount = async () => {
 
 interface GetURLParams {
   type: string;
-  category: 'identity' | 'avatar' | 'license' | 'banner'; // Define exact literal types
+  category: 'identity' | 'avatar' | 'license' | 'banner' | 'media'; // Added 'media' as valid category
 }
 
 // Update the response interface to match the expected structure
@@ -94,7 +94,36 @@ export const GetURL = async (params: GetURLParams): Promise<GetURLResponse> => {
   }
 };
 
-
+// Add BusinessProfile interface at the top of the file
+interface BusinessProfile {
+  id: string;
+  name: string;
+  description: string;
+  email: string;
+  phone: string | null;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  operating_hours: {
+    [key: string]: string;
+  };
+  socials: {
+    website?: string;
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    linkedin?: string;
+    youtube?: string;
+    [key: string]: string | undefined;
+  };
+  avatar: string;
+  banner: string;
+  type: string;
+  additional_services: string;
+  gstin: string;
+  [key: string]: any;
+}
 
 // export const GetURL = async (category: 'avatar' | 'banner' | 'license' | 'identity', fileType: string) => {
 //   try {
@@ -415,4 +444,50 @@ export const fetchLicenseData = async () => {
     throw error;
   }
 }
+
+export const createBusinessMedia = async (businessId: string, data: { url: string, type: string }) => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/business/${businessId}/media`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating media:', error);
+    throw error;
+  }
+};
+
+export const updateBusiness = async (profileId: string, data: Partial<BusinessProfile>) => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    const response = await axios.patch(
+      `${BASE_URL}/api/v1/business/${profileId}`,
+      { data },  // Wrap changes in profile object
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error updating business:', error);
+    throw error;
+  }
+};
 

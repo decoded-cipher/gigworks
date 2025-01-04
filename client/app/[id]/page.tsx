@@ -256,7 +256,7 @@ const DevMorphixWebsite = () => {
               />
             </div>
 
-            <div className="relative z-10 w-80 h-80 border border-white border-8 bg-black rounded-full flex items-center justify-center mb-8 mt-20">
+            <div className="relative z-0 w-80 h-80 border border-white border-8 bg-black rounded-full overflow-hidden border-8 border-white rounded-full flex items-center justify-center mb-8 mt-20">
               <img
                 src={
                   businessData?.profile.avatar
@@ -264,8 +264,8 @@ const DevMorphixWebsite = () => {
                     : "/444.png"
                 }
                 alt="Logo"
-                width={200}
-                height={200}
+                
+                className="w-full h-full object-cover"
               />
             </div>
 

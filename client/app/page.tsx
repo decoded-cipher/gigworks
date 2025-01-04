@@ -216,10 +216,18 @@ export default function GigWorkLandingPage() {
                     className="border border-green-500 hover:bg-green-500 text-xl font-medium bg-tertiary text-white px-10 py-2 h-14 rounded-md transition duration-300 whitespace-nowrap"
                     onClick={() => {
                       if (!isLoggedIn()) {
-                        setRedirectPath('/profile');
                         setIsLoginPopupOpen(true);
                       } else {
-                        router.push('/profile');
+                        // check if the profile in local storage is empty or not
+                        const profile = localStorage.getItem('profile');
+                        if (profile) {
+                          // fetch slug from profile and redirect to profile page
+                          const { slug } = JSON.parse(profile);
+                          router.push(`/${slug}`);
+                        } else {
+                          // ask login popup 
+                          setIsLoginPopupOpen(true);
+                        }
                       }
                     }}
                   >
