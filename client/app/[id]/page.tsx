@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MapPin, Clock, Phone, Briefcase, Dribbble, Facebook, Instagram, Twitter, Linkedin, Youtube, Globe } from "lucide-react";
+import { MapPin, Clock, Phone, Briefcase, Globe } from "lucide-react";
 import ImageGrid from "@/app/components/imgsec";
 import { FooterSection } from "@/app/components/FooterSection";
 import { div } from "framer-motion/client";
@@ -219,14 +219,22 @@ const DevMorphixWebsite = () => {
     { label: "QR", href: "#qr" },
   ];
 
-  const socialIcons = {
-    website: Globe,
-    facebook: Facebook,
-    instagram: Instagram,
-    twitter: Twitter,
-    linkedin: Linkedin,
-    youtube: Youtube,
+  const socialIcons :any = {
+    instagram: "/icon/instagram.svg",
+    facebook: "/icon/facebook.svg",
+    linkedin: "/icon/linkedin.svg",
+    twitter: "/icon/twitter.svg",
+    youtube: "/icon/youtube.svg",
+    reddit: "/icon/reddit.svg",
+    tiktok: "/icon/tiktok.svg",
+    pinterest: "/icon/pinterest.svg",
+    behance: "/icon/behance.svg",
+    dribbble: "/icon/dribbble.svg",
+    github: "/icon/github.svg",
+    medium: "/icon/medium.svg",
+  
   };
+  
 
   return (
     <div className="font-circular">
@@ -582,25 +590,29 @@ const DevMorphixWebsite = () => {
                   Our Social Media Connects
                 </h2>
                 <div className="flex justify-center gap-4">
-                  {Object.entries(businessData?.profile.socials || {}).map(
-                    ([platform, url]) => {
-                      if (url) {
-                        const Icon = socialIcons[platform as keyof typeof socialIcons];
-                        return (
-                          <a
-                            key={platform}
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-3 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-                          >
-                            <Icon className="w-5 h-5" />
-                          </a>
-                        );
-                      }
-                      return null;
-                    }
-                  )}
+                   {Object.entries(businessData?.profile.socials || {}).map(
+            ([platform, url]) => {
+              if (url) {
+                const iconSrc = socialIcons[platform.toLowerCase()];
+                return (
+                  <a
+                    key={platform}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    {iconSrc ? (
+                      <img src={iconSrc} alt={platform} className="w-6 h-6" />
+                    ) : (
+                      platform
+                    )}
+                  </a>
+                );
+              }
+              return null;
+            }
+          )}
                 </div>
               </div>
             </section>
