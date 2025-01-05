@@ -1,14 +1,31 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MapPin, Clock, Phone, Briefcase, Dribbble, Facebook, Instagram, Twitter, Linkedin, Youtube, Globe } from "lucide-react";
+import { MapPin, Clock, Phone, Briefcase, Dribbble, Facebook, Instagram, Twitter, Linkedin, Youtube, Globe, Pencil } from "lucide-react";
+import { jwtDecode } from 'jwt-decode'; // Add this import
+import Cookies from 'js-cookie';
 import ImageGrid from "@/app/components/imgsec";
 import { FooterSection } from "@/app/components/FooterSection";
 import { div } from "framer-motion/client";
 import DynamicQRCode from "@/app/components/QrSection";
 import ScrollToTopButton from "@/app/components/ScrollToTop";
-import { fetchBusinessesByslug, ASSET_BASE_URL,GetURL} from "@/app/api";
+import { fetchBusinessesByslug, ASSET_BASE_URL, GetURL } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
+
+// Add this interface with other interfaces
+interface ApiError {
+  status: number;
+  message?: string;
+}
+
+// Update JWT Payload interface
+interface JWTPayload {
+  exp?: number;
+  iat?: number;
+  sub?: string;
+  email?: string;
+  name?: string;  // Add name property
+}
 
 interface License {
   name: string;
@@ -72,56 +89,84 @@ const DevMorphixWebsite = () => {
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tokenData, setTokenData] = useState<JWTPayload | null>(null);
+  const [showEditPopup, setShowEditPopup] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   const params = useParams();
   const router = useRouter();
-  interface ApiError {
-    status?: number;
-    message?: string;
-  }
-  const ServicesSection = () => {
-    // Only get services from businessData, no fallback values
-    const services = businessData?.profile?.additional_services
-      ? businessData.profile.additional_services.split(',').map(service => 
-          service.trim().replace(/([A-Z])/g, ' $1')
-            .replace(/^./, str => str.toUpperCase())
-            .trim()
-        )
-      : [];
 
-    // Don't render the section if there are no services
-    if (!services || services.length === 0) {
+  // Add JWT token handler function
+  const handleJWTToken = () => {
+    try {
+      // Get token from cookie instead of localStorage
+      const token = Cookies.get('token'); // or whatever your cookie name is
+      
+      if (!token) {
+        console.log('No JWT token found in cookies');
+        return null;
+      }
+
+      console.log('Raw JWT Token:', token);
+
+      const decodedToken = jwtDecode<JWTPayload>(token);
+      console.log('Decoded JWT Payload:', decodedToken);
+      
+      if (decodedToken.exp) {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const isExpired = decodedToken.exp < currentTime;
+        
+        console.log('Token Expiration Status:', isExpired ? 'Expired' : 'Valid');
+        
+        if (isExpired) {
+          console.log('Token has expired');
+          // Optionally remove expired token
+          Cookies.remove('token');
+          return null;
+        }
+      }
+
+      return decodedToken;
+
+    } catch (error) {
+      console.error('Error handling JWT token:', error);
       return null;
     }
-    return (
-      <section className="bg-white rounded-full p-6 mb-8">
-        <h2 className="text-2xl font-bold text-center mb-6">
-          Services Provides
-        </h2>
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-wrap gap-6 justify-center">
-            {services.map((service, index) => (
-              <button
-                key={index}
-                className="w-[250px] bg-stone-800 border-2 text-white border-stone-800 rounded-full px-6 py-2.5 flex items-center justify-center gap-2 hover:bg-white hover:text-black transition-colors duration-300"
-              >
-                <span className="text-sm sm:text-base whitespace-nowrap">
-                  {service}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
   };
+
+  // Add useEffect for JWT token handling
+  useEffect(() => {
+    const decoded = handleJWTToken();
+    setTokenData(decoded);
+  }, []);
+
+  // Add this function to handle edit click
+  const handleEditClick = () => {
+    router.push(`/${params.id}/edit`);
+  };
+
+  // Modify your existing fetchData function to include token handling
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true); // Keep loading true at start
+        setIsLoading(true);
+        
+        const tokenInfo = handleJWTToken();
+        if (tokenInfo) {
+          console.log('User authenticated:', tokenInfo);
+        }
+
         const response = await fetchBusinessesByslug(params.id as string);
         if (response.message === "Business fetched successfully") {
           setBusinessData(response.data);
-          // Log asset URLs with base URL
+          console.log("User Name:", response.data.user.name);
+          
+          if (tokenInfo?.name === response.data.user.name) {
+            setIsOwner(true);
+            console.log('User is owner');
+          } else {
+            console.log("User not authenticated");
+          }
+
           console.log(
             "Avatar URL:",
             `${ASSET_BASE_URL}/${response.data.profile.avatar}`
@@ -154,7 +199,7 @@ const DevMorphixWebsite = () => {
         console.error("Error fetching business data:", error);
         setError("Failed to load business data");
       } finally {
-        setIsLoading(false); // Only set loading to false after everything is done
+        setIsLoading(false);
       }
     };
 
@@ -183,9 +228,16 @@ const DevMorphixWebsite = () => {
   };
 
   const handleWhatsApp = () => {
-    const text = `Check out ${businessData?.profile.name}: ${window.location.href}`;
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(whatsappUrl, "_blank");
+    if (businessData?.user.phone) {
+      // Remove any non-numeric characters from phone number
+      const phoneNumber = businessData.user.phone.replace(/\D/g, '');
+      // Format phone number with country code if needed
+      const formattedPhone = phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`;
+      const whatsappUrl = `https://wa.me/${formattedPhone}`;
+      window.open(whatsappUrl, "_blank");
+    } else {
+      alert("No phone number available");
+    }
   };
 
   if (isLoading) {
@@ -245,11 +297,32 @@ const DevMorphixWebsite = () => {
       return `${to12Hour(start.trim())} - ${to12Hour(end.trim())}`;
     };
   
-    return Object.entries(hours)
-      .slice(0, 7) // Only take first 7 entries
+    // Map for day name conversion
+    const DAY_NAMES: { [key: string]: string } = {
+      'mon': 'Monday',
+      'tue': 'Tuesday',
+      'web': 'Wednesday',
+      'thu': 'Thursday',
+      'fri': 'Friday',
+      'sat': 'Saturday',
+      'sun': 'Sunday'
+    };
+  
+    // Create a map to store days in order
+    const orderedDays = ['mon', 'tue', 'web', 'thu', 'fri', 'sat', 'sun'];
+    const uniqueDays = new Map();
+  
+    // Process days in order
+    orderedDays.slice(0, 7).forEach(day => {
+      if (hours[day]) {
+        uniqueDays.set(DAY_NAMES[day], formatTimeRange(hours[day]));
+      }
+    });
+  
+    return Array.from(uniqueDays)
       .map(([day, hours]) => ({
         day,
-        hours: formatTimeRange(hours)
+        hours
       }));
   }
 
@@ -346,9 +419,21 @@ const DevMorphixWebsite = () => {
               />
             </div>
 
-            <h2 className="sm:text-6xl text-4xl font-bold mb-4">
-              {businessData?.profile.name}
-            </h2>
+            <div className="relative inline-flex items-center">
+              <h2 className="sm:text-6xl text-4xl font-bold mb-4">
+                {businessData?.profile.name}
+              </h2>
+              {isOwner && (
+                <button
+                  onClick={handleEditClick}
+                  className="ml-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  title="Edit Business Profile"
+                >
+                  <Pencil className="w-6 h-6 text-gray-600" />
+                </button>
+              )}
+            </div>
+
             <p className="sm:text-xl text-sm font-medium mb-8">
               {businessData?.subCategory || "No category available"}
             </p>
@@ -391,7 +476,7 @@ const DevMorphixWebsite = () => {
                       fill="black"
                     />
                   </svg>
-                  <span>Whatsapp</span>
+                  <span>WhatsApp</span>
                 </div>
               </button>
             </div>
@@ -406,7 +491,7 @@ const DevMorphixWebsite = () => {
             <section className="mt-7">
               <ImageGrid
                   media={businessData.media}
-                className="bg-white shadow-lg rounded-lg overflow-hidden border my-2 rounded-3xl"
+                className="bg-white shadow-lg rounded-lg overflow-hidden border my-2 w-full rounded-3xl"
               />
             </section>
           )}
@@ -535,21 +620,11 @@ const DevMorphixWebsite = () => {
                         {businessData?.profile.operating_hours && (
                           <div className="space-y-2">
                             {formatOperatingHours(businessData.profile.operating_hours).map(({ day, hours }) => {
-                              // Convert day names for display
-                              const dayName = day === 'web' ? 'Wednesday' : 
-                                            day === 'mon' ? 'Monday' :
-                                            day === 'tue' ? 'Tuesday' :
-                                            day === 'thu' ? 'Thursday' :
-                                            day === 'fri' ? 'Friday' :
-                                            day === 'sat' ? 'Saturday' :
-                                            day === 'sun' ? 'Sunday' : day;
-                              
-                              // Check if hours is empty string, "closed", or undefined
                               const isStoreClosed = !hours || hours.toLowerCase() === 'closed';
                               
                               return (
                                 <div key={day} className="flex justify-between items-center border-b py-1">
-                                  <span className="capitalize font-medium">{dayName}</span>
+                                  <span className="capitalize font-medium">{day}</span>
                                   <span className={isStoreClosed ? "text-red-500" : ""}>
                                     {isStoreClosed ? 'Closed' : hours}
                                   </span>
@@ -591,7 +666,7 @@ const DevMorphixWebsite = () => {
                       d="M1 36.9999C90.6667 10.9999 323.3 -25.4001 536.5 36.9999C439.667 17.8332 197 -9.00014 1 36.9999Z"
                       fill="#009A36"
                       stroke="#009A36"
-                      stroke-width="4"
+                      strokeWidth="4"
                     />
                   </svg>
                 </div>

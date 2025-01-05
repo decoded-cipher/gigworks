@@ -49,11 +49,11 @@ export default function BusinessOverview({
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [cropConfig, setCropConfig] = useState<Crop>({
-    unit: '%',
-    width: 90,
-    height: 90, // Add height
-    x: 0,      // Add x
-    y: 0       // Add y
+    unit: 'px', // Change to px instead of %
+    width: 300,  // Set fixed initial width
+    height: 300, // Set fixed initial height
+    x: 0,
+    y: 0
   });
   const [currentImage, setCurrentImage] = useState<{
     src: string;
@@ -62,6 +62,12 @@ export default function BusinessOverview({
   } | null>(null);
   const [completedCrop, setCompletedCrop] = useState<any>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+
+  // Add state for preview dimensions
+  const [previewDimensions, setPreviewDimensions] = useState({
+    width: 300,
+    height: 300
+  });
 
   // Debounce function
   const debounce = (func: Function, wait: number) => {
@@ -105,25 +111,43 @@ export default function BusinessOverview({
     const files = (e.target as HTMLInputElement).files;
 
     if (type === "file" && files && files[0]) {
-      const file = files[0];
-      const imageType = name === 'profileImage' ? 'profile' : 'cover';
-      
-      setCurrentImage({
-        src: URL.createObjectURL(file),
-        type: imageType,
-        file: file
-      });
-      setIsCropModalOpen(true);
-      
-      // Update crop config with fixed height values
-      setCropConfig({
-        unit: '%',
-        width: imageType === 'profile' ? 100 : 90,
-        height: imageType === 'profile' ? 100 : 90, // Always provide a height value
-        x: 0,
-        y: 0
-      });
-      
+      try {
+        const file = files[0];
+        const imageType = name === 'profileImage' ? 'profile' : 'cover';
+        
+        // Validate file size and type
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+          alert('File size should be less than 5MB');
+          return;
+        }
+        
+        if (!file.type.startsWith('image/')) {
+          alert('Please upload an image file');
+          return;
+        }
+
+        const objectUrl = URL.createObjectURL(file);
+        setCurrentImage({
+          src: objectUrl,
+          type: imageType,
+          file: file
+        });
+
+        setIsCropModalOpen(true);
+        
+        // Set initial crop based on image type
+        setCropConfig({
+          unit: 'px',
+          width: imageType === 'profile' ? 300 : 800,
+          height: imageType === 'profile' ? 300 : 400,
+          x: 0,
+          y: 0
+        });
+
+      } catch (error) {
+        console.error('Error handling file:', error);
+        alert('Error processing image. Please try again.');
+      }
       return;
     }
 
@@ -165,78 +189,98 @@ export default function BusinessOverview({
     image: HTMLImageElement,
     crop: Crop
   ): Promise<Blob> => {
+    if (!crop.width || !crop.height) {
+      throw new Error('Invalid crop values');
+    }
+
     const canvas = document.createElement('canvas');
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
-    canvas.width = crop.width!;
-    canvas.height = crop.height!;
+
+    canvas.width = crop.width;
+    canvas.height = crop.height;
     const ctx = canvas.getContext('2d');
 
     if (!ctx) {
       throw new Error('No 2d context');
     }
 
+    // Draw the cropped image
     ctx.drawImage(
       image,
-      crop.x! * scaleX,
-      crop.y! * scaleY,
-      crop.width! * scaleX,
-      crop.height! * scaleY,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
       0,
       0,
-      crop.width!,
-      crop.height!
+      crop.width,
+      crop.height
     );
 
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          throw new Error('Canvas is empty');
-        }
-        resolve(blob);
-      }, 'image/jpeg');
+    // Return as blob
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error('Canvas is empty'));
+            return;
+          }
+          resolve(blob);
+        },
+        'image/jpeg',
+        0.95  // Quality
+      );
     });
   };
 
   const handleCropSave = async () => {
-    try {
-      if (!currentImage || !imgRef.current || !completedCrop?.width || !completedCrop?.height) {
-        return;
-      }
+    if (!currentImage || !imgRef.current || !completedCrop?.width || !completedCrop?.height) {
+      alert('Please select an area to crop');
+      return;
+    }
 
+    try {
+      setIsUploading(true);
       const croppedImg = await getCroppedImg(imgRef.current, completedCrop);
       const croppedFile = new File([croppedImg], currentImage.file.name, {
-        type: currentImage.file.type,
+        type: 'image/jpeg'
       });
 
-      // Create object URL for preview
-      const previewUrl = URL.createObjectURL(croppedImg);
-      
-      if (currentImage.type === 'profile') {
-        setProfilePreview(previewUrl);
-      } else {
-        setCoverPreview(previewUrl);
-      }
-
-      // Handle the upload with cropped image
+      // Get upload URL
       const category = currentImage.type === 'profile' ? 'avatar' : 'banner';
       const response = await GetURL({
-        type: croppedFile.type,
+        type: 'image/jpeg',
         category: category as 'avatar' | 'identity'
       });
 
+      // Upload the file
       await uploadToPresignedUrl(response.data.presignedUrl, croppedFile);
 
-      updateFormData({
-        [currentImage.type === 'profile' ? 'profileImage' : 'coverImage']: croppedFile,
-        [category]: response.data.assetPath
-      });
+      // Update preview and form data
+      const previewUrl = URL.createObjectURL(croppedImg);
+      if (currentImage.type === 'profile') {
+        setProfilePreview(previewUrl);
+        updateFormData({ 
+          profileImage: croppedFile,
+          avatar: response.data.assetPath
+        });
+      } else {
+        setCoverPreview(previewUrl);
+        updateFormData({ 
+          coverImage: croppedFile,
+          banner: response.data.assetPath
+        });
+      }
 
       setIsCropModalOpen(false);
       setCurrentImage(null);
+      setIsUploading(false);
+
     } catch (error) {
       console.error('Error saving cropped image:', error);
-      alert('Error saving cropped image. Please try again.');
+      alert('Error saving image. Please try again.');
+      setIsUploading(false);
     }
   };
 
@@ -569,7 +613,7 @@ export default function BusinessOverview({
                           className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 111.414 1.414L11.414 10l4.293 4.293a1 1 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                           </svg>
                         </button>
                       </div>
@@ -632,7 +676,7 @@ export default function BusinessOverview({
                           className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                           </svg>
                         </button>
                       </div>
@@ -680,40 +724,59 @@ export default function BusinessOverview({
       {/* Crop Modal */}
       {isCropModalOpen && currentImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-4 rounded-lg max-w-[90vw] max-h-[90vh] overflow-auto">
-            <h3 className="text-lg font-bold mb-4">Crop Image</h3>
-            <div className={`max-w-[600px] max-h-[600px] ${currentImage.type === 'profile' ? 'rounded-full overflow-hidden' : ''}`}>
+          <div className="bg-white p-6 rounded-lg w-[95vw] max-w-[800px] max-h-[90vh] flex flex-col">
+            <h3 className="text-lg font-bold mb-4">Adjust Image</h3>
+            
+            {/* Crop Area */}
+            <div className="flex-1 min-h-0 overflow-auto">
               <ReactCrop
                 crop={cropConfig}
-                onChange={c => setCropConfig(c)}
+                onChange={(c) => setCropConfig(c)}
                 onComplete={handleCropComplete}
-                aspect={currentImage.type === 'profile' ? 1 : 16/9} // Move aspect ratio here
+                aspect={currentImage.type === 'profile' ? 1 : 16/9}
                 circularCrop={currentImage.type === 'profile'}
-                className={currentImage.type === 'profile' ? 'rounded-full' : ''}
+                className="max-h-[60vh] flex items-center justify-center"
               >
                 <img
                   ref={imgRef}
                   src={currentImage.src}
                   alt="Crop preview"
-                  className="max-w-full h-auto"
+                  className="max-w-full max-h-[60vh] object-contain"
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    const minSize = Math.min(img.width, img.height);
+                    setCropConfig({
+                      unit: 'px',
+                      width: currentImage.type === 'profile' ? minSize : img.width,
+                      height: currentImage.type === 'profile' ? minSize : Math.round(img.width / 16 * 9),
+                      x: 0,
+                      y: 0
+                    });
+                  }}
                 />
               </ReactCrop>
             </div>
-            <div className="flex justify-end gap-2 mt-4">
+
+            {/* Action Buttons - Fixed at bottom */}
+            <div className="flex justify-end gap-4 mt-6 pt-4 border-t">
               <button
+                type="button"
                 onClick={() => {
                   setIsCropModalOpen(false);
                   setCurrentImage(null);
                 }}
-                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+                className="px-6 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                disabled={isUploading}
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleCropSave}
-                className="px-4 py-2 bg-[#303030] text-white rounded-md hover:bg-gray-800"
+                className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
+                disabled={isUploading || !completedCrop?.width || !completedCrop?.height}
               >
-                Save
+                {isUploading ? 'Saving...' : 'Save Image'}
               </button>
             </div>
           </div>
