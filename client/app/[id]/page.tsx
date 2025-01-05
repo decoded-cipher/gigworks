@@ -183,11 +183,17 @@ const DevMorphixWebsite = () => {
   };
 
   const handleWhatsApp = () => {
-    const text = `Check out ${businessData?.profile.name}: ${window.location.href}`;
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(whatsappUrl, "_blank");
+    if (businessData?.user.phone) {
+      // Remove any non-numeric characters from phone number
+      const phoneNumber = businessData.user.phone.replace(/\D/g, '');
+      // Format phone number with country code if needed
+      const formattedPhone = phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`;
+      const whatsappUrl = `https://wa.me/${formattedPhone}`;
+      window.open(whatsappUrl, "_blank");
+    } else {
+      alert("No phone number available");
+    }
   };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
