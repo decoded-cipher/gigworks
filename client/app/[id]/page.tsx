@@ -228,6 +228,31 @@ const DevMorphixWebsite = () => {
     youtube: Youtube,
   };
 
+  function formatOperatingHours(hours: { [key: string]: string }) {
+    const to12Hour = (time24: string) => {
+      if (!time24 || time24.toLowerCase() === 'closed') return 'Closed';
+      const [hours, minutes] = time24.split(':');
+      let hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      hour = hour % 12;
+      hour = hour ? hour : 12;
+      return `${hour}:${minutes} ${ampm}`;
+    };
+  
+    const formatTimeRange = (timeRange: string) => {
+      if (timeRange === 'Closed') return 'Closed';
+      const [start, end] = timeRange.split('-');
+      return `${to12Hour(start.trim())} - ${to12Hour(end.trim())}`;
+    };
+  
+    return Object.entries(hours)
+      .slice(0, 7) // Only take first 7 entries
+      .map(([day, hours]) => ({
+        day,
+        hours: formatTimeRange(hours)
+      }));
+  }
+
   return (
     <div className="font-circular">
       <nav className="bg-white border-gray-200 dark:bg-gray-900 fixed top-0 left-0 right-0 z-50 shadow-md">
@@ -509,7 +534,7 @@ const DevMorphixWebsite = () => {
                         <h4 className="text-lg font-medium mb-3">Operating Hours</h4>
                         {businessData?.profile.operating_hours && (
                           <div className="space-y-2">
-                            {Object.entries(businessData.profile.operating_hours).map(([day, hours]) => {
+                            {formatOperatingHours(businessData.profile.operating_hours).map(({ day, hours }) => {
                               // Convert day names for display
                               const dayName = day === 'web' ? 'Wednesday' : 
                                             day === 'mon' ? 'Monday' :
