@@ -113,3 +113,19 @@ span {
             -70px 90px 0 rgba(0, 0, 0, 0);
   }
 }
+
+/* ...existing styles... */
+
+.ReactCrop__crop-selection {
+  border-radius: 50%;
+}
+
+.crop-container .ReactCrop__crop-selection {
+  border: 1px solid white;
+  box-shadow: 0 0 0 9999em rgba(0, 0, 0, 0.5);
+}
+
+.ReactCrop--circular-crop .ReactCrop__crop-selection {
+  border-radius: 50%;
+  box-shadow: 0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
+}
