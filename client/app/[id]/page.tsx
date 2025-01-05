@@ -117,7 +117,7 @@ const DevMorphixWebsite = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
+        setIsLoading(false);
         const response = await fetchBusinessesByslug(params.id as string);
         if (response.message === "Business fetched successfully") {
           setBusinessData(response.data);
@@ -366,8 +366,8 @@ const DevMorphixWebsite = () => {
           </section>
 
           <section>
+                  
 
-            
           </section>
 
           {businessData?.media && businessData.media.length > 0 && (
