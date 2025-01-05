@@ -27,7 +27,19 @@ export default function GigWorkLandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
   const [redirectPath, setRedirectPath] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
   const router = useRouter();
+
+  
+  useEffect(() => {
+    // Simulate fetching data
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000); // Show loader for 2 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
+
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -35,6 +47,7 @@ export default function GigWorkLandingPage() {
         const response = await fetchBusinessCount();
         const count = response.data;
         setCount(count);
+        
       } catch (error) {
         console.error('Error fetching business count:', error);
       }
@@ -119,6 +132,14 @@ export default function GigWorkLandingPage() {
         "Trust in our verified and regularly updated information, ensuring you always have access to accurate and dependable data.",
     },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-black">
+        <div className="loader"></div>
+      </div>
+    );
+  }
 
   return (
     <div className=" min-h-screen bg-black text-white overflow-x-hidden">
