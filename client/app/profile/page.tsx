@@ -311,7 +311,7 @@ const DevMorphixWebsite = () => {
                       d="M1 36.9999C90.6667 10.9999 323.3 -25.4001 536.5 36.9999C439.667 17.8332 197 -9.00014 1 36.9999Z"
                       fill="#009A36"
                       stroke="#009A36"
-                      stroke-width="4"
+                      strokeWidth="4"
                     />
                   </svg>
                 </div>
