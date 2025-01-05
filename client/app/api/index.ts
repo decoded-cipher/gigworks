@@ -416,3 +416,15 @@ export const fetchLicenseData = async () => {
   }
 }
 
+export const profileAsset = async (data: any) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/media`,
+      data
+    );
+    return response;
+  } catch (error) {
+    console.error('Error during login:', error);
+    throw error;
+  }
+};
