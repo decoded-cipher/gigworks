@@ -3,7 +3,7 @@ export const runtime = "edge";
 import React, { useState, useEffect } from "react";
 import { fetchBusinessesByslug, ASSET_BASE_URL, updateBusiness } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
-import { Pencil, Save, X } from "lucide-react";
+import { Pencil, Save, X, Facebook, Instagram, Twitter, Linkedin, Youtube, Globe } from "lucide-react";
 import ImageGrid from "@/app/components/imgsec";
 import ImageUploadButton from "@/app/components/ImageUploadButton";
 import MediaGallery from "@/app/components/MediaGallery";
@@ -71,6 +71,16 @@ interface BusinessData {
   licenses: License[]; // Now License is defined
   tags: string[];
 }
+
+// Add this social media config object near the top of your component
+const socialMediaConfig = {
+  website: { label: 'Website URL', icon: Globe },
+  facebook: { label: 'Facebook Profile', icon: Facebook },
+  instagram: { label: 'Instagram Profile', icon: Instagram },
+  twitter: { label: 'Twitter Profile', icon: Twitter },
+  linkedin: { label: 'LinkedIn Profile', icon: Linkedin },
+  youtube: { label: 'YouTube Channel', icon: Youtube },
+};
 
 export default function EditBusinessPage() {
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
@@ -349,27 +359,59 @@ export default function EditBusinessPage() {
             </div>
           </section>
 
+          {/* Add this new section after Contact Information and before Social Media Links */}
+          <section className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-xl font-semibold mb-4">Additional Services</h2>
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                {businessData.profile.additional_services.split(",").map((service, index) => {
+                  const formattedService = service.trim()
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, str => str.toUpperCase())
+                    .trim();
+
+                  return (
+                    <span key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
+                      {formattedService}
+                    </span>
+                  );
+                })}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Edit Services (comma-separated)</label>
+                <input
+                  type="text"
+                  defaultValue={businessData.profile.additional_services}
+                  onBlur={(e) => handleFieldSave('additional_services', e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                  placeholder="e.g., customOrders, afterSalesSupport"
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  Enter services separated by commas. Use camelCase for multiple words (e.g., customOrders).
+                </p>
+              </div>
+            </div>
+          </section>
+
           {/* Social Media Links */}
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Social Media Links</h2>
             <div className="space-y-4">
-              {Object.entries({
-                website: 'Website URL',
-                facebook: 'Facebook Profile',
-                instagram: 'Instagram Profile',
-                twitter: 'Twitter Profile',
-                linkedin: 'LinkedIn Profile',
-                youtube: 'YouTube Channel'
-              }).map(([key, label]) => (
-                <div key={key}>
-                  <label className="block text-sm font-medium mb-1">{label}</label>
-                  <input
-                    type="url"
-                    defaultValue={businessData.profile.socials?.[key] || ''}
-                    onBlur={(e) => handleFieldSave(`socials.${key}`, e.target.value)}
-                    className="w-full p-2 border rounded-lg"
-                    placeholder={`Enter ${label}`}
-                  />
+              {Object.entries(socialMediaConfig).map(([key, { label, icon: Icon }]) => (
+                <div key={key} className="flex items-center gap-4">
+                  <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full">
+                    <Icon className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
+                    <input
+                      type="url"
+                      defaultValue={businessData.profile.socials?.[key] || ''}
+                      onBlur={(e) => handleFieldSave(`socials.${key}`, e.target.value)}
+                      className="w-full p-2 border rounded-lg"
+                      placeholder={`Enter ${label}`}
+                    />
+                  </div>
                 </div>
               ))}
             </div>

@@ -477,7 +477,7 @@ export const updateBusiness = async (profileId: string, data: Partial<BusinessPr
 
     const response = await axios.patch(
       `${BASE_URL}/api/v1/business/${profileId}`,
-      { data },  // Wrap changes in profile object
+      data,  // Remove the { data } wrapper
       {
         headers: {
           Authorization: `Bearer ${token}`
