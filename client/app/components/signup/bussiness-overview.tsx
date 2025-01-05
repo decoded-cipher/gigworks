@@ -3,15 +3,15 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Textarea } from "@nextui-org/input";
 import type { FormData } from "../../signup/page";
-import ReactCrop, { Crop } from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
+import ReactCrop, { Crop } from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 
-import { GetURL, uploadToPresignedUrl } from "../../api/index";  // Add this import
+import { GetURL, uploadToPresignedUrl } from "../../api/index"; // Add this import
 import {
   fetchBusinessData,
   fetchsubCategoryByCategory,
   checkSlug,
-  fetchDataBySubCategory
+  fetchDataBySubCategory,
 } from "../../api/index";
 
 interface Category {
@@ -42,22 +42,22 @@ export default function BusinessOverview({
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   const [slugError, setSlugError] = useState<string | null>(null);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
-  const [selectedSubCategory, setSelectedSubCategory] = useState('');
+  const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [subCategoryOptions, setSubCategoryOptions] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [profilePreview, setProfilePreview] = useState<string | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [cropConfig, setCropConfig] = useState<Crop>({
-    unit: 'px', // Change to px instead of %
-    width: 300,  // Set fixed initial width
+    unit: "px", // Change to px instead of %
+    width: 300, // Set fixed initial width
     height: 300, // Set fixed initial height
     x: 0,
-    y: 0
+    y: 0,
   });
   const [currentImage, setCurrentImage] = useState<{
     src: string;
-    type: 'profile' | 'cover';
+    type: "profile" | "cover";
     file: File;
   } | null>(null);
   const [completedCrop, setCompletedCrop] = useState<any>(null);
@@ -66,7 +66,7 @@ export default function BusinessOverview({
   // Add state for preview dimensions
   const [previewDimensions, setPreviewDimensions] = useState({
     width: 300,
-    height: 300
+    height: 300,
   });
 
   // Debounce function
@@ -105,7 +105,9 @@ export default function BusinessOverview({
   );
 
   const handleInputChange = async (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value, type } = e.target;
     const files = (e.target as HTMLInputElement).files;
@@ -113,16 +115,17 @@ export default function BusinessOverview({
     if (type === "file" && files && files[0]) {
       try {
         const file = files[0];
-        const imageType = name === 'profileImage' ? 'profile' : 'cover';
-        
+        const imageType = name === "profileImage" ? "profile" : "cover";
+
         // Validate file size and type
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
-          alert('File size should be less than 5MB');
+        if (file.size > 5 * 1024 * 1024) {
+          // 5MB limit
+          alert("File size should be less than 5MB");
           return;
         }
-        
-        if (!file.type.startsWith('image/')) {
-          alert('Please upload an image file');
+
+        if (!file.type.startsWith("image/")) {
+          alert("Please upload an image file");
           return;
         }
 
@@ -130,23 +133,22 @@ export default function BusinessOverview({
         setCurrentImage({
           src: objectUrl,
           type: imageType,
-          file: file
+          file: file,
         });
 
         setIsCropModalOpen(true);
-        
+
         // Set initial crop based on image type
         setCropConfig({
-          unit: 'px',
-          width: imageType === 'profile' ? 300 : 800,
-          height: imageType === 'profile' ? 300 : 400,
+          unit: "px",
+          width: imageType === "profile" ? 300 : 800,
+          height: imageType === "profile" ? 300 : 400,
           x: 0,
-          y: 0
+          y: 0,
         });
-
       } catch (error) {
-        console.error('Error handling file:', error);
-        alert('Error processing image. Please try again.');
+        console.error("Error handling file:", error);
+        alert("Error processing image. Please try again.");
       }
       return;
     }
@@ -171,13 +173,13 @@ export default function BusinessOverview({
     }
   };
 
-  const handleRemoveImage = (type: 'profile' | 'cover') => {
-    if (type === 'profile') {
+  const handleRemoveImage = (type: "profile" | "cover") => {
+    if (type === "profile") {
       setProfilePreview(null);
-      updateFormData({ profileImage: null, avatar: '' });
+      updateFormData({ profileImage: null, avatar: "" });
     } else {
       setCoverPreview(null);
-      updateFormData({ coverImage: null, banner: '' });
+      updateFormData({ coverImage: null, banner: "" });
     }
   };
 
@@ -190,19 +192,19 @@ export default function BusinessOverview({
     crop: Crop
   ): Promise<Blob> => {
     if (!crop.width || !crop.height) {
-      throw new Error('Invalid crop values');
+      throw new Error("Invalid crop values");
     }
 
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
 
     canvas.width = crop.width;
     canvas.height = crop.height;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
 
     if (!ctx) {
-      throw new Error('No 2d context');
+      throw new Error("No 2d context");
     }
 
     // Draw the cropped image
@@ -223,20 +225,25 @@ export default function BusinessOverview({
       canvas.toBlob(
         (blob) => {
           if (!blob) {
-            reject(new Error('Canvas is empty'));
+            reject(new Error("Canvas is empty"));
             return;
           }
           resolve(blob);
         },
-        'image/jpeg',
-        0.95  // Quality
+        "image/jpeg",
+        0.95 // Quality
       );
     });
   };
 
   const handleCropSave = async () => {
-    if (!currentImage || !imgRef.current || !completedCrop?.width || !completedCrop?.height) {
-      alert('Please select an area to crop');
+    if (
+      !currentImage ||
+      !imgRef.current ||
+      !completedCrop?.width ||
+      !completedCrop?.height
+    ) {
+      alert("Please select an area to crop");
       return;
     }
 
@@ -244,14 +251,14 @@ export default function BusinessOverview({
       setIsUploading(true);
       const croppedImg = await getCroppedImg(imgRef.current, completedCrop);
       const croppedFile = new File([croppedImg], currentImage.file.name, {
-        type: 'image/jpeg'
+        type: "image/jpeg",
       });
 
       // Get upload URL
-      const category = currentImage.type === 'profile' ? 'avatar' : 'banner';
+      const category = currentImage.type === "profile" ? "avatar" : "banner";
       const response = await GetURL({
-        type: 'image/jpeg',
-        category: category as 'avatar' | 'identity'
+        type: "image/jpeg",
+        category: category as "avatar" | "identity",
       });
 
       // Upload the file
@@ -259,27 +266,26 @@ export default function BusinessOverview({
 
       // Update preview and form data
       const previewUrl = URL.createObjectURL(croppedImg);
-      if (currentImage.type === 'profile') {
+      if (currentImage.type === "profile") {
         setProfilePreview(previewUrl);
-        updateFormData({ 
+        updateFormData({
           profileImage: croppedFile,
-          avatar: response.data.assetPath
+          avatar: response.data.assetPath,
         });
       } else {
         setCoverPreview(previewUrl);
-        updateFormData({ 
+        updateFormData({
           coverImage: croppedFile,
-          banner: response.data.assetPath
+          banner: response.data.assetPath,
         });
       }
 
       setIsCropModalOpen(false);
       setCurrentImage(null);
       setIsUploading(false);
-
     } catch (error) {
-      console.error('Error saving cropped image:', error);
-      alert('Error saving image. Please try again.');
+      console.error("Error saving cropped image:", error);
+      alert("Error saving image. Please try again.");
       setIsUploading(false);
     }
   };
@@ -297,13 +303,15 @@ export default function BusinessOverview({
     fetchData();
   }, []);
 
-  const handleCategoryChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCategoryChange = async (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const categoryId = event.target.value;
     setSelectedCategory(categoryId);
-    
+
     // Update form data with category ID
     updateFormData({
-      businessCategory: categoryId
+      businessCategory: categoryId,
     });
 
     try {
@@ -315,13 +323,15 @@ export default function BusinessOverview({
     }
   };
 
-  const handleSubCategoryChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSubCategoryChange = async (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const subCategoryId = event.target.value;
     setSelectedSubCategory(subCategoryId);
 
     // Update form data with subcategory ID
     updateFormData({
-      subCategory: subCategoryId
+      subCategory: subCategoryId,
     });
 
     try {
@@ -332,12 +342,14 @@ export default function BusinessOverview({
     }
   };
 
-  const handleSubCategoryOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSubCategoryOptionChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const optionId = event.target.value;
-    
+
     // Update form data with subcategory option ID
     updateFormData({
-      subCategoryOption: optionId
+      subCategoryOption: optionId,
     });
   };
 
@@ -348,7 +360,7 @@ export default function BusinessOverview({
 
   // Add this useEffect to load owner's name from localStorage
   useEffect(() => {
-    const userDataString = localStorage.getItem('userData');
+    const userDataString = localStorage.getItem("userData");
     if (userDataString) {
       try {
         const userData = JSON.parse(userDataString);
@@ -357,11 +369,11 @@ export default function BusinessOverview({
             ownerName: userData.name,
             // You can also auto-fill other fields if needed, for example:
             whatsAppNumber: userData.phone || formData.whatsAppNumber,
-            emailAddress: userData.email || formData.emailAddress
+            emailAddress: userData.email || formData.emailAddress,
           });
         }
       } catch (error) {
-        console.error('Error parsing user data from localStorage:', error);
+        console.error("Error parsing user data from localStorage:", error);
       }
     }
   }, []);
@@ -419,7 +431,9 @@ export default function BusinessOverview({
             >
               <option value="">Select SubCategory</option>
               {subCategories.map((subCategory: any) => (
-                <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
+                <option key={subCategory.id} value={subCategory.id}>
+                  {subCategory.name}
+                </option>
               ))}
             </select>
           </div>
@@ -437,7 +451,9 @@ export default function BusinessOverview({
             >
               <option value="">Select Sub Category Option</option>
               {subCategoryOptions.map((option: any) => (
-                <option key={option.id} value={option.id}>{option.name}</option>
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
               ))}
             </select>
           </div>
@@ -527,7 +543,6 @@ export default function BusinessOverview({
                 value={formData.slug}
                 onFocus={() => setSlugFocused(true)}
                 onBlur={() => setSlugFocused(false)}
-                
               />
               {isCheckingSlug && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -547,12 +562,12 @@ export default function BusinessOverview({
               }`}
             >
               {slugAvailable && (
-              <p className="text-gray-600">
-                This will be your unique business URL: gigwork.co.in/
-                <span className="font-medium">
-                  {formData.slug || "your-slug"}
-                </span>
-              </p>
+                <p className="text-gray-600">
+                  This will be your unique business URL: gigwork.co.in/
+                  <span className="font-medium">
+                    {formData.slug || "your-slug"}
+                  </span>
+                </p>
               )}
               <ul className="text-gray-500 space-y-1 pl-4">
                 <li>• Use only letters, numbers, and hyphens</li>
@@ -562,150 +577,205 @@ export default function BusinessOverview({
               </ul>
             </div>
           </div>
+        </div>
 
-            <div className="mb-6 col-span-3">
-            <label htmlFor="businessDescription" className="block text-lg font-bold mb-2 ">
-              Business Description
-            </label>
-            <textarea
-              id="businessDescription"
-              name="businessDescription"
-              value={formData.businessDescription}
-              onChange={handleInputChange}
-              placeholder="Tell us about your business..."
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030] resize-none"
-              required
-            />
-          </div>
+        <div className="mb-6 col-span-3">
+          <label
+            htmlFor="businessDescription"
+            className="block text-lg font-bold mb-2 "
+          >
+            Business Description
+          </label>
+          <textarea
+            id="businessDescription"
+            name="businessDescription"
+            value={formData.businessDescription}
+            onChange={handleInputChange}
+            placeholder="Tell us about your business..."
+            rows={4}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030] resize-none"
+            required
+          />
+        </div>
 
-          <div className="col-span-full">
-            <h1 className="text-2xl font-bold py-1">Media & Branding</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Profile Image Upload */}
-              <div>
-                <label className="block text-base font-bold pb-2 text-gray-700">
-                  Upload Profile<span className="text-red-500">*</span>
-                </label>
-                <div className="relative border-2 border-dashed bg-gray-200 rounded-full hover:border-gray-500 transition aspect-square w-32 h-32 mx-auto">
-                  {profilePreview ? (
-                    <div className="relative w-full h-full">
-                      <img 
-                        src={profilePreview} 
-                        alt="Profile preview" 
-                        className="w-full h-full object-cover rounded-full"
-                      />
-                      <div className="absolute -top-2 -right-2 flex gap-2">
-                        <label className="cursor-pointer bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
-                          <input
-                            type="file"
-                            name="profileImage"
-                            onChange={handleInputChange}
-                            className="hidden"
-                            accept="image/*"
-                          />
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                          </svg>
-                        </label>
-                        <button
-                          onClick={() => handleRemoveImage('profile')}
-                          className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+        <div className="col-span-full">
+          <h1 className="text-2xl font-bold py-1">Media & Branding</h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Profile Image Upload */}
+            <div>
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                Upload Profile<span className="text-red-500">*</span>
+              </label>
+              <div className="relative border-2 border-dashed bg-gray-200 rounded-full hover:border-gray-500 transition aspect-square w-32 h-32 mx-auto">
+                {profilePreview ? (
+                  <div className="relative w-full h-full">
+                    <img
+                      src={profilePreview}
+                      alt="Profile preview"
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                    <div className="absolute -top-2 -right-2 flex gap-2">
+                      <label className="cursor-pointer bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
+                        <input
+                          type="file"
+                          name="profileImage"
+                          onChange={handleInputChange}
+                          className="hidden"
+                          accept="image/*"
+                        />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 111.414 1.414L11.414 10l4.293 4.293a1 1 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                          </svg>
-                        </button>
-                      </div>
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                      </label>
+                      <button
+                        onClick={() => handleRemoveImage("profile")}
+                        className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 text-red-500"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 111.414 1.414L11.414 10l4.293 4.293a1 1 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
                     </div>
-                  ) : (
-                    <>
-                      <input
-                        type="file"
-                        name="profileImage"
-                        onChange={handleInputChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 rounded-full"
-                        disabled={isUploading}
-                        accept="image/*"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        {isUploading ? (
-                          <p className="text-sm text-gray-600">Uploading...</p>
-                        ) : (
-                          <div className="text-center">
-                            <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            <p className="mt-1 text-sm text-gray-600">Click to upload</p>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="file"
+                      name="profileImage"
+                      onChange={handleInputChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 rounded-full"
+                      disabled={isUploading}
+                      accept="image/*"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {isUploading ? (
+                        <p className="text-sm text-gray-600">Uploading...</p>
+                      ) : (
+                        <div className="text-center">
+                          <svg
+                            className="mx-auto h-12 w-12 text-gray-400"
+                            stroke="currentColor"
+                            fill="none"
+                            viewBox="0 0 48 48"
+                          >
+                            <path
+                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                          <p className="mt-1 text-sm text-gray-600">
+                            Click to upload
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
+            </div>
 
-              {/* Cover Image Upload */}
-              <div>
-                <label className="block text-base font-bold pb-2 text-gray-700">
-                  Upload Cover
-                </label>
-                <div className="relative border-2 bg-gray-200 rounded-lg hover:border-gray-500 transition min-h-[120px]">
-                  {coverPreview ? (
-                    <div className="relative w-full h-full">
-                      <img 
-                        src={coverPreview} 
-                        alt="Cover preview" 
-                        className="w-full h-[120px] object-cover rounded-lg"
-                      />
-                      <div className="absolute top-2 right-2 flex gap-2">
-                        <label className="cursor-pointer bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
-                          <input
-                            type="file"
-                            name="coverImage"
-                            onChange={handleInputChange}
-                            className="hidden"
-                            accept="image/*"
-                          />
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                          </svg>
-                        </label>
-                        <button
-                          onClick={() => handleRemoveImage('cover')}
-                          className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+            {/* Cover Image Upload */}
+            <div>
+              <label className="block text-base font-bold pb-2 text-gray-700">
+                Upload Cover
+              </label>
+              <div className="relative border-2 bg-gray-200 rounded-lg hover:border-gray-500 transition min-h-[120px]">
+                {coverPreview ? (
+                  <div className="relative w-full h-full">
+                    <img
+                      src={coverPreview}
+                      alt="Cover preview"
+                      className="w-full h-[120px] object-cover rounded-lg"
+                    />
+                    <div className="absolute top-2 right-2 flex gap-2">
+                      <label className="cursor-pointer bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
+                        <input
+                          type="file"
+                          name="coverImage"
+                          onChange={handleInputChange}
+                          className="hidden"
+                          accept="image/*"
+                        />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                          </svg>
-                        </button>
-                      </div>
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                      </label>
+                      <button
+                        onClick={() => handleRemoveImage("cover")}
+                        className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 text-red-500"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
                     </div>
-                  ) : (
-                    <>
-                      <input
-                        type="file"
-                        name="coverImage"
-                        onChange={handleInputChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                        disabled={isUploading}
-                        accept="image/*"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        {isUploading ? (
-                          <p className="text-sm text-gray-600">Uploading...</p>
-                        ) : (
-                          <div className="text-center">
-                            <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            <p className="mt-1 text-sm text-gray-600">Click to upload</p>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="file"
+                      name="coverImage"
+                      onChange={handleInputChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      disabled={isUploading}
+                      accept="image/*"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {isUploading ? (
+                        <p className="text-sm text-gray-600">Uploading...</p>
+                      ) : (
+                        <div className="text-center">
+                          <svg
+                            className="mx-auto h-12 w-12 text-gray-400"
+                            stroke="currentColor"
+                            fill="none"
+                            viewBox="0 0 48 48"
+                          >
+                            <path
+                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                          <p className="mt-1 text-sm text-gray-600">
+                            Click to upload
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -726,15 +796,15 @@ export default function BusinessOverview({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg w-[95vw] max-w-[800px] max-h-[90vh] flex flex-col">
             <h3 className="text-lg font-bold mb-4">Adjust Image</h3>
-            
+
             {/* Crop Area */}
             <div className="flex-1 min-h-0 overflow-auto">
               <ReactCrop
                 crop={cropConfig}
                 onChange={(c) => setCropConfig(c)}
                 onComplete={handleCropComplete}
-                aspect={currentImage.type === 'profile' ? 1 : 16/9}
-                circularCrop={currentImage.type === 'profile'}
+                aspect={currentImage.type === "profile" ? 1 : 16 / 9}
+                circularCrop={currentImage.type === "profile"}
                 className="max-h-[60vh] flex items-center justify-center"
               >
                 <img
@@ -746,11 +816,15 @@ export default function BusinessOverview({
                     const img = e.currentTarget;
                     const minSize = Math.min(img.width, img.height);
                     setCropConfig({
-                      unit: 'px',
-                      width: currentImage.type === 'profile' ? minSize : img.width,
-                      height: currentImage.type === 'profile' ? minSize : Math.round(img.width / 16 * 9),
+                      unit: "px",
+                      width:
+                        currentImage.type === "profile" ? minSize : img.width,
+                      height:
+                        currentImage.type === "profile"
+                          ? minSize
+                          : Math.round((img.width / 16) * 9),
                       x: 0,
-                      y: 0
+                      y: 0,
                     });
                   }}
                 />
@@ -774,9 +848,11 @@ export default function BusinessOverview({
                 type="button"
                 onClick={handleCropSave}
                 className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
-                disabled={isUploading || !completedCrop?.width || !completedCrop?.height}
+                disabled={
+                  isUploading || !completedCrop?.width || !completedCrop?.height
+                }
               >
-                {isUploading ? 'Saving...' : 'Save Image'}
+                {isUploading ? "Saving..." : "Save Image"}
               </button>
             </div>
           </div>
