@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MapPin, Clock, Phone, Briefcase, Dribbble } from "lucide-react";
+import { MapPin, Clock, Phone, Briefcase, Dribbble, Facebook, Instagram, Twitter, Linkedin, Youtube, Globe } from "lucide-react";
 import ImageGrid from "@/app/components/imgsec";
 import { FooterSection } from "@/app/components/FooterSection";
 import { div } from "framer-motion/client";
@@ -176,6 +176,15 @@ const DevMorphixWebsite = () => {
     { label: "QR", href: "#qr" },
   ];
 
+  const socialIcons = {
+    website: Globe,
+    facebook: Facebook,
+    instagram: Instagram,
+    twitter: Twitter,
+    linkedin: Linkedin,
+    youtube: Youtube,
+  };
+
   return (
     <div className="font-circular">
       <nav className="bg-white border-gray-200 dark:bg-gray-900 fixed top-0 left-0 right-0 z-50 shadow-md">
@@ -347,7 +356,12 @@ const DevMorphixWebsite = () => {
               <div className="max-w-4xl mx-auto">
                 <div className="flex flex-wrap gap-6 justify-center">
                   {(
-                    businessData?.profile.additional_services.split(",") || [
+                    businessData?.profile.additional_services.split(",").map(service => {
+                      // Convert camelCase to Title Case with spaces
+                      return service.trim().replace(/([A-Z])/g, ' $1')
+                                         .replace(/^./, str => str.toUpperCase())
+                                         .trim();
+                    }) || [
                       "App Development",
                       "Web Development",
                       "Cloud Services",
@@ -376,27 +390,51 @@ const DevMorphixWebsite = () => {
               style={{ scrollMarginTop: "100px" }}
             >
               {/* Map Section - Left Side */}
-              {/* <div className="md:w-1/2">
-                <div className="bg-white  rounded-lg p-6 h-full"> */}
-                  {/* <h2 className="text-xl font-bold mb-4">Our Location</h2> */}
-                  {/* <div className="h-[400px] rounded-lg overflow-hidden">
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.4985632429584!2d88.34671491498358!3d22.572175985181594!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a027703ef804be5%3A0xea29c7e2b2efccc3!2sDevMorphix!5e0!3m2!1sen!2sin!4v1624281837702!5m2!1sen!2sin"
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                    ></iframe>
+              <div className="md:w-1/2">
+                <div className="bg-white rounded-lg p-6 h-full">
+                  <div className="h-[400px] rounded-lg overflow-hidden">
+                      {businessData?.profile.name.toLowerCase() === 'emilia' ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3934.8730957553427!2d76.56412737495825!3d9.463395593246565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b062f23a403b63b%3A0xfed9fd50695f7df8!2sEMILIA%20BEAUTY%20HUB%20CHANGANACHERRY!5e0!3m2!1sen!2sin!4v1702359671799!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                        <div className="mt-2">
+                          <a 
+                            href="https://maps.app.goo.gl/VTsPuqgduDUwk2du8"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-blue-500 hover:text-blue-700"
+                          >
+                            View on Google Maps →
+                          </a>
+                        </div>
+                      </>
+                    ) : (
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d251482.44857791857!2d76.1643857954714!3d9.982669325611842!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d514abec6bf%3A0xbd582caa5844192!2sKochi%2C%20Kerala!5e0!3m2!1sen!2sin!4v1702359671799!5m2!1sen!2sin"
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      ></iframe>
+                    )}
                   </div>
                 </div>
-              </div> */}
+              </div>
 
               {/* Services Grid - Right Side */}
               <div className="md:w-1/2">
-                <div className="gap-4 p-6 ">
+                <div className="gap-4 p-6">
                   {/* Company Info Card */}
-                  <div className="bg-white rounded-lg mt-6 ">
+                  <div className="bg-white rounded-lg mt-6">
                     <h3 className="text-xl font-light mb-4">
                       {businessData?.profile.name}
                     </h3>
@@ -422,6 +460,38 @@ const DevMorphixWebsite = () => {
                           </span>
                         </span>
                       </div>
+                      
+                      {/* Operating Hours */}
+                      <div className="mt-6">
+                        <h4 className="text-lg font-medium mb-3">Operating Hours</h4>
+                        {businessData?.profile.operating_hours && (
+                          <div className="space-y-2">
+                            {Object.entries(businessData.profile.operating_hours).map(([day, hours]) => {
+                              // Convert day names for display
+                              const dayName = day === 'web' ? 'Wednesday' : 
+                                            day === 'mon' ? 'Monday' :
+                                            day === 'tue' ? 'Tuesday' :
+                                            day === 'thu' ? 'Thursday' :
+                                            day === 'fri' ? 'Friday' :
+                                            day === 'sat' ? 'Saturday' :
+                                            day === 'sun' ? 'Sunday' : day;
+                              
+                              // Check if hours is empty string, "closed", or undefined
+                              const isStoreClosed = !hours || hours.toLowerCase() === 'closed';
+                              
+                              return (
+                                <div key={day} className="flex justify-between items-center border-b py-2">
+                                  <span className="capitalize font-medium">{dayName}</span>
+                                  <span className={isStoreClosed ? "text-red-500" : ""}>
+                                    {isStoreClosed ? 'Closed' : hours}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+
                     </div>
                   </div>
                 </div>
@@ -468,19 +538,20 @@ const DevMorphixWebsite = () => {
                 <h2 className="text-xl font-medium mb-4">
                   Our Social Media Connects
                 </h2>
-                <div className="flex justify-center space-x-6">
+                <div className="flex justify-center gap-4">
                   {Object.entries(businessData?.profile.socials || {}).map(
                     ([platform, url]) => {
                       if (url) {
+                        const Icon = socialIcons[platform as keyof typeof socialIcons];
                         return (
                           <a
                             key={platform}
                             href={url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-gray-600 hover:text-gray-800"
+                            className="p-3 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
                           >
-                            {platform}
+                            <Icon className="w-5 h-5" />
                           </a>
                         );
                       }
@@ -490,6 +561,7 @@ const DevMorphixWebsite = () => {
                 </div>
               </div>
             </section>
+
           </section>
 
           {/* <section className="bg-white shadow-lg rounded-lg p-6 mb-8">
