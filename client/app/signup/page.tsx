@@ -180,12 +180,20 @@ export default function SignupPage() {
         state: formData.address.state,
         zip: formData.address.pinCode,
         socials: {
-          website: formData.websiteURL || "",
+          website: formData.socialMediaHandles.find(h => h.platform === "Website")?.link || "",
           facebook: formData.socialMediaHandles.find(h => h.platform === "Facebook")?.link || "",
           instagram: formData.socialMediaHandles.find(h => h.platform === "Instagram")?.link || "",
-          twitter: formData.socialMediaHandles.find(h => h.platform === "Twitter")?.link || "",
+          twitter: formData.socialMediaHandles.find(h => h.platform === "X (Twitter)")?.link || "",
           linkedin: formData.socialMediaHandles.find(h => h.platform === "LinkedIn")?.link || "",
-          youtube: formData.socialMediaHandles.find(h => h.platform === "YouTube")?.link || ""
+          youtube: formData.socialMediaHandles.find(h => h.platform === "YouTube")?.link || "",
+          reddit: formData.socialMediaHandles.find(h => h.platform === "Reddit")?.link || "",
+          tiktok: formData.socialMediaHandles.find(h => h.platform === "TikTok")?.link || "",
+          pinterest: formData.socialMediaHandles.find(h => h.platform === "Pinterest")?.link || "",
+          behance: formData.socialMediaHandles.find(h => h.platform === "Behance")?.link || "",
+          dribbble: formData.socialMediaHandles.find(h => h.platform === "Dribbble")?.link || "",
+          github: formData.socialMediaHandles.find(h => h.platform === "GitHub")?.link || "",
+          medium: formData.socialMediaHandles.find(h => h.platform === "Medium")?.link || "",
+
         },
         operating_hours: formatOperatingHours(formData.operatingHours),
         avatar: formData.avatar || "",

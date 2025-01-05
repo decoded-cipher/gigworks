@@ -73,7 +73,11 @@ export default function LocationDetails({
       [name]: value
     }
     updateFormData({ socialMediaHandles: newHandles })
+    console.log("social",newHandles);
+    
+    
   }
+  console.log("socialing",formData);
 
   const addOperatingHours = () => {
     // Find the first available day
@@ -238,7 +242,7 @@ export default function LocationDetails({
               </div>
             </div> */}
 
-            
+
           {/* Operating Hours */}
           <div className="mt-6 space-y-1">
             <div className="flex flex-col sm:flex-row justify-between items-center">

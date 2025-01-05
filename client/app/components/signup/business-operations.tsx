@@ -341,7 +341,7 @@ export default function BusinessOperations({
             <div className="w-full">
               <input
                 type="text"
-                name="businessRegistrationNumber"
+                name="referral_code"
                 value={formData.referral_code}
                 onChange={handleInputChange}
                 placeholder="If any referral code"

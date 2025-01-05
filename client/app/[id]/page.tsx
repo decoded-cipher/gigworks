@@ -285,6 +285,7 @@ const DevMorphixWebsite = () => {
     dribbble: "/icon/dribbble.svg",
     github: "/icon/github.svg",
     medium: "/icon/medium.svg",
+    website: "/icon/globe.svg",
   
   };
   
