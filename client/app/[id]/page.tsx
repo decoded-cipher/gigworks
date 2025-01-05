@@ -117,7 +117,7 @@ const DevMorphixWebsite = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(false);
+        setIsLoading(true); // Keep loading true at start
         const response = await fetchBusinessesByslug(params.id as string);
         if (response.message === "Business fetched successfully") {
           setBusinessData(response.data);
@@ -154,7 +154,7 @@ const DevMorphixWebsite = () => {
         console.error("Error fetching business data:", error);
         setError("Failed to load business data");
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // Only set loading to false after everything is done
       }
     };
 
@@ -189,7 +189,14 @@ const DevMorphixWebsite = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>; // Add your loading component here
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
+          <p className="mt-4 text-gray-600">Loading business profile...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
