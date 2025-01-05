@@ -78,6 +78,42 @@ const DevMorphixWebsite = () => {
     status?: number;
     message?: string;
   }
+  const ServicesSection = () => {
+    // Only get services from businessData, no fallback values
+    const services = businessData?.profile?.additional_services
+      ? businessData.profile.additional_services.split(',').map(service => 
+          service.trim().replace(/([A-Z])/g, ' $1')
+            .replace(/^./, str => str.toUpperCase())
+            .trim()
+        )
+      : [];
+
+    // Don't render the section if there are no services
+    if (!services || services.length === 0) {
+      return null;
+    }
+    return (
+      <section className="bg-white rounded-full p-6 mb-8">
+        <h2 className="text-2xl font-bold text-center mb-6">
+          Services Provides
+        </h2>
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-wrap gap-6 justify-center">
+            {services.map((service, index) => (
+              <button
+                key={index}
+                className="w-[250px] bg-stone-800 border-2 text-white border-stone-800 rounded-full px-6 py-2.5 flex items-center justify-center gap-2 hover:bg-white hover:text-black transition-colors duration-300"
+              >
+                <span className="text-sm sm:text-base whitespace-nowrap">
+                  {service}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -153,7 +189,67 @@ const DevMorphixWebsite = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>; // Add your loading component here
+    return (
+      <div className="flex items-center justify-center w-full h-full min-h-[200px]">
+      <div className="flex flex-col items-center justify-center">
+        {/* Bouncing dots */}
+        <div className="flex justify-center space-x-1">
+          {[...Array(5)].map((_, index) => (
+            <div
+              key={index}
+              className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"
+              style={{
+                animationDelay: `${index * 0.1}s`,
+                animationDuration: '0.8s'
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Zigzag line */}
+        <div className="mt-4 relative h-8 w-24">
+          <div 
+            className="absolute left-0 w-4 h-4 bg-blue-500 rounded-full"
+            style={{
+              animation: `
+                zigzag 2s linear infinite,
+                pulse 1s ease-in-out infinite alternate
+              `
+            }}
+          />
+        </div>
+
+        <style jsx>{`
+          @keyframes zigzag {
+            0% {
+              left: 0;
+              top: 0;
+            }
+            25% {
+              left: 100%;
+              top: 100%;
+            }
+            50% {
+              left: 0;
+              top: 100%;
+            }
+            75% {
+              left: 100%;
+              top: 0;
+            }
+            100% {
+              left: 0;
+              top: 0;
+            }
+          }
+        `}</style>
+
+        {/* Loading text */}
+        <p className="mt-8 text-sm text-gray-600 text-center animate-pulse">Loading...</p>
+      </div>
+    </div>
+
+    );
   }
 
   if (error) {
@@ -349,7 +445,7 @@ const DevMorphixWebsite = () => {
             id="service"
             style={{ scrollMarginTop: "100px" }}
           >
-            <section className="bg-white rounded-full p-6 mb-8">
+            {/* <section className="bg-white rounded-full p-6 mb-8">
               <h2 className="text-2xl font-bold text-center mb-6">
                 Services Provides
               </h2>
@@ -380,7 +476,7 @@ const DevMorphixWebsite = () => {
                   ))}
                 </div>
               </div>
-            </section>
+            </section> */}
 
             <hr className="my-4 mx-10 "></hr>
 
@@ -392,7 +488,7 @@ const DevMorphixWebsite = () => {
               {/* Map Section - Left Side */}
               <div className="md:w-1/2">
                 <div className="bg-white rounded-lg p-6 h-full">
-                  <div className="h-[400px] rounded-lg overflow-hidden">
+                  <div className="h-[500px] rounded-lg overflow-hidden">
                       {businessData?.profile.name.toLowerCase() === 'emilia' ? (
                       <>
                         <iframe
@@ -480,7 +576,7 @@ const DevMorphixWebsite = () => {
                               const isStoreClosed = !hours || hours.toLowerCase() === 'closed';
                               
                               return (
-                                <div key={day} className="flex justify-between items-center border-b py-2">
+                                <div key={day} className="flex justify-between items-center border-b py-1">
                                   <span className="capitalize font-medium">{dayName}</span>
                                   <span className={isStoreClosed ? "text-red-500" : ""}>
                                     {isStoreClosed ? 'Closed' : hours}
