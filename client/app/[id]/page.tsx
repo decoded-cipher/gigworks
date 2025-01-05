@@ -188,69 +188,9 @@ const DevMorphixWebsite = () => {
     window.open(whatsappUrl, "_blank");
   };
 
-  // if (isLoading) {
-  //   return (
-  //     <div className="flex items-center justify-center w-full h-full min-h-[200px]">
-  //     <div className="flex flex-col items-center justify-center">
-  //       {/* Bouncing dots */}
-  //       <div className="flex justify-center space-x-1">
-  //         {[...Array(5)].map((_, index) => (
-  //           <div
-  //             key={index}
-  //             className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"
-  //             style={{
-  //               animationDelay: `${index * 0.1}s`,
-  //               animationDuration: '0.8s'
-  //             }}
-  //           />
-  //         ))}
-  //       </div>
-        
-  //       {/* Zigzag line */}
-  //       <div className="mt-4 relative h-8 w-24">
-  //         <div 
-  //           className="absolute left-0 w-4 h-4 bg-blue-500 rounded-full"
-  //           style={{
-  //             animation: `
-  //               zigzag 2s linear infinite,
-  //               pulse 1s ease-in-out infinite alternate
-  //             `
-  //           }}
-  //         />
-  //       </div>
-
-  //       <style jsx>{`
-  //         @keyframes zigzag {
-  //           0% {
-  //             left: 0;
-  //             top: 0;
-  //           }
-  //           25% {
-  //             left: 100%;
-  //             top: 100%;
-  //           }
-  //           50% {
-  //             left: 0;
-  //             top: 100%;
-  //           }
-  //           75% {
-  //             left: 100%;
-  //             top: 0;
-  //           }
-  //           100% {
-  //             left: 0;
-  //             top: 0;
-  //           }
-  //         }
-  //       `}</style>
-
-  //       {/* Loading text */}
-  //       <p className="mt-8 text-sm text-gray-600 text-center animate-pulse">Loading...</p>
-  //     </div>
-  //   </div>
-
-  //   );
-  // }
+  if (isLoading) {
+    return <div>Loading...</div>; // Add your loading component here
+  }
 
   if (error) {
     return <div>Error: {error}</div>; // Add your error component here
