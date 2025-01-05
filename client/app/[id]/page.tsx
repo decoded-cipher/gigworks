@@ -283,7 +283,7 @@ const DevMorphixWebsite = () => {
 
   return (
     <div className="font-circular">
-      <nav className="bg-white border-gray-200 dark:bg-gray-900 fixed top-0 left-0 right-0 z-50 shadow-md">
+      <nav className="bg-white border-gray-200 dark:bg-gray-900 fixed top-0 left-0 right-0 z-50 shadow-md px-4 sm:px-6 lg:px-52">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <a
             href=""
@@ -361,7 +361,7 @@ const DevMorphixWebsite = () => {
               />
             </div>
 
-            <div className="relative z-0 w-80 h-80 border border-white border-8 bg-black rounded-full overflow-hidden border-8 border-white rounded-full flex items-center justify-center mb-8 mt-20">
+            <div className="relative z-0 w-60 md:w-80 h-60 md:h-80 border border-white border-8 bg-black rounded-full overflow-hidden border-8 border-white rounded-full flex items-center justify-center mb-8 mt-20">
               <img
                 src={
                   businessData?.profile.avatar

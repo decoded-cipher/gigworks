@@ -273,9 +273,17 @@ export default function LocationDetails({
                   {[
                     "Instagram",
                     "Facebook",
-                    "Twitter",
+                    "X (Twitter)",
                     "LinkedIn",
                     "Website",
+                    "YouTube",
+                    "Reddit",
+                    "TikTok",
+                    "Pinterest",
+                    "Behance",
+                    "Dribbble",
+                    "GitHub",
+                    "Medium",
                   ].map((platform) => (
                     <option key={platform} value={platform}>
                       {platform}
