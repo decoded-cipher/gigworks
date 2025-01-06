@@ -71,7 +71,7 @@ const DevMorphixWebsite = () => {
     setIsMenuOpen(false);
   };
 
-  const textToCopy = "#ABC23SK";
+  const textToCopy = partnerData?.referral_code || "";
 
   const copyToClipboard = async () => {
     try {

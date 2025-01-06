@@ -1,12 +1,43 @@
 'use client'
 
+import { useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import type { FormData } from '../../signup/page'
 
 const LocationPicker = dynamic(
   () => import("../../components/LocationPicker"),
   { ssr: false }
 )
+
+interface Address {
+  streetAddress: string
+  city: string
+  state: string
+  pinCode: string
+}
+
+interface Location {
+  latitude: number | null
+  longitude: number | null
+  fullAddress: string
+}
+
+interface OperatingHour {
+  day: string
+  startTime: string
+  endTime: string
+}
+
+interface SocialMediaHandle {
+  platform: string
+  link: string
+}
+
+interface FormData {
+  address: Address
+  location: Location
+  operatingHours: OperatingHour[]
+  socialMediaHandles: SocialMediaHandle[]
+}
 
 interface LocationDetailsProps {
   formData: FormData
@@ -21,15 +52,42 @@ export default function LocationDetails({
   onNext,
   onPrevious
 }: LocationDetailsProps) {
+  // Initialize with Monday if no operating hours exist
+  useEffect(() => {
+    if (!formData.operatingHours || formData.operatingHours.length === 0) {
+      const initialSchedule = {
+        operatingHours: [{
+          day: "Monday",
+          startTime: "09:00",
+          endTime: "17:00"
+        }]
+      };
+      updateFormData(initialSchedule);
+    } else if (
+      formData.operatingHours.length === 1 && 
+      formData.operatingHours[0].day === "Monday" && 
+      (!formData.operatingHours[0].startTime || !formData.operatingHours[0].endTime)
+    ) {
+      // Ensure default times are set for Monday if they're missing
+      updateFormData({
+        operatingHours: [{
+          ...formData.operatingHours[0],
+          startTime: formData.operatingHours[0].startTime || "09:00",
+          endTime: formData.operatingHours[0].endTime || "17:00"
+        }]
+      });
+    }
+  }, []);
+
   const handleLocationSelect = (locationData: { address: string; lat: number; lng: number }) => {
     const addressParts = locationData.address.split(",")
 
     updateFormData({
       address: {
-        streetAddress: addressParts[0] || "",
-        city: addressParts[1] || "",
-        state: addressParts[2] || "",
-        pinCode: addressParts[3] || "",
+        streetAddress: addressParts[0]?.trim() || "",
+        city: addressParts[1]?.trim() || "",
+        state: addressParts[2]?.trim() || "",
+        pinCode: addressParts[3]?.trim() || "",
       },
       location: {
         latitude: locationData.lat,
@@ -53,34 +111,34 @@ export default function LocationDetails({
     index: number,
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target
-    const newHours = [...formData.operatingHours]
-    newHours[index] = {
-      ...newHours[index],
-      [name]: value
-    }
-    updateFormData({ operatingHours: newHours })
-  }
+    const { name, value } = e.target;
+    const newHours = formData.operatingHours.map((hour, i) => {
+      if (i === index) {
+        return {
+          ...hour,
+          [name]: value
+        };
+      }
+      return hour;
+    });
+    
+    updateFormData({
+      operatingHours: newHours
+    });
+  };
 
   const handleSocialMediaChange = (
     index: number,
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target
-    const newHandles = [...formData.socialMediaHandles]
-    newHandles[index] = {
-      ...newHandles[index],
-      [name]: value
-    }
+    const newHandles = formData.socialMediaHandles.map((handle, i) => 
+      i === index ? { ...handle, [name]: value } : handle
+    )
     updateFormData({ socialMediaHandles: newHandles })
-    console.log("social",newHandles);
-    
-    
   }
-  console.log("socialing",formData);
 
   const addOperatingHours = () => {
-    // Find the first available day
     const selectedDays = formData.operatingHours.map(hour => hour.day)
     const availableDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
       .filter(day => !selectedDays.includes(day))
@@ -96,19 +154,20 @@ export default function LocationDetails({
   }
 
   const removeOperatingHours = (index: number) => {
+    // Prevent removing if it's Monday and it's the only entry
+    if (index === 0 && formData.operatingHours.length === 1 && formData.operatingHours[0].day === "Monday") {
+      return
+    }
+    
     updateFormData({
       operatingHours: formData.operatingHours.filter((_, i) => i !== index)
     })
-  }
-
+  }  
   const addSocialMediaHandle = () => {
-    // Get currently selected platforms
     const selectedPlatforms = formData.socialMediaHandles.map(handle => handle.platform)
-    
-    // Get all available platforms
     const availablePlatforms = [
       "Instagram",
-      "Facebook",
+      "Facebook", 
       "X (Twitter)",
       "LinkedIn",
       "Website",
@@ -122,7 +181,6 @@ export default function LocationDetails({
       "Medium",
     ].filter(platform => !selectedPlatforms.includes(platform))
     
-    // Add new handle with first available platform
     if (availablePlatforms.length > 0) {
       updateFormData({
         socialMediaHandles: [
@@ -140,13 +198,22 @@ export default function LocationDetails({
   }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onNext()
-  }
+    e.preventDefault();
+  
+    // Ensure Monday has default times before submission
+    const updatedHours = formData.operatingHours.map(hour => ({
+      ...hour,
+      startTime: hour.startTime || "09:00",
+      endTime: hour.endTime || "17:00"
+    }));
+  
+    updateFormData({ operatingHours: updatedHours });
+    onNext();
+  };
 
   const getAvailableDaysForDropdown = (currentIndex: number) => {
     const selectedDays = formData.operatingHours
-      .filter((_, index) => index !== currentIndex) // Exclude current selection
+      .filter((_, index) => index !== currentIndex)
       .map(hour => hour.day)
     
     return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -155,7 +222,7 @@ export default function LocationDetails({
 
   const getAvailablePlatformsForDropdown = (currentIndex: number) => {
     const selectedPlatforms = formData.socialMediaHandles
-      .filter((_, index) => index !== currentIndex) // Exclude current selection
+      .filter((_, index) => index !== currentIndex)
       .map(handle => handle.platform)
     
     return [
@@ -183,9 +250,9 @@ export default function LocationDetails({
         <div className="w-full bg-white rounded-md p-4 sm:p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h1 className="py-2 sm:py-4 font-semibold text-xl">
+              <h2 className="py-2 sm:py-4 font-semibold text-xl">
                 Address & Location <span className="text-red-500">*</span>
-              </h1>
+              </h2>
               <div className="space-y-8">
                 <input
                   type="text"
@@ -226,29 +293,13 @@ export default function LocationDetails({
               </div>
             </div>
           </div>
-          
-            {/* <div className="relative w-full z-0">
-              <h1 className="py-2 sm:py-4 font-semibold text-xl">
-                Pick Location <span className="text-red-500">*</span>
-              </h1>
-              <div className="relative w-full rounded-md">
-                <LocationPicker onLocationSelect={handleLocationSelect} />
-                <button
-                  type="button"
-                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded-md shadow-md text-gray-700 font-semibold border border-gray-300"
-                >
-                  Choose Location
-                </button>
-              </div>
-            </div> */}
-
 
           {/* Operating Hours */}
           <div className="mt-6 space-y-1">
             <div className="flex flex-col sm:flex-row justify-between items-center">
-              <h1 className="py-2 sm:py-4 font-semibold text-xl">
+              <h2 className="py-2 sm:py-4 font-semibold text-xl">
                 Operating Hours<span className="text-red-500">*</span>
-              </h1>
+              </h2>
               <button
                 type="button"
                 onClick={addOperatingHours}
@@ -272,15 +323,18 @@ export default function LocationDetails({
                     className="w-full sm:w-1/3 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
                   >
                     {index === 0 ? (
-                      // First dropdown shows all days
-                      ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-                        .map((day) => (
-                          <option key={day} value={day}>
-                            {day}
-                          </option>
-                        ))
+                      // First dropdown shows Monday only if it's the initial entry
+                      formData.operatingHours.length === 1 ? (
+                        <option value="Monday">Monday</option>
+                      ) : (
+                        ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+                          .map((day) => (
+                            <option key={day} value={day}>
+                              {day}
+                            </option>
+                          ))
+                      )
                     ) : (
-                      // Subsequent dropdowns show only available days plus current selection
                       Array.from(new Set([hours.day, ...availableDays]))
                         .map((day) => (
                           <option key={day} value={day}>
@@ -304,7 +358,8 @@ export default function LocationDetails({
                       onChange={(e) => handleOperatingHoursChange(index, e)}
                       className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
                     />
-                    {formData.operatingHours.length > 1 && (
+                    {/* Only show remove button if it's not Monday as the only entry */}
+                    {!(index === 0 && formData.operatingHours.length === 1 && hours.day === "Monday") && (
                       <button
                         type="button"
                         onClick={() => removeOperatingHours(index)}
@@ -322,14 +377,14 @@ export default function LocationDetails({
           {/* Social Media Handles */}
           <div className="mt-6 space-y-1">
             <div className="flex flex-col sm:flex-row justify-between items-center">
-              <h1 className="py-2 sm:py-4 font-semibold text-xl">
+              <h2 className="py-2 sm:py-4 font-semibold text-xl">
                 Social Media Handles<span className="text-red-500">*</span>
-              </h1>
+              </h2>
               <button
                 type="button"
                 onClick={addSocialMediaHandle}
                 className="text-[#303030] font-semibold mb-2 sm:mb-0"
-                disabled={formData.socialMediaHandles.length >= 13} // Total number of platforms
+                disabled={formData.socialMediaHandles.length >= 13}
               >
                 + Add More
               </button>
@@ -348,7 +403,6 @@ export default function LocationDetails({
                     className="w-full sm:w-1/3 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
                   >
                     {index === 0 ? (
-                      // First dropdown shows all platforms
                       [
                         "Instagram",
                         "Facebook",
@@ -369,7 +423,6 @@ export default function LocationDetails({
                         </option>
                       ))
                     ) : (
-                      // Subsequent dropdowns show only available platforms plus current selection
                       Array.from(new Set([handle.platform, ...availablePlatforms]))
                         .map((platform) => (
                           <option key={platform} value={platform}>
