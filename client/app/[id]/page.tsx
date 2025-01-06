@@ -713,7 +713,7 @@ const DevMorphixWebsite = () => {
                     "No description available"}
                 </p>
               </div>
-              {businessData?.profile.socials && (
+              {businessData?.profile.socials && Object.values(businessData.profile.socials).some(url => url) && (
                 <div>
                   <h2 className="text-xl font-medium mb-4">
                     Our Social Media Connects

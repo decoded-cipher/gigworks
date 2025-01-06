@@ -1,15 +1,30 @@
 "use client";
 export const runtime = "edge";
 import React, { useState, useEffect } from "react";
-import { fetchBusinessesByslug, ASSET_BASE_URL, updateBusiness } from "@/app/api";
+import {
+  fetchBusinessesByslug,
+  ASSET_BASE_URL,
+  updateBusiness,
+} from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
-import { Pencil, Save, X, Facebook, Instagram, Twitter, Linkedin, Youtube, Globe } from "lucide-react";
+import {
+  Pencil,
+  Save,
+  X,
+  Facebook,
+  Instagram,
+  Twitter,
+  Linkedin,
+  Youtube,
+  Globe,
+} from "lucide-react";
 import ImageGrid from "@/app/components/imgsec";
 import ImageUploadButton from "@/app/components/ImageUploadButton";
 import MediaGallery from "@/app/components/MediaGallery";
 import OperatingHours from "@/app/components/OperatingHours";
 // import { deleteBusinessMedia } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
+import { s } from "framer-motion/client";
 
 // Add License interface before other interfaces
 interface License {
@@ -53,7 +68,7 @@ interface BusinessProfile {
   type: string;
   additional_services: string;
   gstin: string;
-  id: string;  // Add this field
+  id: string; // Add this field
   [key: string]: any; // Add index signature to allow dynamic access
 }
 
@@ -73,15 +88,22 @@ interface BusinessData {
 }
 
 // Add this social media config object near the top of your component
-const socialMediaConfig = {
-  website: { label: 'Website URL', icon: Globe },
-  facebook: { label: 'Facebook Profile', icon: Facebook },
-  instagram: { label: 'Instagram Profile', icon: Instagram },
-  twitter: { label: 'Twitter Profile', icon: Twitter },
-  linkedin: { label: 'LinkedIn Profile', icon: Linkedin },
-  youtube: { label: 'YouTube Channel', icon: Youtube },
-};
 
+const socialMediaConfig = {
+  website: { label: "Website URL", icon: "/icon/globe.svg" },
+  facebook: { label: "Facebook Profile", icon: "/icon/facebook.svg" },
+  instagram: { label: "Instagram Profile", icon: "/icon/instagram.svg" },
+  twitter: { label: "Twitter Profile", icon: "/icon/twitter.svg" },
+  linkedin: { label: "LinkedIn Profile", icon: "/icon/linkedin.svg" },
+  youtube: { label: "YouTube Channel", icon: "/icon/youtube.svg" },
+  reddit: { label: "Reddit Profile", icon: "/icon/reddit.svg" },
+  tiktok: { label: "TikTok Profile", icon: "/icon/tiktok.svg" },
+  pinterest: { label: "Pinterest Profile", icon: "/icon/pinterest.svg" },
+  behance: { label: "Behance Profile", icon: "/icon/behance.svg" },
+  dribbble: { label: "Dribbble Profile", icon: "/icon/dribbble.svg" },
+  github: { label: "GitHub Profile", icon: "/icon/github.svg" },
+  medium: { label: "Medium Profile", icon: "/icon/medium.svg" },
+};
 export default function EditBusinessPage() {
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -110,9 +132,9 @@ export default function EditBusinessPage() {
   // Check authorization
   useEffect(() => {
     const token = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('token='))
-      ?.split('=')[1];
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
 
     if (!token) {
       router.push(`/${params.id}`);
@@ -130,14 +152,14 @@ export default function EditBusinessPage() {
     try {
       if (!businessData?.profile.id) return;
 
-      const fieldParts = field.split('.');
+      const fieldParts = field.split(".");
       let updateData: Record<string, any> = {};
-      
-      if (fieldParts.length > 1 && fieldParts[0] === 'socials') {
+
+      if (fieldParts.length > 1 && fieldParts[0] === "socials") {
         // Handle social media fields specifically
         updateData.socials = {
           ...(businessData.profile.socials || {}),
-          [fieldParts[1]]: value
+          [fieldParts[1]]: value,
         };
       } else {
         // Handle regular fields
@@ -146,25 +168,27 @@ export default function EditBusinessPage() {
 
       await updateBusiness(businessData.profile.id, updateData);
       toast.success(`${field} updated successfully`);
-      
+
       // Update local state
-      setBusinessData(prev => {
+      setBusinessData((prev) => {
         if (!prev) return null;
         return {
           ...prev,
           profile: {
             ...prev.profile,
-            ...(fieldParts[0] === 'socials' ? {
-              socials: {
-                ...prev.profile.socials,
-                [fieldParts[1]]: value
-              }
-            } : updateData)
-          }
+            ...(fieldParts[0] === "socials"
+              ? {
+                  socials: {
+                    ...prev.profile.socials,
+                    [fieldParts[1]]: value,
+                  },
+                }
+              : updateData),
+          },
         };
       });
     } catch (error) {
-      console.error('Error updating field:', error);
+      console.error("Error updating field:", error);
       toast.error(`Failed to update ${field}`);
     }
   };
@@ -179,7 +203,7 @@ export default function EditBusinessPage() {
       // TODO: Implement API call to save all changes
       router.push(`/${params.id}`);
     } catch (error) {
-      console.error('Error saving changes:', error);
+      console.error("Error saving changes:", error);
     }
   };
 
@@ -193,29 +217,31 @@ export default function EditBusinessPage() {
     // }
   };
 
-  const handleOperatingHoursUpdate = async (newHours: { [key: string]: string }) => {
+  const handleOperatingHoursUpdate = async (newHours: {
+    [key: string]: string;
+  }) => {
     try {
       if (!businessData?.profile.id) return;
 
       await updateBusiness(businessData.profile.id, {
-        operating_hours: newHours
+        operating_hours: newHours,
       });
-      toast.success('Operating hours updated successfully');
-      
+      toast.success("Operating hours updated successfully");
+
       // Update local state
-      setBusinessData(prev => {
+      setBusinessData((prev) => {
         if (!prev) return null;
         return {
           ...prev,
           profile: {
             ...prev.profile,
-            operating_hours: newHours
-          }
+            operating_hours: newHours,
+          },
         };
       });
     } catch (error) {
-      console.error('Error updating operating hours:', error);
-      toast.error('Failed to update operating hours');
+      console.error("Error updating operating hours:", error);
+      toast.error("Failed to update operating hours");
     }
   };
 
@@ -279,7 +305,11 @@ export default function EditBusinessPage() {
                   category="banner"
                   label="Upload Banner"
                   showPreview={true}
-                  currentImage={businessData.profile.banner ? `${ASSET_BASE_URL}/${businessData.profile.banner}` : undefined}
+                  currentImage={
+                    businessData.profile.banner
+                      ? `${ASSET_BASE_URL}/${businessData.profile.banner}`
+                      : undefined
+                  }
                   multiple={false}
                   onUploadComplete={fetchData}
                 />
@@ -293,7 +323,11 @@ export default function EditBusinessPage() {
                   category="avatar"
                   label="Upload Avatar"
                   showPreview={true}
-                  currentImage={businessData.profile.avatar ? `${ASSET_BASE_URL}/${businessData.profile.avatar}` : undefined}
+                  currentImage={
+                    businessData.profile.avatar
+                      ? `${ASSET_BASE_URL}/${businessData.profile.avatar}`
+                      : undefined
+                  }
                   multiple={false}
                   onUploadComplete={fetchData}
                 />
@@ -306,19 +340,23 @@ export default function EditBusinessPage() {
             <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Business Name</label>
+                <label className="block text-sm font-medium mb-1">
+                  Business Name
+                </label>
                 <input
                   type="text"
                   defaultValue={businessData.profile.name}
-                  onBlur={(e) => handleFieldSave('name', e.target.value)}
+                  onBlur={(e) => handleFieldSave("name", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Description</label>
+                <label className="block text-sm font-medium mb-1">
+                  Description
+                </label>
                 <textarea
                   defaultValue={businessData.profile.description}
-                  onBlur={(e) => handleFieldSave('description', e.target.value)}
+                  onBlur={(e) => handleFieldSave("description", e.target.value)}
                   className="w-full p-2 border rounded-lg min-h-[100px]"
                 />
               </div>
@@ -334,7 +372,7 @@ export default function EditBusinessPage() {
                 <input
                   type="email"
                   defaultValue={businessData.profile.email}
-                  onChange={(e) => handleChange('email', e.target.value)}
+                  onChange={(e) => handleChange("email", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -343,16 +381,18 @@ export default function EditBusinessPage() {
                 <input
                   type="tel"
                   defaultValue={businessData.user.phone}
-                  onChange={(e) => handleChange('phone', e.target.value)}
+                  onChange={(e) => handleChange("phone", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Address</label>
+                <label className="block text-sm font-medium mb-1">
+                  Address
+                </label>
                 <input
                   type="text"
                   defaultValue={businessData.profile.address}
-                  onChange={(e) => handleChange('address', e.target.value)}
+                  onChange={(e) => handleChange("address", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -364,30 +404,41 @@ export default function EditBusinessPage() {
             <h2 className="text-xl font-semibold mb-4">Additional Services</h2>
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
-                {businessData.profile.additional_services.split(",").map((service, index) => {
-                  const formattedService = service.trim()
-                    .replace(/([A-Z])/g, ' $1')
-                    .replace(/^./, str => str.toUpperCase())
-                    .trim();
+                {businessData.profile.additional_services
+                  .split(",")
+                  .map((service, index) => {
+                    const formattedService = service
+                      .trim()
+                      .replace(/([A-Z])/g, " $1")
+                      .replace(/^./, (str) => str.toUpperCase())
+                      .trim();
 
-                  return (
-                    <span key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
-                      {formattedService}
-                    </span>
-                  );
-                })}
+                    return (
+                      <span
+                        key={index}
+                        className="bg-gray-100 px-3 py-1 rounded-full text-sm"
+                      >
+                        {formattedService}
+                      </span>
+                    );
+                  })}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Edit Services (comma-separated)</label>
+                <label className="block text-sm font-medium mb-1">
+                  Edit Services (comma-separated)
+                </label>
                 <input
                   type="text"
                   defaultValue={businessData.profile.additional_services}
-                  onBlur={(e) => handleFieldSave('additional_services', e.target.value)}
+                  onBlur={(e) =>
+                    handleFieldSave("additional_services", e.target.value)
+                  }
                   className="w-full p-2 border rounded-lg"
                   placeholder="e.g., customOrders, afterSalesSupport"
                 />
                 <p className="text-sm text-gray-500 mt-1">
-                  Enter services separated by commas. Use camelCase for multiple words (e.g., customOrders).
+                  Enter services separated by commas. Use camelCase for multiple
+                  words (e.g., customOrders).
                 </p>
               </div>
             </div>
@@ -397,23 +448,33 @@ export default function EditBusinessPage() {
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Social Media Links</h2>
             <div className="space-y-4">
-              {Object.entries(socialMediaConfig).map(([key, { label, icon: Icon }]) => (
-                <div key={key} className="flex items-center gap-4">
-                  <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full">
-                    <Icon className="w-5 h-5 text-gray-600" />
+              {Object.entries(socialMediaConfig).map(
+                ([key, { label, icon }]) => (
+                  <div key={key} className="flex items-center gap-4">
+                    <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full">
+                      <img src={icon} alt={label} className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium mb-1 text-gray-700">
+                        {label}
+                      </label>
+                      <input
+                        type="url"
+                        defaultValue={
+                          businessData.profile.socials?.[
+                            key as keyof typeof businessData.profile.socials
+                          ] || ""
+                        }
+                        onBlur={(e) =>
+                          handleFieldSave(`socials.${key}`, e.target.value)
+                        }
+                        className="w-full p-2 border rounded-lg"
+                        placeholder={`Enter ${label}`}
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium mb-1 text-gray-700">{label}</label>
-                    <input
-                      type="url"
-                      defaultValue={businessData.profile.socials?.[key] || ''}
-                      onBlur={(e) => handleFieldSave(`socials.${key}`, e.target.value)}
-                      className="w-full p-2 border rounded-lg"
-                      placeholder={`Enter ${label}`}
-                    />
-                  </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           </section>
 
