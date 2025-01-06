@@ -177,7 +177,7 @@ const DevMorphixWebsite = () => {
             <h2 className="sm:text-6xl text-4xl font-bold mb-4">
               {partnerData?.name || "Loading..."}
             </h2>
-            <p className="sm:text-2xl text-xl font-medium mb-8">
+            <p className="text-xl font-light text-gray-600 mb-2">
               Reference Code
             </p>
             <div className="flex justify-center items-center w-full">
@@ -229,8 +229,8 @@ const DevMorphixWebsite = () => {
           <section className="relative py-8 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
             {renderAnalyticsChart()}
             <div className="flex items-center gap-2 mb-4">
-              <Phone size={20} />
-              <p className="text-lg">{partnerData?.phone || "Loading..."}</p>
+              {/* <Phone size={20} />
+              <p className="text-lg">{partnerData?.phone || "Loading..."}</p> */}
             </div>
           </section>
         </main>
