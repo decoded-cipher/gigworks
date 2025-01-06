@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AxiosError } from 'axios';
+import { AxiosError } from "axios";
 import { MapPin, Clock, Phone, Briefcase, Dribbble } from "lucide-react";
 import ImageGrid from "../components/imgsec";
 import { FooterSection } from "../components/FooterSection";
 import { div } from "framer-motion/client";
-import DynamicQRCode from "../components/QrSection";
 import ScrollToTopButton from "../components/ScrollToTop";
 import { GetPartner, GetPartnerAnalytics, ASSET_BASE_URL } from "../api";
 
@@ -35,11 +34,16 @@ const DevMorphixWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [copied, setCopied] = React.useState(false);
   const [partnerData, setPartnerData] = useState<PartnerData | null>(null);
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
-  
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
+    null
+  );
+  const [hoveredBar, setHoveredBar] = useState<{
+    month: string;
+    count: number;
+  } | null>(null);
   const [dateRange, setDateRange] = useState({
-    start: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0], // First day of current year
-    end: new Date(new Date().getFullYear(), 11, 31).toISOString().split('T')[0]  // Last day of current year
+    start: new Date(new Date().getFullYear(), 0, 1).toISOString().split("T")[0], // First day of current year
+    end: new Date(new Date().getFullYear(), 11, 31).toISOString().split("T")[0], // Last day of current year
   });
 
   useEffect(() => {
@@ -47,17 +51,20 @@ const DevMorphixWebsite = () => {
       try {
         const [partnerResponse, analyticsResponse] = await Promise.all([
           GetPartner(),
-          GetPartnerAnalytics(dateRange.start, dateRange.end)
+          GetPartnerAnalytics(dateRange.start, dateRange.end),
         ]);
         setPartnerData(partnerResponse.data);
         setAnalyticsData(analyticsResponse.data);
       } catch (error) {
         const axiosError = error as AxiosError<{ error: string }>;
-        console.error('Error fetching data:', axiosError);
-        if(axiosError.response?.data?.error === "Cannot read properties of undefined (reading 'avatar')") {
-          router.push('/partnerSignup/1');
+        console.error("Error fetching data:", axiosError);
+        if (
+          axiosError.response?.data?.error ===
+          "Cannot read properties of undefined (reading 'avatar')"
+        ) {
+          router.push("/partnerSignup/1");
         }
-        console.error('Error fetching data:', axiosError.response?.data?.error);
+        console.error("Error fetching data:", axiosError.response?.data?.error);
       }
     };
 
@@ -93,7 +100,9 @@ const DevMorphixWebsite = () => {
   const renderAnalyticsChart = () => {
     if (!analyticsData) return null;
 
-    const maxCount = Math.max(...analyticsData.analytics.map(item => item.count));
+    const maxCount = Math.max(
+      ...analyticsData.analytics.map((item) => item.count)
+    );
     const chartHeight = 200; // pixels
 
     return (
@@ -107,7 +116,9 @@ const DevMorphixWebsite = () => {
                 <input
                   type="date"
                   value={dateRange.start}
-                  onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                  onChange={(e) =>
+                    setDateRange((prev) => ({ ...prev, start: e.target.value }))
+                  }
                   className="border rounded-md p-2"
                 />
               </div>
@@ -116,30 +127,45 @@ const DevMorphixWebsite = () => {
                 <input
                   type="date"
                   value={dateRange.end}
-                  onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                  onChange={(e) =>
+                    setDateRange((prev) => ({ ...prev, end: e.target.value }))
+                  }
                   className="border rounded-md p-2"
                 />
               </div>
             </div>
           </div>
         </div>
-        
-        <div className="flex items-end justify-between h-[200px] gap-2">
+
+        <div className="flex items-end justify-between h-[300px] pt-2 gap-2">
           {analyticsData.analytics.map((item) => {
-            const height = item.count ? (item.count / maxCount) * chartHeight : 4;
-            const month = new Date(item.month).toLocaleString('default', { month: 'short' });
-            
+            const height = item.count
+              ? (item.count / maxCount) * chartHeight
+              : 4;
+            const month = new Date(item.month).toLocaleString("default", {
+              month: "short",
+            });
+
             return (
-              <div key={item.month} className="flex flex-col items-center flex-1">
-                <div 
+              <div
+                key={item.month}
+                className="flex flex-col items-center flex-1 relative"
+                onMouseEnter={() => setHoveredBar(item)}
+                onMouseLeave={() => setHoveredBar(null)}
+              >
+                <div
                   className="w-full bg-blue-500 rounded-t"
-                  style={{ 
-                    height: `${height}px`,
-                    minHeight: '4px'
-                  }}
+                  style={{ height: `${height}px` }}
                 />
                 <span className="text-xs mt-2 rotate-45 origin-left">{month}</span>
-                <span className="text-xs mt-5">{item.count}</span>
+                <span className="text-xs mt-2">{item.count}</span>
+
+                {/* Tooltip */}
+                {hoveredBar?.month === item.month && (
+                  <div className="absolute z-50 -top-8 bg-gray-800 text-white px-3 py-1 rounded-md text-xs whitespace-nowrap">
+                    {`${month}: ${item.count}`} profiles
+                  </div>
+                )}
               </div>
             );
           })}
@@ -164,9 +190,9 @@ const DevMorphixWebsite = () => {
 
             <div className="relative z-10 w-80 h-80 border border-white border-8 bg-black rounded-full flex items-center justify-center mb-8 mt-20">
               {partnerData?.avatar ? (
-                <img 
-                  src={`${ASSET_BASE_URL}/${partnerData.avatar}`} 
-                  alt="Profile" 
+                <img
+                  src={`${ASSET_BASE_URL}/${partnerData.avatar}`}
+                  alt="Profile"
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (
@@ -225,7 +251,9 @@ const DevMorphixWebsite = () => {
               </div>
             </div>
           </section>
-          <h2 className="text-2xl font-semibold mb-4 text-center py-4">Analytics</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-center py-4">
+            Analytics
+          </h2>
           <section className="relative py-8 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
             {renderAnalyticsChart()}
             <div className="flex items-center gap-2 mb-4">
