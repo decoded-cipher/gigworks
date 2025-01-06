@@ -294,7 +294,7 @@ export default function BusinessOverview({
     const fetchData = async () => {
       try {
         const data = await fetchBusinessData();
-        setCategories(data.data.categories); // Adjust according to the structure of your data
+        setCategories(data.data.categories); 
         console.log(data.data.categories);
       } catch (error) {
         console.error("Error fetching business categories:", error);
@@ -309,7 +309,6 @@ export default function BusinessOverview({
     const categoryId = event.target.value;
     setSelectedCategory(categoryId);
 
-    // Update form data with category ID
     updateFormData({
       businessCategory: categoryId,
     });
@@ -329,7 +328,6 @@ export default function BusinessOverview({
     const subCategoryId = event.target.value;
     setSelectedSubCategory(subCategoryId);
 
-    // Update form data with subcategory ID
     updateFormData({
       subCategory: subCategoryId,
     });
@@ -347,7 +345,6 @@ export default function BusinessOverview({
   ) => {
     const optionId = event.target.value;
 
-    // Update form data with subcategory option ID
     updateFormData({
       subCategoryOption: optionId,
     });

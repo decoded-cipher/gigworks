@@ -434,7 +434,7 @@ const DevMorphixWebsite = () => {
             {isOwner && (
               <button
                 onClick={handleEditClick}
-                className="absolute top-24 right-4 p-2 bg-gray-100 rounded-full transition-colors"
+                className="absolute top-24 right-4 p-2 bg-gray-100 hover:bg-gray-20 rounded-full transition-colors"
                 title="Edit Business Profile"
               >
                 <Pencil className="w-4 h-4 text-gray-600" />
@@ -713,40 +713,42 @@ const DevMorphixWebsite = () => {
                     "No description available"}
                 </p>
               </div>
-              <div className="mt-24">
-                <h2 className="text-xl font-medium mb-4">
-                  Our Social Media Connects
-                </h2>
-                <div className="flex justify-center gap-4">
-                  {Object.entries(businessData?.profile.socials || {}).map(
-                    ([platform, url]) => {
-                      if (url) {
-                        const iconSrc = socialIcons[platform.toLowerCase()];
-                        return (
-                          <a
-                            key={platform}
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-gray-600 hover:text-gray-800"
-                          >
-                            {iconSrc ? (
-                              <img
-                                src={iconSrc}
-                                alt={platform}
-                                className="w-6 h-6"
-                              />
-                            ) : (
-                              platform
-                            )}
-                          </a>
-                        );
+              {businessData?.profile.socials && (
+                <div>
+                  <h2 className="text-xl font-medium mb-4">
+                    Our Social Media Connects
+                  </h2>
+                  <div className="flex justify-center gap-4">
+                    {Object.entries(businessData.profile.socials).map(
+                      ([platform, url]) => {
+                        if (url) {
+                          const iconSrc = socialIcons[platform.toLowerCase()];
+                          return (
+                            <a
+                              key={platform}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-gray-600 hover:text-gray-800"
+                            >
+                              {iconSrc ? (
+                                <img
+                                  src={iconSrc}
+                                  alt={platform}
+                                  className="w-6 h-6"
+                                />
+                              ) : (
+                                platform
+                              )}
+                            </a>
+                          );
+                        }
+                        return null;
                       }
-                      return null;
-                    }
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </section>
           </section>
 
