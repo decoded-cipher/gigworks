@@ -2,9 +2,23 @@
 
 import React, { useState, useEffect } from "react";
 
-import { MapPin, Clock, Phone, Briefcase, Dribbble, Facebook, Instagram, Twitter, Linkedin, Youtube, Globe, Pencil } from "lucide-react";
-import { jwtDecode } from 'jwt-decode'; // Add this import
-import Cookies from 'js-cookie';
+import {
+  MapPin,
+  Mail,
+  Clock,
+  Phone,
+  Briefcase,
+  Dribbble,
+  Facebook,
+  Instagram,
+  Twitter,
+  Linkedin,
+  Youtube,
+  Globe,
+  Pencil,
+} from "lucide-react";
+import { jwtDecode } from "jwt-decode"; // Add this import
+import Cookies from "js-cookie";
 
 import ImageGrid from "@/app/components/imgsec";
 import { FooterSection } from "@/app/components/FooterSection";
@@ -26,7 +40,7 @@ interface JWTPayload {
   iat?: number;
   sub?: string;
   email?: string;
-  name?: string;  // Add name property
+  name?: string; // Add name property
 }
 
 interface License {
@@ -101,36 +115,38 @@ const DevMorphixWebsite = () => {
   const handleJWTToken = () => {
     try {
       // Get token from cookie instead of localStorage
-      const token = Cookies.get('token'); // or whatever your cookie name is
-      
+      const token = Cookies.get("token"); // or whatever your cookie name is
+
       if (!token) {
-        console.log('No JWT token found in cookies');
+        console.log("No JWT token found in cookies");
         return null;
       }
 
-      console.log('Raw JWT Token:', token);
+      console.log("Raw JWT Token:", token);
 
       const decodedToken = jwtDecode<JWTPayload>(token);
-      console.log('Decoded JWT Payload:', decodedToken);
-      
+      console.log("Decoded JWT Payload:", decodedToken);
+
       if (decodedToken.exp) {
         const currentTime = Math.floor(Date.now() / 1000);
         const isExpired = decodedToken.exp < currentTime;
-        
-        console.log('Token Expiration Status:', isExpired ? 'Expired' : 'Valid');
-        
+
+        console.log(
+          "Token Expiration Status:",
+          isExpired ? "Expired" : "Valid"
+        );
+
         if (isExpired) {
-          console.log('Token has expired');
+          console.log("Token has expired");
           // Optionally remove expired token
-          Cookies.remove('token');
+          Cookies.remove("token");
           return null;
         }
       }
 
       return decodedToken;
-
     } catch (error) {
-      console.error('Error handling JWT token:', error);
+      console.error("Error handling JWT token:", error);
       return null;
     }
   };
@@ -151,20 +167,20 @@ const DevMorphixWebsite = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
+
         const tokenInfo = handleJWTToken();
         if (tokenInfo) {
-          console.log('User authenticated:', tokenInfo);
+          console.log("User authenticated:", tokenInfo);
         }
 
         const response = await fetchBusinessesByslug(params.id as string);
         if (response.message === "Business fetched successfully") {
           setBusinessData(response.data);
           console.log("User Name:", response.data.user.name);
-          
+
           if (tokenInfo?.name === response.data.user.name) {
             setIsOwner(true);
-            console.log('User is owner');
+            console.log("User is owner");
           } else {
             console.log("User not authenticated");
           }
@@ -232,9 +248,11 @@ const DevMorphixWebsite = () => {
   const handleWhatsApp = () => {
     if (businessData?.user.phone) {
       // Remove any non-numeric characters from phone number
-      const phoneNumber = businessData.user.phone.replace(/\D/g, '');
+      const phoneNumber = businessData.user.phone.replace(/\D/g, "");
       // Format phone number with country code if needed
-      const formattedPhone = phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`;
+      const formattedPhone = phoneNumber.startsWith("91")
+        ? phoneNumber
+        : `91${phoneNumber}`;
       const whatsappUrl = `https://wa.me/${formattedPhone}`;
       window.open(whatsappUrl, "_blank");
     } else {
@@ -272,7 +290,7 @@ const DevMorphixWebsite = () => {
     { label: "QR", href: "#qr" },
   ];
 
-  const socialIcons :any = {
+  const socialIcons: any = {
     instagram: "/icon/instagram.svg",
     facebook: "/icon/facebook.svg",
     linkedin: "/icon/linkedin.svg",
@@ -286,54 +304,51 @@ const DevMorphixWebsite = () => {
     github: "/icon/github.svg",
     medium: "/icon/medium.svg",
     website: "/icon/globe.svg",
-  
   };
-  
 
   function formatOperatingHours(hours: { [key: string]: string }) {
     const to12Hour = (time24: string) => {
-      if (!time24 || time24.toLowerCase() === 'closed') return 'Closed';
-      const [hours, minutes] = time24.split(':');
+      if (!time24 || time24.toLowerCase() === "closed") return "Closed";
+      const [hours, minutes] = time24.split(":");
       let hour = parseInt(hours);
-      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const ampm = hour >= 12 ? "PM" : "AM";
       hour = hour % 12;
       hour = hour ? hour : 12;
       return `${hour}:${minutes} ${ampm}`;
     };
-  
+
     const formatTimeRange = (timeRange: string) => {
-      if (timeRange === 'Closed') return 'Closed';
-      const [start, end] = timeRange.split('-');
+      if (timeRange === "Closed") return "Closed";
+      const [start, end] = timeRange.split("-");
       return `${to12Hour(start.trim())} - ${to12Hour(end.trim())}`;
     };
-  
+
     // Map for day name conversion
     const DAY_NAMES: { [key: string]: string } = {
-      'mon': 'Monday',
-      'tue': 'Tuesday',
-      'web': 'Wednesday',
-      'thu': 'Thursday',
-      'fri': 'Friday',
-      'sat': 'Saturday',
-      'sun': 'Sunday'
+      mon: "Monday",
+      tue: "Tuesday",
+      web: "Wednesday",
+      thu: "Thursday",
+      fri: "Friday",
+      sat: "Saturday",
+      sun: "Sunday",
     };
-  
+
     // Create a map to store days in order
-    const orderedDays = ['mon', 'tue', 'web', 'thu', 'fri', 'sat', 'sun'];
+    const orderedDays = ["mon", "tue", "web", "thu", "fri", "sat", "sun"];
     const uniqueDays = new Map();
-  
+
     // Process days in order
-    orderedDays.slice(0, 7).forEach(day => {
+    orderedDays.slice(0, 7).forEach((day) => {
       if (hours[day]) {
         uniqueDays.set(DAY_NAMES[day], formatTimeRange(hours[day]));
       }
     });
-  
-    return Array.from(uniqueDays)
-      .map(([day, hours]) => ({
-        day,
-        hours
-      }));
+
+    return Array.from(uniqueDays).map(([day, hours]) => ({
+      day,
+      hours,
+    }));
   }
 
   return (
@@ -416,6 +431,16 @@ const DevMorphixWebsite = () => {
               />
             </div>
 
+            {isOwner && (
+              <button
+                onClick={handleEditClick}
+                className="absolute top-24 right-4 p-2 bg-gray-100 rounded-full transition-colors"
+                title="Edit Business Profile"
+              >
+                <Pencil className="w-4 h-4 text-gray-600" />
+              </button>
+            )}
+
             <div className="relative z-0 w-60 md:w-80 h-60 md:h-80 border border-white border-8 bg-black rounded-full overflow-hidden border-8 border-white rounded-full flex items-center justify-center mb-8 mt-20">
               <img
                 src={
@@ -424,7 +449,6 @@ const DevMorphixWebsite = () => {
                     : "/444.png"
                 }
                 alt="Logo"
-                
                 className="w-full h-full object-cover"
               />
             </div>
@@ -433,15 +457,6 @@ const DevMorphixWebsite = () => {
               <h2 className="sm:text-6xl text-4xl font-bold mb-4">
                 {businessData?.profile.name}
               </h2>
-              {isOwner && (
-                <button
-                  onClick={handleEditClick}
-                  className="ml-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
-                  title="Edit Business Profile"
-                >
-                  <Pencil className="w-6 h-6 text-gray-600" />
-                </button>
-              )}
             </div>
 
             <p className="sm:text-xl text-sm font-medium mb-8">
@@ -492,20 +507,16 @@ const DevMorphixWebsite = () => {
             </div>
           </section>
 
-          <section>
-                  
-
-          </section>
+          <section></section>
 
           {businessData?.media && businessData.media.length > 0 && (
             <section className="mt-7">
               <ImageGrid
-                  media={businessData.media}
+                media={businessData.media}
                 className="bg-white shadow-lg rounded-lg overflow-hidden border my-2 w-full rounded-3xl"
               />
             </section>
           )}
-
 
           <section
             className="border my-7  rounded-3xl "
@@ -556,7 +567,7 @@ const DevMorphixWebsite = () => {
               <div className="md:w-1/2">
                 <div className="bg-white rounded-lg p-6 h-full">
                   <div className="h-[500px] rounded-lg overflow-hidden">
-                      {businessData?.profile.name.toLowerCase() === 'emilia' ? (
+                    {businessData?.profile.name.toLowerCase() === "emilia" ? (
                       <>
                         <iframe
                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3934.8730957553427!2d76.56412737495825!3d9.463395593246565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b062f23a403b63b%3A0xfed9fd50695f7df8!2sEMILIA%20BEAUTY%20HUB%20CHANGANACHERRY!5e0!3m2!1sen!2sin!4v1702359671799!5m2!1sen!2sin"
@@ -568,7 +579,7 @@ const DevMorphixWebsite = () => {
                           referrerPolicy="no-referrer-when-downgrade"
                         ></iframe>
                         <div className="mt-2">
-                          <a 
+                          <a
                             href="https://maps.app.goo.gl/VTsPuqgduDUwk2du8"
                             target="_blank"
                             rel="noopener noreferrer"
@@ -602,41 +613,57 @@ const DevMorphixWebsite = () => {
                       {businessData?.profile.name}
                     </h3>
                     <div className="space-y-4">
-                      <div>
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
                         <span className="font-light text-md text-black">
-                          Email: <span>{businessData?.profile.email}</span>
+                          <span>{businessData?.profile.email}</span>
                         </span>
                       </div>
-                      <div>
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
                         <span className="font-light text-md text-black">
-                          Phone:{" "}
                           <span>
                             {businessData?.user.phone || "Not available"}
                           </span>
                         </span>
                       </div>
-                      <div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
                         <span className="font-light text-md text-black">
-                          Address:{" "}
+                          {" "}
                           <span>
                             {`${businessData?.profile.address}, ${businessData?.profile.city}, ${businessData?.profile.state}, ${businessData?.profile.country}`}
                           </span>
                         </span>
                       </div>
-                      
+
                       {/* Operating Hours */}
                       <div className="mt-6">
-                        <h4 className="text-lg font-medium mb-3">Operating Hours</h4>
+                        <h4 className="text-lg font-medium mb-3">
+                          Operating Hours
+                        </h4>
                         {businessData?.profile.operating_hours && (
                           <div className="space-y-2">
-                            {formatOperatingHours(businessData.profile.operating_hours).map(({ day, hours }) => {
-                              const isStoreClosed = !hours || hours.toLowerCase() === 'closed';
-                              
+                            {formatOperatingHours(
+                              businessData.profile.operating_hours
+                            ).map(({ day, hours }) => {
+                              const isStoreClosed =
+                                !hours || hours.toLowerCase() === "closed";
+
                               return (
-                                <div key={day} className="flex justify-between items-center border-b py-1">
-                                  <span className="capitalize font-medium">{day}</span>
-                                  <span className={isStoreClosed ? "text-red-500" : ""}>
-                                    {isStoreClosed ? 'Closed' : hours}
+                                <div
+                                  key={day}
+                                  className="flex justify-between items-center border-b py-1"
+                                >
+                                  <span className="capitalize font-medium">
+                                    {day}
+                                  </span>
+                                  <span
+                                    className={
+                                      isStoreClosed ? "text-red-500" : ""
+                                    }
+                                  >
+                                    {isStoreClosed ? "Closed" : hours}
                                   </span>
                                 </div>
                               );
@@ -644,7 +671,6 @@ const DevMorphixWebsite = () => {
                           </div>
                         )}
                       </div>
-
                     </div>
                   </div>
                 </div>
@@ -662,7 +688,7 @@ const DevMorphixWebsite = () => {
               <div className="hidden md:block flex flex-col items-center justify-center">
                 {/* <h2 className="text-xl font-medium mb-2">Contact us</h2> */}
                 <p className="text-4xl font-mediu mb-2">
-                  {businessData?.user.phone || "Not available"}
+                  +91 {businessData?.user.phone || "Not available"}
                 </p>
                 <div className="flex justify-center pb-11">
                   <svg
@@ -692,33 +718,36 @@ const DevMorphixWebsite = () => {
                   Our Social Media Connects
                 </h2>
                 <div className="flex justify-center gap-4">
-                   {Object.entries(businessData?.profile.socials || {}).map(
-            ([platform, url]) => {
-              if (url) {
-                const iconSrc = socialIcons[platform.toLowerCase()];
-                return (
-                  <a
-                    key={platform}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-600 hover:text-gray-800"
-                  >
-                    {iconSrc ? (
-                      <img src={iconSrc} alt={platform} className="w-6 h-6" />
-                    ) : (
-                      platform
-                    )}
-                  </a>
-                );
-              }
-              return null;
-            }
-          )}
+                  {Object.entries(businessData?.profile.socials || {}).map(
+                    ([platform, url]) => {
+                      if (url) {
+                        const iconSrc = socialIcons[platform.toLowerCase()];
+                        return (
+                          <a
+                            key={platform}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-600 hover:text-gray-800"
+                          >
+                            {iconSrc ? (
+                              <img
+                                src={iconSrc}
+                                alt={platform}
+                                className="w-6 h-6"
+                              />
+                            ) : (
+                              platform
+                            )}
+                          </a>
+                        );
+                      }
+                      return null;
+                    }
+                  )}
                 </div>
               </div>
             </section>
-
           </section>
 
           {/* <section className="bg-white shadow-lg rounded-lg p-6 mb-8">

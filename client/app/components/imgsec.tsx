@@ -146,9 +146,9 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
   const getBentoSpan = (imageSize?: 'small' | 'medium' | 'large') => {
     switch(imageSize) {
       case 'large':
-        return 'md:col-span-2 md:row-span-2';
+        return 'md:col-span-1 md:row-span-1';//'md:col-span-2 md:row-span-2';
       case 'medium':
-        return 'md:col-span-2 md:row-span-1';
+        return 'md:col-span-1 md:row-span-1';//'md:col-span-2 md:row-span-1'; 
       default:
         return 'md:col-span-1 md:row-span-1';
     }
@@ -171,7 +171,7 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
         <div className="h-[calc(600px-64px)] overflow-y-auto px-6 py-4 
           [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[minmax(160px,auto)]">
-            {mediaImages.map((image, index) => {
+            {mediaImages.map((image:any, index) => {
               const bentoSpan = getBentoSpan(image.size);
               
               return (

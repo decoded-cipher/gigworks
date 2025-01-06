@@ -1,83 +1,97 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import type { FormData } from '../../signup/page'
-import { fetchLicenseData,GetURL } from '../../api/index'
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import type { FormData } from "../../signup/page";
+import { fetchLicenseData, GetURL } from "../../api/index";
+import Image from "next/image";
+import { X, Upload } from "lucide-react";
+import axios from "axios";
 
 interface LicenseType {
   id: string;
   name: string;
   description?: string;
 }
+interface PreviewFile {
+  url: string;
+  file: File;
+}
 
 interface BusinessOperationsProps {
-  formData: FormData
-  updateFormData: (data: Partial<FormData>) => void
-  onNext: () => Promise<void> // Updated to handle async
-  onPrevious: () => void
+  formData: FormData;
+  updateFormData: (data: Partial<FormData>) => void;
+  onNext: () => Promise<void>; // Updated to handle async
+  onPrevious: () => void;
 }
 
 export default function BusinessOperations({
   formData,
   updateFormData,
   onNext,
-  onPrevious
+  onPrevious,
 }: BusinessOperationsProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [licenseTypes, setLicenseTypes] = useState<LicenseType[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isUploading, setIsUploading] = useState(false) // Added isUploading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [licenseTypes, setLicenseTypes] = useState<LicenseType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false); // Added isUploading state
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [previews, setPreviews] = useState<(string | null)[]>([null]);
 
   useEffect(() => {
     const fetchLicenses = async () => {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
       try {
-        const response = await fetchLicenseData()
+        const response = await fetchLicenseData();
         if (response.data && Array.isArray(response.data)) {
-          setLicenseTypes(response.data)
+          setLicenseTypes(response.data);
         } else {
-          setError('Invalid license data format')
+          setError("Invalid license data format");
         }
       } catch (error) {
-        console.error('Error fetching license types:', error)
-        setError('Failed to fetch license types')
+        console.error("Error fetching license types:", error);
+        setError("Failed to fetch license types");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-    fetchLicenses()
-  }, [])
-
+    };
+    fetchLicenses();
+  }, []);
 
   const handleInputChange = async (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const target = e.target as HTMLInputElement;
     const { name, value, type } = target;
-    
-    if (type === 'file' && target.files?.[0]) {
+
+    if (type === "file" && target.files?.[0]) {
       const file = target.files[0];
       const index = parseInt(target.dataset.index || "0");
-      
+
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      const newPreviews = [...previews];
+      newPreviews[index] = previewUrl;
+      setPreviews(newPreviews);
+
       try {
         setIsUploading(true);
-        
-        // Use the literal type 'license' without type assertion
+
         const response = await GetURL({
           type: file.type,
-          category: 'license'
+          category: "license",
         });
 
-        // Rest of upload handling
-        const uploadResponse = await axios.put(response.data.presignedUrl, file, {
-          headers: {
-            'Content-Type': file.type,
+        const uploadResponse = await axios.put(
+          response.data.presignedUrl,
+          file,
+          {
+            headers: {
+              "Content-Type": file.type,
+            },
           }
-        });
+        );
 
         if (uploadResponse.status !== 200) {
           throw new Error(`HTTP error! status: ${uploadResponse.status}`);
@@ -86,73 +100,108 @@ export default function BusinessOperations({
         const newLicenses = [...formData.otherLicenses];
         newLicenses[index] = {
           ...newLicenses[index],
-          certification: response.data.assetPath
+          certification: response.data.assetPath,
         };
         updateFormData({ otherLicenses: newLicenses });
-
       } catch (error) {
-        console.error('Error uploading license:', error);
-        alert('Error uploading file. Please try again.');
+        console.error("Error uploading license:", error);
+        // Remove preview on error
+        const newPreviews = [...previews];
+        newPreviews[index] = null;
+        setPreviews(newPreviews);
+        alert("Error uploading file. Please try again.");
       } finally {
         setIsUploading(false);
       }
       return;
     }
-
-    const checked = type === 'checkbox' ? target.checked : undefined
-    const index = parseInt(target.dataset.index || "0")
-    const field = target.dataset.field
+    const checked = type === "checkbox" ? target.checked : undefined;
+    const index = parseInt(target.dataset.index || "0");
+    const field = target.dataset.field;
 
     if (name === "otherLicenses") {
-      const newLicenses = [...formData.otherLicenses]
+      const newLicenses = [...formData.otherLicenses];
       newLicenses[index] = {
         ...newLicenses[index],
-        [field as string]: value
-      }
-      updateFormData({ otherLicenses: newLicenses })
+        [field as string]: value,
+      };
+      updateFormData({ otherLicenses: newLicenses });
     } else if (type === "checkbox" && checked !== undefined) {
-      const [group, key] = name.split(".")
+      const [group, key] = name.split(".");
       updateFormData({
         [group]: {
-          ...formData[group as keyof Pick<FormData, "paymentMethods" | "additionalServices">],
-          [key]: checked
-        }
-      })
+          ...formData[
+            group as keyof Pick<
+              FormData,
+              "paymentMethods" | "additionalServices"
+            >
+          ],
+          [key]: checked,
+        },
+      });
     } else {
-      updateFormData({ [name]: value })
+      updateFormData({ [name]: value });
     }
-  }
+  };
 
+  const removeLicense = (index: number) => {
+    // Clean up preview URL
+    if (previews[index]) {
+      URL.revokeObjectURL(previews[index]!);
+    }
+    const newPreviews = [...previews];
+    newPreviews.splice(index, 1);
+    setPreviews(newPreviews);
+
+    updateFormData({
+      otherLicenses: formData.otherLicenses.filter((_, i) => i !== index),
+    });
+  };
 
   const addLicense = () => {
+    setPreviews([...previews, null]);
     updateFormData({
       otherLicenses: [
         ...formData.otherLicenses,
-        { type: "", registrationNumber: "", certification: "" }
-      ]
-    })
-  }
+        { type: "", registrationNumber: "", certification: "" },
+      ],
+    });
+  };
 
-  const removeLicense = (index: number) => {
-    updateFormData({
-      otherLicenses: formData.otherLicenses.filter((_, i) => i !== index)
-    })
-  }
+  const removeFile = (index: number) => {
+    // Clean up preview URL
+    if (previews[index]) {
+      URL.revokeObjectURL(previews[index]!);
+    }
+    const newPreviews = [...previews];
+    newPreviews[index] = null;
+    setPreviews(newPreviews);
+
+    // Clear the certification in formData
+    const newLicenses = [...formData.otherLicenses];
+    newLicenses[index] = {
+      ...newLicenses[index],
+      certification: "",
+    };
+    updateFormData({ otherLicenses: newLicenses });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
     setSubmitError(null);
-    
+
     try {
-      await onNext()
+      await onNext();
     } catch (error: any) {
-      console.error('Submission error:', error);
-      setSubmitError(error.message || 'Failed to submit form. Please try again.');
+      console.error("Submission error:", error);
+      setSubmitError(
+        error.message || "Failed to submit form. Please try again."
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div>
@@ -160,13 +209,18 @@ export default function BusinessOperations({
         <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
           <strong className="font-bold">Error: </strong>
           <span className="block sm:inline">{submitError}</span>
-          <button 
+          <button
             onClick={() => setSubmitError(null)}
             className="absolute top-0 bottom-0 right-0 px-4 py-3"
           >
             <span className="sr-only">Dismiss</span>
-            <svg className="h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-              <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+            <svg
+              className="h-6 w-6 text-red-500"
+              role="button"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
             </svg>
           </button>
         </div>
@@ -193,7 +247,6 @@ export default function BusinessOperations({
                 onChange={handleInputChange}
                 placeholder="22AAA*********5"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030]"
-                
               />
             </div>
           </div>
@@ -222,13 +275,16 @@ export default function BusinessOperations({
                     value={license.type}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030]"
-                     
                   >
                     <option value="">Select License Type</option>
                     {isLoading && <option disabled>Loading...</option>}
                     {error && <option disabled>{error}</option>}
                     {licenseTypes.map((type) => (
-                      <option key={type.id} value={type.id} title={type.description}>
+                      <option
+                        key={type.id}
+                        value={type.id}
+                        title={type.description}
+                      >
                         {type.name}
                       </option>
                     ))}
@@ -248,7 +304,6 @@ export default function BusinessOperations({
                     onChange={handleInputChange}
                     placeholder="KL0520*******08"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030]"
-                    
                   />
                 </div>
 
@@ -256,25 +311,53 @@ export default function BusinessOperations({
                   <label className="block text-lg font-bold mb-2">
                     Upload Certificate
                   </label>
-                  <div className="relative border-2 bg-gray-200 rounded-lg hover:border-gray-500 transition h-20">
-                    <input
-                      type="file"
-                      name="otherLicenses"
-                      data-index={index}
-                      data-field="certification"
-                      onChange={handleInputChange}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                      disabled={isUploading} // Added disabled prop
-                      
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      {isUploading ? (
-                        <p className="text-sm text-gray-600">Uploading...</p>
-                      ) : (
-                        <p className="text-sm text-gray-600">click to upload</p>
-                      )}
-                    </div>
+                  <div className="relative border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-500 transition min-h-[120px] bg-gray-50">
+                    {!previews[index] ? (
+                      <>
+                        <input
+                          type="file"
+                          name="otherLicenses"
+                          data-index={index}
+                          data-field="certification"
+                          onChange={handleInputChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                          disabled={isUploading}
+                          accept="image/*,.pdf"
+                        />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <Upload className="w-6 h-6 text-gray-400" />
+                          {isUploading ? (
+                            <p className="mt-2 text-sm text-gray-600">
+                              Uploading...
+                            </p>
+                          ) : (
+                            <p className="mt-2 text-sm text-gray-600">
+                              Click to upload certificate
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="relative p-2">
+                        <div className="relative w-full h-[200px]">
+                          <Image
+                            src={previews[index]!}
+                            alt="License Certificate Preview"
+                            fill
+                            className="object-contain rounded-lg"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(index)}
+                          className="absolute top-4 right-4 p-1 bg-red-100 rounded-full hover:bg-red-200 transition"
+                        >
+                          <X className="w-4 h-4 text-red-600" />
+                        </button>
+                      </div>
+                    )}
                   </div>
+
                   {formData.otherLicenses.length > 1 && (
                     <button
                       type="button"
@@ -294,21 +377,23 @@ export default function BusinessOperations({
             Payment Methods Accepted
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {Object.entries(formData.paymentMethods).map(([method, checked]) => (
-              <div key={method} className="flex items-center">
-                <input
-                  type="checkbox"
-                  id={method}
-                  name={`paymentMethods.${method}`}
-                  checked={checked}
-                  onChange={handleInputChange}
-                  className="mr-2"
-                />
-                <label htmlFor={method} className="text-base capitalize">
-                  {method.replace(/([A-Z])/g, " $1")}
-                </label>
-              </div>
-            ))}
+            {Object.entries(formData.paymentMethods).map(
+              ([method, checked]) => (
+                <div key={method} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={method}
+                    name={`paymentMethods.${method}`}
+                    checked={checked}
+                    onChange={handleInputChange}
+                    className="mr-2"
+                  />
+                  <label htmlFor={method} className="text-base capitalize">
+                    {method.replace(/([A-Z])/g, " $1")}
+                  </label>
+                </div>
+              )
+            )}
           </div>
 
           {/* Additional Services */}
@@ -316,21 +401,23 @@ export default function BusinessOperations({
             Additional Services
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {Object.entries(formData.additionalServices).map(([service, checked]) => (
-              <div key={service} className="flex items-center">
-                <input
-                  type="checkbox"
-                  id={service}
-                  name={`additionalServices.${service}`}
-                  checked={checked}
-                  onChange={handleInputChange}
-                  className="mr-2"
-                />
-                <label htmlFor={service} className="text-base capitalize">
-                  {service.replace(/([A-Z])/g, " $1")}
-                </label>
-              </div>
-            ))}
+            {Object.entries(formData.additionalServices).map(
+              ([service, checked]) => (
+                <div key={service} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={service}
+                    name={`additionalServices.${service}`}
+                    checked={checked}
+                    onChange={handleInputChange}
+                    className="mr-2"
+                  />
+                  <label htmlFor={service} className="text-base capitalize">
+                    {service.replace(/([A-Z])/g, " $1")}
+                  </label>
+                </div>
+              )
+            )}
           </div>
 
           {/* Referrals */}
@@ -366,11 +453,10 @@ export default function BusinessOperations({
             disabled={isSubmitting}
             className="w-full md:w-40 bg-[#303030] text-white font-bold px-4 py-2 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
           >
-            {isSubmitting ? 'Creating...' : 'Submit'}
+            {isSubmitting ? "Creating..." : "Submit"}
           </button>
         </div>
       </form>
     </div>
-  )
+  );
 }
-
