@@ -14,16 +14,6 @@ export const addProfileLicense = async (profile_id: string, data: any): Promise<
 
             // SQL Query : SELECT COUNT(*) FROM license_type WHERE id = data.type_id
 
-            let licenseTypeCount = await db
-                .select()
-                .from(licenseType)
-                .where(sql`${licenseType.id} = ${data.type_id}`)
-                .get();
-
-            if (licenseTypeCount === 0) {
-                return reject('Invalid license type');
-            }
-
             if (data.some((item) => !item.type_id || !item.number || !item.url)) {
                 return reject('Missing some license data');
             }
