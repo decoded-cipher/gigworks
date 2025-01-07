@@ -132,6 +132,7 @@ export const getPartnerAnalytics = async (user: User, start: string, end: string
                 .leftJoin(profile, sql`profile.partner_id = partner.id`)
                 .where(sql`
                     profile.partner_id = ${partner.id} AND
+                    partner.user_id = ${user.id} AND
                     profile.created_at BETWEEN ${start} AND ${end}
                 `)
                 .groupBy(sql`strftime('%Y-%m', profile.created_at)`)
