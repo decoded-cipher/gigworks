@@ -108,7 +108,7 @@ const DevMorphixWebsite = () => {
     return (
       <div className="w-full p-4">
         <div className="flex flex-col gap-4 mb-6">
-          <div className="flex justify-between items-center">
+          <div className="flex md:flex-row flex-col justify-between items-center">
             <span>Total Referrals: {analyticsData.meta.total}</span>
             <div className="flex gap-4 items-center">
               <div className="flex flex-col">

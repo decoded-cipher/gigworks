@@ -1,10 +1,13 @@
+"use client";
+
 import React, { useState } from 'react';
 import { Upload, X } from 'lucide-react';
 import { GetURL, uploadToPresignedUrl, createBusinessMedia } from '@/app/api';
+import { toast } from 'react-hot-toast';
 
 interface ImageUploadButtonProps {
-  businessId: string;  // This now expects profile.id instead of _id
-  onUploadComplete: () => void;
+  businessId: string;
+  onUploadComplete: (assetpath?: string) => void;
   category: 'media' | 'avatar' | 'banner';
   label?: string;
   showPreview?: boolean;
@@ -13,13 +16,13 @@ interface ImageUploadButtonProps {
 }
 
 const ImageUploadButton = ({ 
-  businessId,  // This is now profile.id
+  businessId,
   onUploadComplete, 
   category,
   label = "Select Images",
   showPreview = false,
   currentImage,
-  multiple = true
+  multiple = false
 }: ImageUploadButtonProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -27,41 +30,59 @@ const ImageUploadButton = ({
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setSelectedFiles(Array.from(event.target.files));
+      const files = Array.from(event.target.files);
+      setSelectedFiles(files);
     }
   };
 
   const handleUpload = async () => {
+    if (selectedFiles.length === 0) {
+      toast.error('Please select a file to upload');
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
     try {
-      setIsUploading(true);
-      const totalFiles = selectedFiles.length;
-      let completedFiles = 0;
-      
       for (const file of selectedFiles) {
+        console.log(`Starting upload for ${file.name}`);
+        
         // Get presigned URL
         const urlResponse = await GetURL({
           type: file.type,
           category: category
         });
+        console.log('URL Response:', urlResponse);
+
+        if (!urlResponse || !urlResponse.presignedUrl || !urlResponse.assetpath) {
+          throw new Error('Invalid URL response from server');
+        }
 
         // Upload to storage
         await uploadToPresignedUrl(urlResponse.presignedUrl, file);
+        console.log(`File ${file.name} uploaded successfully to storage`);
 
-        // Create media record using profile.id
-        await createBusinessMedia(businessId, {
-          url: urlResponse.assetpath,
-          type: file.type
-        });
+        if (category === 'avatar' || category === 'banner') {
+          console.log(`Completing ${category} upload with assetpath:`, urlResponse.assetpath);
+          onUploadComplete(urlResponse.assetpath);
+        } else {
+          // For media, create media record
+          await createBusinessMedia(businessId, {
+            url: urlResponse.assetpath,
+            type: file.type,
+          });
+          onUploadComplete();
+        }
 
-        completedFiles++;
-        setUploadProgress((completedFiles / totalFiles) * 100);
+        setUploadProgress(100);
+        toast.success(`${file.name} uploaded successfully`);
       }
 
       setSelectedFiles([]);
-      setUploadProgress(0);
-      onUploadComplete();
     } catch (error) {
-      console.error('Error uploading images:', error);
+      console.error('Error in upload process:', error);
+      toast.error('Upload failed. Please try again.');
     } finally {
       setIsUploading(false);
     }
@@ -123,7 +144,6 @@ const ImageUploadButton = ({
             ))}
           </div>
           
-          {/* Upload button and progress */}
           <div className="mt-4 space-y-2">
             <button
               onClick={handleUpload}
@@ -149,3 +169,4 @@ const ImageUploadButton = ({
 };
 
 export default ImageUploadButton;
+
