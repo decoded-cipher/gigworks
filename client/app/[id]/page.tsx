@@ -715,7 +715,7 @@ const DevMorphixWebsite = () => {
               </div>
               {businessData?.profile.socials && Object.values(businessData.profile.socials).some(url => url) && (
                 <div>
-                  <h2 className="text-xl font-medium mb-4">
+                  <h2 className="text-xl font-medium my-4">
                     Our Social Media Connects
                   </h2>
                   <div className="flex justify-center gap-4">
