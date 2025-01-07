@@ -1,5 +1,6 @@
 "use client";
-export const runtime = "edge";
+
+
 import React, { useState, useEffect } from "react";
 import {
   fetchBusinessesByslug,
@@ -22,7 +23,7 @@ import ImageGrid from "@/app/components/imgsec";
 import ImageUploadButton from "@/app/components/ImageUploadButton";
 import MediaGallery from "@/app/components/MediaGallery";
 import OperatingHours from "@/app/components/OperatingHours";
-// import { deleteBusinessMedia } from "@/app/api";
+import { deletebusinessMedia } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
 import { s } from "framer-motion/client";
 
@@ -36,7 +37,7 @@ interface License {
 
 // Add MediaItem interface
 interface MediaItem {
-  _id: string;
+  id: string;
   url: string;
   type: string;
 }
@@ -86,6 +87,8 @@ interface BusinessData {
   licenses: License[]; // Now License is defined
   tags: string[];
 }
+
+export const runtime = "edge";
 
 // Add this social media config object near the top of your component
 
@@ -166,6 +169,15 @@ export default function EditBusinessPage() {
         updateData[field] = value;
       }
 
+      // Ensure updateData is not empty before making the API call
+      if (Object.keys(updateData).length === 0) {
+        console.warn("No values to update");
+        return;
+      }
+
+      // Log the updateData object
+      console.log("Updating business with data:", updateData);
+
       await updateBusiness(businessData.profile.id, updateData);
       toast.success(`${field} updated successfully`);
 
@@ -193,6 +205,13 @@ export default function EditBusinessPage() {
     }
   };
 
+  const handleImageUpload = (assetpath: string, field: 'avatar' | 'banner') => {
+    console.log('Image uploaded:', assetpath);
+    // console.log('Field:', field);
+    handleFieldSave(field, assetpath);
+
+  };
+
   // Replace handleChange with immediate save
   const handleChange = async (field: string, value: string) => {
     await handleFieldSave(field, value);
@@ -208,13 +227,16 @@ export default function EditBusinessPage() {
   };
 
   const handleMediaDelete = async (mediaId: string) => {
-    // try {
-    //   await deleteBusinessMedia(mediaId);
-    //   // Refresh the business data to update the media gallery
-    //   fetchData();
-    // } catch (error) {
-    //   console.error('Error deleting media:', error);
-    // }
+    try {
+      if (businessData?.profile.id) {
+        await deletebusinessMedia(businessData.profile.id, mediaId);
+      }
+      fetchData();
+      toast.success('Media item deleted successfully');
+    } catch (error) {
+      console.error('Error deleting media:', error);
+      toast.error('Failed to delete media item');
+    }
   };
 
   const handleOperatingHoursUpdate = async (newHours: {
@@ -297,6 +319,29 @@ export default function EditBusinessPage() {
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Profile Images</h2>
             <div className="grid md:grid-cols-2 gap-6">
+               {/* Profile Avatar */}
+              <div>
+                <h3 className="text-sm font-medium mb-2">Profile Image</h3>
+                <ImageUploadButton
+                
+                  businessId={businessData.profile.id} // Changed from _id to profile.id
+                  category="avatar"
+                  label="Upload Avatar"
+                  showPreview={true}
+                  currentImage={
+                    businessData.profile.avatar
+                      ? `${ASSET_BASE_URL}/${businessData.profile.avatar}`
+                      : undefined
+                  }
+                  multiple={false}
+                  onUploadComplete={(assetpath) => {
+                    if (assetpath) {
+                      handleImageUpload(assetpath, 'avatar');
+                      businessData.profile.avatar = assetpath;
+                    }
+                  }}
+                />
+              </div>
               {/* Banner Image */}
               <div>
                 <h3 className="text-sm font-medium mb-2">Banner Image</h3>
@@ -311,27 +356,16 @@ export default function EditBusinessPage() {
                       : undefined
                   }
                   multiple={false}
-                  onUploadComplete={fetchData}
+                  onUploadComplete={(assetpath) => {
+                    if (assetpath) {
+                      handleImageUpload(assetpath, 'avatar');
+                      businessData.profile.avatar = assetpath;
+                    }
+                  }}
                 />
               </div>
 
-              {/* Profile Avatar */}
-              <div>
-                <h3 className="text-sm font-medium mb-2">Profile Image</h3>
-                <ImageUploadButton
-                  businessId={businessData.profile.id} // Changed from _id to profile.id
-                  category="avatar"
-                  label="Upload Avatar"
-                  showPreview={true}
-                  currentImage={
-                    businessData.profile.avatar
-                      ? `${ASSET_BASE_URL}/${businessData.profile.avatar}`
-                      : undefined
-                  }
-                  multiple={false}
-                  onUploadComplete={fetchData}
-                />
-              </div>
+             
             </div>
           </section>
 

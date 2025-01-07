@@ -452,6 +452,10 @@ export const createBusinessMedia = async (businessId: string, data: { url: strin
       .find(row => row.startsWith('token='))
       ?.split('=')[1];
 
+        console.log(typeof data);
+        console.log(data);
+        
+        
     const response = await axios.post(
       `${BASE_URL}/api/v1/business/${businessId}/media`,
       data,
@@ -468,16 +472,15 @@ export const createBusinessMedia = async (businessId: string, data: { url: strin
   }
 };
 
-export const updateBusiness = async (profileId: string, data: Partial<BusinessProfile>) => {
+export const deletebusinessMedia = async (businessId: string, mediaId: string) => {
   try {
     const token = document.cookie
       .split('; ')
       .find(row => row.startsWith('token='))
       ?.split('=')[1];
 
-    const response = await axios.patch(
-      `${BASE_URL}/api/v1/business/${profileId}`,
-      data,  // Remove the { data } wrapper
+    const response = await axios.delete(
+      `${BASE_URL}/api/v1/business/${businessId}/media/${mediaId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -486,7 +489,42 @@ export const updateBusiness = async (profileId: string, data: Partial<BusinessPr
     );
     return response.data;
   } catch (error) {
-    console.error('Error updating business:', error);
+    console.error('Error deleting media:', error);
+    throw error;
+  }
+}
+
+
+
+
+export const updateBusiness = async (businessId: string, updateData: Record<string, any>) => {
+  try {
+    console.log("Sending update request for business:", businessId);
+    console.log("Update data:", updateData);
+
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    if (!token) {
+      throw new Error('No token provided');
+    }
+
+    const response = await axios.patch(
+      `https://gigworks-server.devmorphix.workers.dev/api/v1/business/${businessId}`,
+      updateData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    console.log("Update response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating business:", error);
     throw error;
   }
 };
