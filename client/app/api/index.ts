@@ -512,7 +512,7 @@ export const updateBusiness = async (businessId: string, updateData: Record<stri
     }
 
     const response = await axios.patch(
-      `${BASE_URL}${businessId}`,
+      `${BASE_URL}/${businessId}`,
       updateData,
       {
         headers: {
