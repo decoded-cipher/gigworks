@@ -148,64 +148,74 @@ export default function OperatingHours({ hours, onUpdate }: OperatingHoursProps)
     return (
         <div className="space-y-4">
             {DAYS.map((day) => {
-                const times = parseHours(operatingHours[day] || 'Closed');
-                const isClosed = operatingHours[day] === 'Closed';
+          const times = parseHours(operatingHours[day] || 'Closed')
+          const isClosed = operatingHours[day] === 'Closed'
 
-                return (
-                    <div key={day} className="flex items-center gap-4">
-                        <div className="w-32">
-                            <span className="font-medium">{DAY_NAMES[day]}</span>
-                        </div>
+          return (
+            <div key={day} className="group">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pb-6 border-b border-gray-200">
+                <div className="min-w-[120px]">
+                  <span className="font-medium text-gray-900">{DAY_NAMES[day]}</span>
+                </div>
 
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
-                                checked={isClosed}
-                                onChange={(e) => toggleClosed(day, e.target.checked)}
-                                className="h-4 w-4 cursor-pointer"
-                                id={`closed-${day}`}
-                            />
-                            <label htmlFor={`closed-${day}`} className="text-sm cursor-pointer">
-                                Closed
-                            </label>
-                        </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 min-w-[100px]">
+                    <input
+                      type="checkbox"
+                      checked={isClosed}
+                      onChange={(e) => toggleClosed(day, e.target.checked)}
+                      className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                      id={`closed-${day}`}
+                    />
+                    <label 
+                      htmlFor={`closed-${day}`} 
+                      className="text-sm font-medium text-gray-700 cursor-pointer select-none"
+                    >
+                      Closed
+                    </label>
+                  </div>
 
-                        {!isClosed && (
-                            <>
-                                <select
-                                    className="p-2 border rounded"
-                                    value={times.open}
-                                    onChange={(e) => handleTimeChange(day, 'open', e.target.value)}
-                                >
-                                    {TIME_OPTIONS.map(option => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
+                  {!isClosed && (
+                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
+                      <select
+                        value={times.open}
+                        onChange={(e) => handleTimeChange(day, 'open', e.target.value)}
+                        className="block w-32 rounded-md border-gray-300 shadow-sm 
+                          focus:border-blue-500 focus:ring-blue-500 text-sm bg-white"
+                      >
+                        {TIME_OPTIONS.map(option => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
 
-                                <span>to</span>
+                      <span className="text-gray-500 px-1">to</span>
 
-                                <select
-                                    className="p-2 border rounded"
-                                    value={times.close}
-                                    onChange={(e) => handleTimeChange(day, 'close', e.target.value)}
-                                    disabled={!times.open}
-                                >
-                                    {TIME_OPTIONS.filter(option => (
-                                        !option.value ||
-                                        (times.open && to24Hour(option.value) > to24Hour(times.open))
-                                    )).map(option => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </>
-                        )}
+                      <select
+                        value={times.close}
+                        onChange={(e) => handleTimeChange(day, 'close', e.target.value)}
+                        disabled={!times.open}
+                        className="block w-32 rounded-md border-gray-300 shadow-sm 
+                          focus:border-blue-500 focus:ring-blue-500 text-sm bg-white
+                          disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                      >
+                        {TIME_OPTIONS.filter(option => (
+                          !option.value ||
+                          (times.open && to24Hour(option.value) > to24Hour(times.open))
+                        )).map(option => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                );
-            })}
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })}
         </div>
     );
 }
