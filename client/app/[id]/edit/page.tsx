@@ -1,6 +1,5 @@
 "use client";
 
-
 import React, { useState, useEffect } from "react";
 import {
   fetchBusinessesByslug,
@@ -205,11 +204,10 @@ export default function EditBusinessPage() {
     }
   };
 
-  const handleImageUpload = (assetpath: string, field: 'avatar' | 'banner') => {
-    console.log('Image uploaded:', assetpath);
+  const handleImageUpload = (assetpath: string, field: "avatar" | "banner") => {
+    console.log("Image uploaded:", assetpath);
     // console.log('Field:', field);
     handleFieldSave(field, assetpath);
-
   };
 
   // Replace handleChange with immediate save
@@ -232,10 +230,10 @@ export default function EditBusinessPage() {
         await deletebusinessMedia(businessData.profile.id, mediaId);
       }
       fetchData();
-      toast.success('Media item deleted successfully');
+      toast.success("Media item deleted successfully");
     } catch (error) {
-      console.error('Error deleting media:', error);
-      toast.error('Failed to delete media item');
+      console.error("Error deleting media:", error);
+      toast.error("Failed to delete media item");
     }
   };
 
@@ -294,8 +292,10 @@ export default function EditBusinessPage() {
   return (
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold">Edit Business Profile</h1>
+        <div className="flex md:flex-row flex-col justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold md:pb-0 pb-2">
+            Edit Business Profile
+          </h1>
           <div className="flex gap-4">
             <button
               onClick={() => router.push(`/${params.id}`)}
@@ -319,11 +319,10 @@ export default function EditBusinessPage() {
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Profile Images</h2>
             <div className="grid md:grid-cols-2 gap-6">
-               {/* Profile Avatar */}
+              {/* Profile Avatar */}
               <div>
                 <h3 className="text-sm font-medium mb-2">Profile Image</h3>
                 <ImageUploadButton
-                
                   businessId={businessData.profile.id} // Changed from _id to profile.id
                   category="avatar"
                   label="Upload Avatar"
@@ -336,7 +335,7 @@ export default function EditBusinessPage() {
                   multiple={false}
                   onUploadComplete={(assetpath) => {
                     if (assetpath) {
-                      handleImageUpload(assetpath, 'avatar');
+                      handleImageUpload(assetpath, "avatar");
                       businessData.profile.avatar = assetpath;
                     }
                   }}
@@ -358,14 +357,12 @@ export default function EditBusinessPage() {
                   multiple={false}
                   onUploadComplete={(assetpath) => {
                     if (assetpath) {
-                      handleImageUpload(assetpath, 'avatar');
+                      handleImageUpload(assetpath, "avatar");
                       businessData.profile.avatar = assetpath;
                     }
                   }}
                 />
               </div>
-
-             
             </div>
           </section>
 
@@ -547,6 +544,44 @@ export default function EditBusinessPage() {
               onUpdate={() => fetchData()}
               onDelete={handleMediaDelete}
             />
+          </section>
+
+          <section className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-xl font-semibold mb-4">Business Operation</h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-medium mb-1">GSTIN</h3>
+                <p className="p-2 bg-gray-50 rounded-lg">
+                  {businessData.profile.gstin || "Not provided"}
+                </p>
+              </div>
+              {businessData.licenses.map((license, index) => (
+                <div key={index} className="space-y-2">
+                  <h3 className="text-sm font-medium mb-1">
+                    License {index + 1}
+                  </h3>
+                  <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+                    <p>
+                      <span className="font-medium">Name:</span> {license.name}
+                    </p>
+                    <p>
+                      <span className="font-medium">Number:</span>{" "}
+                      {license.number}
+                    </p>
+                    {license.url && (
+                      <div>
+                        <span className="font-medium">Certificate:</span>
+                        <img
+                          src={`${ASSET_BASE_URL}/${license.url}`}
+                          alt={`License certificate for ${license.name}`}
+                          className="mt-2 max-w-full h-auto rounded-lg border"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
         </div>
       </div>

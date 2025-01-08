@@ -8,7 +8,7 @@ import { toast } from 'react-hot-toast';
 interface ImageUploadButtonProps {
   businessId: string;
   onUploadComplete: (assetpath?: string) => void;
-  category: 'media' | 'avatar' | 'banner';
+  category: 'media' | 'avatar' | 'banner' |'identity';
   label?: string;
   showPreview?: boolean;
   currentImage?: string;
@@ -63,7 +63,7 @@ const ImageUploadButton = ({
         await uploadToPresignedUrl(urlResponse.presignedUrl, file);
         console.log(`File ${file.name} uploaded successfully to storage`);
 
-        if (category === 'avatar' || category === 'banner') {
+        if (category === 'avatar' || category === 'banner' || category === 'identity') {
           console.log(`Completing ${category} upload with assetpath:`, urlResponse.assetpath);
           onUploadComplete(urlResponse.assetpath);
         } else {

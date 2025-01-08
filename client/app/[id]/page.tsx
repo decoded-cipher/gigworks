@@ -102,6 +102,9 @@ export const runtime = "edge";
 
 const DevMorphixWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hoveredIcon, setHoveredIcon] = useState<{
+    platform: string;
+  } | null>(null);
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -623,14 +626,13 @@ const DevMorphixWebsite = () => {
                         <Phone className="h-4 w-4 text-muted-foreground" />
                         <span className="font-light text-md text-black">
                           <span>
-                            {businessData?.user.phone || "Not available"}
+                            +91 {businessData?.user.phone || "Not available"}
                           </span>
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex items-start gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground mt-1" />
                         <span className="font-light text-md text-black">
-                          {" "}
                           <span>
                             {`${businessData?.profile.address}, ${businessData?.profile.city}, ${businessData?.profile.state}, ${businessData?.profile.country}`}
                           </span>
@@ -713,42 +715,54 @@ const DevMorphixWebsite = () => {
                     "No description available"}
                 </p>
               </div>
-              {businessData?.profile.socials && Object.values(businessData.profile.socials).some(url => url) && (
-                <div>
-                  <h2 className="text-xl font-medium my-4">
-                    Our Social Media Connects
-                  </h2>
-                  <div className="flex justify-center gap-4">
+              {businessData?.profile.socials &&
+                Object.values(businessData.profile.socials).some(
+                  (url) => url
+                ) && (
+                  <div>
+                    <h2 className="text-xl font-medium my-4">
+                      Our Social Media Connects
+                    </h2>
+                    <div className="flex justify-center gap-4">
                     {Object.entries(businessData.profile.socials).map(
-                      ([platform, url]) => {
-                        if (url) {
-                          const iconSrc = socialIcons[platform.toLowerCase()];
-                          return (
-                            <a
-                              key={platform}
-                              href={url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-gray-600 hover:text-gray-800"
-                            >
-                              {iconSrc ? (
-                                <img
-                                  src={iconSrc}
-                                  alt={platform}
-                                  className="w-6 h-6"
-                                />
-                              ) : (
-                                platform
-                              )}
-                            </a>
-                          );
-                        }
-                        return null;
-                      }
+          ([platform, url]) => {
+            if (url) {
+              const iconSrc = socialIcons[platform.toLowerCase()];
+
+              return (
+                <div key={platform} className="relative">
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-600 hover:text-gray-800"
+                    onMouseEnter={() => setHoveredIcon({ platform })}
+                    onMouseLeave={() => setHoveredIcon(null)}
+                  >
+                    {iconSrc ? (
+                      <img
+                        src={iconSrc}
+                        alt={platform}
+                        className="w-6 h-6"
+                      />
+                    ) : (
+                      platform
                     )}
-                  </div>
+                  </a>
+                  {hoveredIcon?.platform === platform && (
+                    <div className="absolute left-1/2 -translate-x-1/2 -top-8 bg-gray-800 text-white px-3 py-1 rounded-md text-xs whitespace-nowrap">
+                      {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                    </div>
+                  )}
                 </div>
-              )}
+              );
+            }
+            return null;
+          }
+        )}
+                    </div>
+                  </div>
+                )}
             </section>
           </section>
 

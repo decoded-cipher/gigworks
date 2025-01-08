@@ -512,7 +512,7 @@ export const updateBusiness = async (businessId: string, updateData: Record<stri
     }
 
     const response = await axios.patch(
-      `https://gigworks-server.devmorphix.workers.dev/api/v1/business/${businessId}`,
+      `${BASE_URL}${businessId}`,
       updateData,
       {
         headers: {
