@@ -357,8 +357,8 @@ export default function EditBusinessPage() {
                   multiple={false}
                   onUploadComplete={(assetpath) => {
                     if (assetpath) {
-                      handleImageUpload(assetpath, "avatar");
-                      businessData.profile.avatar = assetpath;
+                      handleImageUpload(assetpath, "banner");
+                      businessData.profile.banner = assetpath;
                     }
                   }}
                 />
