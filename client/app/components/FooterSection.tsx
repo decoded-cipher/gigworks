@@ -9,7 +9,7 @@ export  function FooterSection() {
       <footer className="p-4 bg-black sm:p-6 dark:bg-gray-800 md:pt-24 pt-9">
         <div className="mx-auto max-w-screen-xl">
           <div className="md:grid md:grid-cols-3 md:gap-8">
-            <div className="mb-6 mr-6 md:mb-0 md:col-span-1 -mt-2">
+            <div className="mb-6  md:mb-0 md:col-span-1 -mt-2">
               <a
                 href="https://gigwork.co.in"
                 className="flex md:items-center justify-center"
@@ -220,7 +220,7 @@ export  function FooterSection() {
                   Contact US
                 </h2>
                 <ul className="text-white text-sm">
-                  <li className="mb-2 md:flex">
+                  <li className="mb-2 flex">
                     <svg
                       className="mb-2 mr-2"
                       xmlns="http://www.w3.org/2000/svg"
@@ -238,7 +238,7 @@ export  function FooterSection() {
                     +91 73061 04563
                     </a>
                   </li>
-                  <li className="mb-2 md:flex">
+                  <li className="mb-2 flex">
                     <svg
                       className="text-white mr-2 mb-2"
                       aria-hidden="true"
@@ -255,7 +255,7 @@ export  function FooterSection() {
                       mail@gigwork.co.in
                     </a>
                   </li>
-                  <li className="md:flex">
+                  <li className="flex">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="mr-2 mb-2"
@@ -270,7 +270,7 @@ export  function FooterSection() {
                       />
                     </svg>
                     <a href="#" className="hover:underline">
-                      Kurusumood ,  Chethipuzha P.O, Chanaganassery
+                      Kottayam, Kerala
                     </a>
                   </li>
                 </ul>
@@ -411,8 +411,8 @@ export  function FooterSection() {
           <div className="sm:flex sm:items-center sm:justify-center text-center">
             <span className="text-sm text-gray-500">
               © 2024{" "}
-              <a href="https://gigworks.co.in" className="hover:underline">
-                Gigworks
+              <a href="https://gigwork.co.in" className="hover:underline">
+                Gigwork
               </a>
               . All Rights Reserved.
             </span>

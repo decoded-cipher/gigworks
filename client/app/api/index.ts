@@ -58,7 +58,7 @@ export const fetchBusinessCount = async () => {
 
 interface GetURLParams {
   type: string;
-  category: 'identity' | 'avatar' | 'license' | 'banner'; // Define exact literal types
+  category: 'identity' | 'avatar' | 'license' | 'banner' | 'media'; // Added 'media' as valid category
 }
 
 // Update the response interface to match the expected structure
@@ -94,7 +94,36 @@ export const GetURL = async (params: GetURLParams): Promise<GetURLResponse> => {
   }
 };
 
-
+// Add BusinessProfile interface at the top of the file
+interface BusinessProfile {
+  id: string;
+  name: string;
+  description: string;
+  email: string;
+  phone: string | null;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  operating_hours: {
+    [key: string]: string;
+  };
+  socials: {
+    website?: string;
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    linkedin?: string;
+    youtube?: string;
+    [key: string]: string | undefined;
+  };
+  avatar: string;
+  banner: string;
+  type: string;
+  additional_services: string;
+  gstin: string;
+  [key: string]: any;
+}
 
 // export const GetURL = async (category: 'avatar' | 'banner' | 'license' | 'identity', fileType: string) => {
 //   try {
@@ -415,4 +444,88 @@ export const fetchLicenseData = async () => {
     throw error;
   }
 }
+
+export const createBusinessMedia = async (businessId: string, data: { url: string, type: string }) => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+        console.log(typeof data);
+        console.log(data);
+        
+        
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/business/${businessId}/media`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating media:', error);
+    throw error;
+  }
+};
+
+export const deletebusinessMedia = async (businessId: string, mediaId: string) => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    const response = await axios.delete(
+      `${BASE_URL}/api/v1/business/${businessId}/media/${mediaId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting media:', error);
+    throw error;
+  }
+}
+
+
+
+
+export const updateBusiness = async (businessId: string, updateData: Record<string, any>) => {
+  try {
+    console.log("Sending update request for business:", businessId);
+    console.log("Update data:", updateData);
+
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    if (!token) {
+      throw new Error('No token provided');
+    }
+
+    const response = await axios.patch(
+      `https://gigworks-server.devmorphix.workers.dev/api/v1/business/${businessId}`,
+      updateData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    console.log("Update response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating business:", error);
+    throw error;
+  }
+};
 

@@ -140,9 +140,11 @@ export default function SignupPage() {
       afterSalesSupport: false,
     },
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleFinalSubmit = async () => {
     try {
+      setError(null); // Clear any previous errors
       // Helper function to format time
       const formatOperatingHours = (hours: Array<{ day: string; startTime: string; endTime: string }>) => {
         const daysMap: { [key: string]: string } = {
@@ -178,12 +180,20 @@ export default function SignupPage() {
         state: formData.address.state,
         zip: formData.address.pinCode,
         socials: {
-          website: formData.websiteURL || "",
+          website: formData.socialMediaHandles.find(h => h.platform === "Website")?.link || "",
           facebook: formData.socialMediaHandles.find(h => h.platform === "Facebook")?.link || "",
           instagram: formData.socialMediaHandles.find(h => h.platform === "Instagram")?.link || "",
-          twitter: formData.socialMediaHandles.find(h => h.platform === "Twitter")?.link || "",
+          twitter: formData.socialMediaHandles.find(h => h.platform === "X (Twitter)")?.link || "",
           linkedin: formData.socialMediaHandles.find(h => h.platform === "LinkedIn")?.link || "",
-          youtube: formData.socialMediaHandles.find(h => h.platform === "YouTube")?.link || ""
+          youtube: formData.socialMediaHandles.find(h => h.platform === "YouTube")?.link || "",
+          reddit: formData.socialMediaHandles.find(h => h.platform === "Reddit")?.link || "",
+          tiktok: formData.socialMediaHandles.find(h => h.platform === "TikTok")?.link || "",
+          pinterest: formData.socialMediaHandles.find(h => h.platform === "Pinterest")?.link || "",
+          behance: formData.socialMediaHandles.find(h => h.platform === "Behance")?.link || "",
+          dribbble: formData.socialMediaHandles.find(h => h.platform === "Dribbble")?.link || "",
+          github: formData.socialMediaHandles.find(h => h.platform === "GitHub")?.link || "",
+          medium: formData.socialMediaHandles.find(h => h.platform === "Medium")?.link || "",
+
         },
         operating_hours: formatOperatingHours(formData.operatingHours),
         avatar: formData.avatar || "",
@@ -224,11 +234,13 @@ export default function SignupPage() {
       toast.success("Business created successfully!");
       
       // Redirect to the profile page with the slug
-      router.push(`/profile/${profileSlug}`);
+      router.push(`/${profileSlug}`);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating business:", error);
-      toast.error("Failed to create business. Please try again.");
+      const errorMessage = error.response?.data?.error || "Failed to create business. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
@@ -268,6 +280,24 @@ export default function SignupPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Show error message if exists */}
+      {error && (
+        <div className="fixed top-20 left-0 right-0 mx-auto w-full max-w-md z-50">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">{error}</span>
+            <button 
+              onClick={() => setError(null)}
+              className="absolute top-0 bottom-0 right-0 px-4 py-3"
+            >
+              <span className="sr-only">Dismiss</span>
+              <svg className="h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
       {/* Navigation */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white">
         <nav className="flex flex-col sm:flex-row justify-between items-center p-4 w-full">
