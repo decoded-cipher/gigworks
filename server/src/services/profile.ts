@@ -78,7 +78,7 @@ export const updateProfile = async (id: string, data: Profile) => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            const allowedFields = ['name', 'slug', 'description', 'email', 'phone', 'category_id', 'sub_category_id', 'sub_category_option_id', 'address', 'city', 'state', 'zip', 'country', 'operating_hours', 'socials', 'logo', 'type', 'additional_services', 'gstin'];
+            const allowedFields = ['name', 'slug', 'description', 'email', 'phone', 'category_id', 'sub_category_id', 'sub_category_option_id', 'address', 'city', 'state', 'zip', 'country', 'operating_hours', 'socials', 'type', 'additional_services', 'gstin', 'avatar', 'banner'];
             const dataKeys = Object.keys(data);
 
             for (let key of dataKeys) {
@@ -282,19 +282,22 @@ export const getRenewalProfiles = async (page: number, limit: number, days: numb
                     profileId: profile.id,
                     profileName: profile.name,
                     avatar: profile.avatar,
+                    slug: profile.slug,
                     owner: user.name,
                     phone: user.phone,
                     lastPaymentStatus: profilePayment.payment_status,
                     expiryDate: sql`DATETIME(${profilePayment.created_at}, '+1 YEAR')`,
-                    daysLeft: sql`CAST((julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP)) AS INTEGER)`
+                    daysLeft: sql`CAST((julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP)) AS INTEGER)`,
+                    statusOrder: sql`CASE WHEN ${profilePayment.payment_status} = 'pending' THEN 1 ELSE 2 END`
                 })
                 .from(profile)
                 .leftJoin(user, sql`${user.id} = ${profile.user_id}`)
                 .leftJoin(profilePayment, sql`${profilePayment.profile_id} = ${profile.id}`)
                 .where(sql`julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) < ${days}`)
-                // .limit(limit)
-                // .offset((page - 1) * limit)
+                .orderBy('statusOrder')
                 .orderBy(profilePayment.created_at)
+                .limit(limit)
+                .offset((page - 1) * limit);
 
             resolve({
                 data: results,
