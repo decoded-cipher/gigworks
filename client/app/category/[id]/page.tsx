@@ -1,5 +1,4 @@
 "use client"
-export const runtime = "edge";
 import { FooterSection } from '@/app/components/FooterSection'
 import Navbar from '@/app/components/navSection'
 import React, { useState, useEffect } from 'react'
@@ -22,6 +21,7 @@ interface employ {
   type?: string
   slug: string
 }
+export const runtime = "edge";
 
 export default function CategoryPage({ params }: CategoryPageProps) {
   const { id } = params
@@ -30,7 +30,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   const [employs, setEmploys] = useState<employ[]>([])
   const [categoryName, setCategoryName] = useState("")
   const [isLoading, setIsLoading] = useState(true)
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
