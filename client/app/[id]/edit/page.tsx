@@ -7,26 +7,14 @@ import {
   updateBusiness,
 } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
-import {
-  Pencil,
-  Save,
-  X,
-  Facebook,
-  Instagram,
-  Twitter,
-  Linkedin,
-  Youtube,
-  Globe,
-} from "lucide-react";
+import { Pencil, Save, X, Facebook, Instagram, Twitter, Linkedin, Youtube, Globe } from 'lucide-react';
 import ImageGrid from "@/app/components/imgsec";
 import ImageUploadButton from "@/app/components/ImageUploadButton";
 import MediaGallery from "@/app/components/MediaGallery";
 import OperatingHours from "@/app/components/OperatingHours";
 import { deletebusinessMedia } from "@/app/api";
-import { toast } from "react-hot-toast"; // Add toast for notifications
-import { s } from "framer-motion/client";
+import { toast } from "react-hot-toast";
 
-// Add License interface before other interfaces
 interface License {
   name: string;
   number: string;
@@ -34,7 +22,6 @@ interface License {
   description: string;
 }
 
-// Add MediaItem interface
 interface MediaItem {
   id: string;
   url: string;
@@ -61,15 +48,15 @@ interface BusinessProfile {
     twitter?: string;
     linkedin?: string;
     youtube?: string;
-    [key: string]: string | undefined; // Add index signature for socials
+    [key: string]: string | undefined;
   };
   avatar: string;
   banner: string;
   type: string;
   additional_services: string;
   gstin: string;
-  id: string; // Add this field
-  [key: string]: any; // Add index signature to allow dynamic access
+  id: string;
+  [key: string]: any;
 }
 
 interface BusinessData {
@@ -79,17 +66,19 @@ interface BusinessData {
     phone: string;
   };
   _id: string;
-  media: MediaItem[]; // Add this field
+  media: MediaItem[];
   category: string;
   subCategory: string;
   subCategoryOption: string;
-  licenses: License[]; // Now License is defined
+  licenses: License[];
   tags: string[];
 }
 
-export const runtime = "edge";
+interface Changes {
+  [key: string]: any;
+}
 
-// Add this social media config object near the top of your component
+export const runtime = "edge";
 
 const socialMediaConfig = {
   website: { label: "Website URL", icon: "/icon/globe.svg" },
@@ -106,15 +95,16 @@ const socialMediaConfig = {
   github: { label: "GitHub Profile", icon: "/icon/github.svg" },
   medium: { label: "Medium Profile", icon: "/icon/medium.svg" },
 };
+
 export default function EditBusinessPage() {
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [changes, setChanges] = useState<Partial<BusinessProfile>>({});
+  const [changes, setChanges] = useState<Changes>({});
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const params = useParams();
   const router = useRouter();
 
-  // Move fetchData outside useEffect so it can be referenced anywhere in the component
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -131,7 +121,6 @@ export default function EditBusinessPage() {
     }
   };
 
-  // Check authorization
   useEffect(() => {
     const token = document.cookie
       .split("; ")
@@ -143,85 +132,76 @@ export default function EditBusinessPage() {
     }
   }, [params.id, router]);
 
-  // Initial data fetch
   useEffect(() => {
     if (params.id) {
       fetchData();
     }
   }, [params.id]);
 
-  const handleFieldSave = async (field: string, value: any) => {
-    try {
-      if (!businessData?.profile.id) return;
+  useEffect(() => {
+    setHasUnsavedChanges(Object.keys(changes).length > 0);
+  }, [changes]);
 
+  const handleFieldChange = (field: string, value: any) => {
+    setChanges((prev) => {
       const fieldParts = field.split(".");
-      let updateData: Record<string, any> = {};
-
       if (fieldParts.length > 1 && fieldParts[0] === "socials") {
-        // Handle social media fields specifically
-        updateData.socials = {
-          ...(businessData.profile.socials || {}),
-          [fieldParts[1]]: value,
+        return {
+          ...prev,
+          socials: {
+            ...(prev.socials || {}),
+            [fieldParts[1]]: value,
+          },
         };
-      } else {
-        // Handle regular fields
-        updateData[field] = value;
       }
+      return {
+        ...prev,
+        [field]: value,
+      };
+    });
 
-      // Ensure updateData is not empty before making the API call
-      if (Object.keys(updateData).length === 0) {
-        console.warn("No values to update");
-        return;
-      }
-
-      // Log the updateData object
-      console.log("Updating business with data:", updateData);
-
-      await updateBusiness(businessData.profile.id, updateData);
-      toast.success(`${field} updated successfully`);
-
-      // Update local state
-      setBusinessData((prev) => {
-        if (!prev) return null;
+    // Update UI immediately
+    setBusinessData((prev) => {
+      if (!prev) return null;
+      const fieldParts = field.split(".");
+      if (fieldParts.length > 1 && fieldParts[0] === "socials") {
         return {
           ...prev,
           profile: {
             ...prev.profile,
-            ...(fieldParts[0] === "socials"
-              ? {
-                  socials: {
-                    ...prev.profile.socials,
-                    [fieldParts[1]]: value,
-                  },
-                }
-              : updateData),
+            socials: {
+              ...prev.profile.socials,
+              [fieldParts[1]]: value,
+            },
           },
         };
-      });
+      }
+      return {
+        ...prev,
+        profile: {
+          ...prev.profile,
+          [field]: value,
+        },
+      };
+    });
+  };
+
+  const handleSaveAllChanges = async () => {
+    try {
+      if (!businessData?.profile.id || Object.keys(changes).length === 0) return;
+
+      await updateBusiness(businessData.profile.id, changes);
+      toast.success("All changes saved successfully");
+      setChanges({});
+      router.push(`/${params.id}`);
     } catch (error) {
-      console.error("Error updating field:", error);
-      toast.error(`Failed to update ${field}`);
+      console.error("Error saving changes:", error);
+      toast.error("Failed to save changes");
     }
   };
 
   const handleImageUpload = (assetpath: string, field: "avatar" | "banner") => {
-    console.log("Image uploaded:", assetpath);
-    // console.log('Field:', field);
-    handleFieldSave(field, assetpath);
-  };
-
-  // Replace handleChange with immediate save
-  const handleChange = async (field: string, value: string) => {
-    await handleFieldSave(field, value);
-  };
-
-  const handleSave = async () => {
-    try {
-      // TODO: Implement API call to save all changes
-      router.push(`/${params.id}`);
-    } catch (error) {
-      console.error("Error saving changes:", error);
-    }
+    handleFieldChange(field, assetpath);
   };
 
   const handleMediaDelete = async (mediaId: string) => {
@@ -237,32 +217,8 @@ export default function EditBusinessPage() {
     }
   };
 
-  const handleOperatingHoursUpdate = async (newHours: {
-    [key: string]: string;
-  }) => {
-    try {
-      if (!businessData?.profile.id) return;
-
-      await updateBusiness(businessData.profile.id, {
-        operating_hours: newHours,
-      });
-      toast.success("Operating hours updated successfully");
-
-      // Update local state
-      setBusinessData((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          profile: {
-            ...prev.profile,
-            operating_hours: newHours,
-          },
-        };
-      });
-    } catch (error) {
-      console.error("Error updating operating hours:", error);
-      toast.error("Failed to update operating hours");
-    }
+  const handleOperatingHoursUpdate = (newHours: { [key: string]: string }) => {
+    handleFieldChange("operating_hours", newHours);
   };
 
   if (isLoading) {
@@ -295,6 +251,11 @@ export default function EditBusinessPage() {
         <div className="flex md:flex-row flex-col justify-between items-center mb-8">
           <h1 className="text-2xl font-bold md:pb-0 pb-2">
             Edit Business Profile
+            {hasUnsavedChanges && (
+              <span className="text-yellow-600 text-sm ml-2">
+                (Unsaved changes)
+              </span>
+            )}
           </h1>
           <div className="flex gap-4">
             <button
@@ -305,11 +266,16 @@ export default function EditBusinessPage() {
               Cancel
             </button>
             <button
-              onClick={handleSave}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
+              onClick={handleSaveAllChanges}
+              className={`flex items-center gap-2 px-4 py-2 ${
+                hasUnsavedChanges
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-300 text-gray-600"
+              } rounded-lg`}
+              disabled={!hasUnsavedChanges}
             >
               <Save size={20} />
-              Save All Changes
+              {hasUnsavedChanges ? "Save All Changes" : "No Changes"}
             </button>
           </div>
         </div>
@@ -319,11 +285,10 @@ export default function EditBusinessPage() {
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Profile Images</h2>
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Profile Avatar */}
               <div>
                 <h3 className="text-sm font-medium mb-2">Profile Image</h3>
                 <ImageUploadButton
-                  businessId={businessData.profile.id} // Changed from _id to profile.id
+                  businessId={businessData.profile.id}
                   category="avatar"
                   label="Upload Avatar"
                   showPreview={true}
@@ -336,16 +301,14 @@ export default function EditBusinessPage() {
                   onUploadComplete={(assetpath) => {
                     if (assetpath) {
                       handleImageUpload(assetpath, "avatar");
-                      businessData.profile.avatar = assetpath;
                     }
                   }}
                 />
               </div>
-              {/* Banner Image */}
               <div>
                 <h3 className="text-sm font-medium mb-2">Banner Image</h3>
                 <ImageUploadButton
-                  businessId={businessData.profile.id} // Changed from _id to profile.id
+                  businessId={businessData.profile.id}
                   category="banner"
                   label="Upload Banner"
                   showPreview={true}
@@ -358,7 +321,6 @@ export default function EditBusinessPage() {
                   onUploadComplete={(assetpath) => {
                     if (assetpath) {
                       handleImageUpload(assetpath, "banner");
-                      businessData.profile.banner = assetpath;
                     }
                   }}
                 />
@@ -377,7 +339,7 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.profile.name}
-                  onBlur={(e) => handleFieldSave("name", e.target.value)}
+                  onChange={(e) => handleFieldChange("name", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -387,7 +349,9 @@ export default function EditBusinessPage() {
                 </label>
                 <textarea
                   defaultValue={businessData.profile.description}
-                  onBlur={(e) => handleFieldSave("description", e.target.value)}
+                  onChange={(e) =>
+                    handleFieldChange("description", e.target.value)
+                  }
                   className="w-full p-2 border rounded-lg min-h-[100px]"
                 />
               </div>
@@ -403,7 +367,7 @@ export default function EditBusinessPage() {
                 <input
                   type="email"
                   defaultValue={businessData.profile.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
+                  onChange={(e) => handleFieldChange("email", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -412,25 +376,23 @@ export default function EditBusinessPage() {
                 <input
                   type="tel"
                   defaultValue={businessData.user.phone}
-                  onChange={(e) => handleChange("phone", e.target.value)}
+                  onChange={(e) => handleFieldChange("phone", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Address
-                </label>
+                <label className="block text-sm font-medium mb-1">Address</label>
                 <input
                   type="text"
                   defaultValue={businessData.profile.address}
-                  onChange={(e) => handleChange("address", e.target.value)}
+                  onChange={(e) => handleFieldChange("address", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
             </div>
           </section>
 
-          {/* Add this new section after Contact Information and before Social Media Links */}
+          {/* Additional Services */}
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Additional Services</h2>
             <div className="space-y-4">
@@ -461,16 +423,12 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.profile.additional_services}
-                  onBlur={(e) =>
-                    handleFieldSave("additional_services", e.target.value)
+                  onChange={(e) =>
+                    handleFieldChange("additional_services", e.target.value)
                   }
                   className="w-full p-2 border rounded-lg"
                   placeholder="e.g., customOrders, afterSalesSupport"
                 />
-                <p className="text-sm text-gray-500 mt-1">
-                  Enter services separated by commas. Use camelCase for multiple
-                  words (e.g., customOrders).
-                </p>
               </div>
             </div>
           </section>
@@ -479,33 +437,31 @@ export default function EditBusinessPage() {
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Social Media Links</h2>
             <div className="space-y-4">
-              {Object.entries(socialMediaConfig).map(
-                ([key, { label, icon }]) => (
-                  <div key={key} className="flex items-center gap-4">
-                    <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full">
-                      <img src={icon} alt={label} className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-sm font-medium mb-1 text-gray-700">
-                        {label}
-                      </label>
-                      <input
-                        type="url"
-                        defaultValue={
-                          businessData.profile.socials?.[
-                            key as keyof typeof businessData.profile.socials
-                          ] || ""
-                        }
-                        onBlur={(e) =>
-                          handleFieldSave(`socials.${key}`, e.target.value)
-                        }
-                        className="w-full p-2 border rounded-lg"
-                        placeholder={`Enter ${label}`}
-                      />
-                    </div>
+              {Object.entries(socialMediaConfig).map(([key, { label, icon }]) => (
+                <div key={key} className="flex items-center gap-4">
+                  <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full">
+                    <img src={icon} alt={label} className="w-5 h-5" />
                   </div>
-                )
-              )}
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium mb-1 text-gray-700">
+                      {label}
+                    </label>
+                    <input
+                      type="url"
+                      defaultValue={
+                        businessData.profile.socials?.[
+                          key as keyof typeof businessData.profile.socials
+                        ] || ""
+                      }
+                      onChange={(e) =>
+                        handleFieldChange(`socials.${key}`, e.target.value)
+                      }
+                      className="w-full p-2 border rounded-lg"
+                      placeholder={`Enter ${label}`}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
 
@@ -518,34 +474,18 @@ export default function EditBusinessPage() {
             />
           </section>
 
-          {/* Tags */}
-          {/* <section className="bg-white rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Business Tags</h2>
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Add tags (comma separated)"
-                defaultValue={businessData.tags?.join(', ')}
-                onChange={(e) => handleChange('tags', e.target.value)}
-                className="w-full p-2 border rounded-lg"
-              />
-              <p className="text-sm text-gray-500">
-                Enter tags separated by commas (e.g., web design, development, marketing)
-              </p>
-            </div>
-          </section> */}
-
           {/* Media Gallery */}
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Media Gallery</h2>
             <MediaGallery
               media={businessData.media}
-              businessId={businessData.profile.id} // Changed from _id to profile.id
+              businessId={businessData.profile.id}
               onUpdate={() => fetchData()}
               onDelete={handleMediaDelete}
             />
           </section>
 
+          {/* Business Operation */}
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Business Operation</h2>
             <div className="space-y-4">
@@ -588,3 +528,4 @@ export default function EditBusinessPage() {
     </div>
   );
 }
+
