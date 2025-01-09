@@ -157,7 +157,7 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
   return (
     <>
       <section className={cn(
-        "w-full max-w-6xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden",
+        "w-full mx-auto bg-white rounded-xl shadow-xl overflow-hidden",
         "border border-gray-200",
         "h-[600px]",
         className
