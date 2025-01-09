@@ -467,7 +467,7 @@ const DevMorphixWebsite = () => {
             {isOwner && (
               <button
                 onClick={handlelogout}
-                className="absolute top-24 left-4 p-2 bg-gray-100 hover:bg-red-500 rounded-lg transition-colors"
+                className="absolute top-24 left-4 p-2 px-4 text-white bg-red-500 hover:bg-red-400 rounded-lg transition-colors"
                 title="Edit Business Profile"
               >
                 Logout
@@ -477,10 +477,10 @@ const DevMorphixWebsite = () => {
             {isOwner && (
               <button
                 onClick={handleEditClick}
-                className="absolute top-24 right-4 p-2 bg-gray-100 hover:bg-gray-600 rounded-full transition-colors"
+                className="absolute top-24 right-4 p-2 bg-white  hover:bg-gray-300 rounded-full transition-colors"
                 title="Edit Business Profile"
               >
-                <Pencil className="w-4 h-4 text-gray-600 hover:text-white" />
+                <Pencil className="w-4 h-4 text-gray-600" />
               </button>
             )}
 
