@@ -25,7 +25,12 @@ import { FooterSection } from "@/app/components/FooterSection";
 import { div } from "framer-motion/client";
 import DynamicQRCode from "@/app/components/QrSection";
 import ScrollToTopButton from "@/app/components/ScrollToTop";
-import { fetchBusinessesByslug, ASSET_BASE_URL, GetURL } from "@/app/api";
+import {
+  fetchBusinessesByslug,
+  ASSET_BASE_URL,
+  GetURL,
+  UserLogout,
+} from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
 
 // Add this interface with other interfaces
@@ -163,6 +168,31 @@ const DevMorphixWebsite = () => {
   // Add this function to handle edit click
   const handleEditClick = () => {
     router.push(`/${params.id}/edit`);
+  };
+
+  const handlelogout = async () => {
+    try {
+      const token = Cookies.get("token");
+      // console.log("Raw JWT Token:", token);
+      
+      if (!token) {
+        console.log("No JWT token found in cookies");
+        return null;
+      }
+      const res = await UserLogout(token);
+      
+      if (res.message === "User logged out successfully") {
+        Cookies.remove("token");
+        localStorage.removeItem("userData"); 
+        localStorage.removeItem("userProfiles"); 
+        router.push("/");
+      }else{
+        console.log("Error logging out:", res);
+      }
+
+    } catch (err) {
+      console.error("Error logging out:", err);
+    }
   };
 
   // Modify your existing fetchData function to include token handling
@@ -436,11 +466,21 @@ const DevMorphixWebsite = () => {
 
             {isOwner && (
               <button
-                onClick={handleEditClick}
-                className="absolute top-24 right-4 p-2 bg-gray-100 hover:bg-gray-20 rounded-full transition-colors"
+                onClick={handlelogout}
+                className="absolute top-24 left-4 p-2 bg-gray-100 hover:bg-red-500 rounded-lg transition-colors"
                 title="Edit Business Profile"
               >
-                <Pencil className="w-4 h-4 text-gray-600" />
+                Logout
+              </button>
+            )}
+
+            {isOwner && (
+              <button
+                onClick={handleEditClick}
+                className="absolute top-24 right-4 p-2 bg-gray-100 hover:bg-gray-600 rounded-full transition-colors"
+                title="Edit Business Profile"
+              >
+                <Pencil className="w-4 h-4 text-gray-600 hover:text-white" />
               </button>
             )}
 
@@ -724,42 +764,45 @@ const DevMorphixWebsite = () => {
                       Our Social Media Connects
                     </h2>
                     <div className="flex justify-center gap-4">
-                    {Object.entries(businessData.profile.socials).map(
-          ([platform, url]) => {
-            if (url) {
-              const iconSrc = socialIcons[platform.toLowerCase()];
+                      {Object.entries(businessData.profile.socials).map(
+                        ([platform, url]) => {
+                          if (url) {
+                            const iconSrc = socialIcons[platform.toLowerCase()];
 
-              return (
-                <div key={platform} className="relative">
-                  <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-600 hover:text-gray-800"
-                    onMouseEnter={() => setHoveredIcon({ platform })}
-                    onMouseLeave={() => setHoveredIcon(null)}
-                  >
-                    {iconSrc ? (
-                      <img
-                        src={iconSrc}
-                        alt={platform}
-                        className="w-6 h-6"
-                      />
-                    ) : (
-                      platform
-                    )}
-                  </a>
-                  {hoveredIcon?.platform === platform && (
-                    <div className="absolute left-1/2 -translate-x-1/2 -top-8 bg-gray-800 text-white px-3 py-1 rounded-md text-xs whitespace-nowrap">
-                      {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                    </div>
-                  )}
-                </div>
-              );
-            }
-            return null;
-          }
-        )}
+                            return (
+                              <div key={platform} className="relative">
+                                <a
+                                  href={url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-gray-600 hover:text-gray-800"
+                                  onMouseEnter={() =>
+                                    setHoveredIcon({ platform })
+                                  }
+                                  onMouseLeave={() => setHoveredIcon(null)}
+                                >
+                                  {iconSrc ? (
+                                    <img
+                                      src={iconSrc}
+                                      alt={platform}
+                                      className="w-6 h-6"
+                                    />
+                                  ) : (
+                                    platform
+                                  )}
+                                </a>
+                                {hoveredIcon?.platform === platform && (
+                                  <div className="absolute left-1/2 -translate-x-1/2 -top-8 bg-gray-800 text-white px-3 py-1 rounded-md text-xs whitespace-nowrap">
+                                    {platform.charAt(0).toUpperCase() +
+                                      platform.slice(1)}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+                          return null;
+                        }
+                      )}
                     </div>
                   </div>
                 )}

@@ -333,13 +333,29 @@ export const VerifyRegisterOTP = async (data: any) => {
 
 export const UserLogout = async (data: any) => {
   try {
+
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    if (!token) {
+      throw new Error('No token provided');
+    }
+
+
     const response = await axios.post(
       `${BASE_URL}/auth/logout`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }, 
+      }
     );
     return response.data;
   } catch (error) {
-    console.error('Error verifying OTP:', error);
+    console.error('Error in logout:', error);
     throw error;
   }
 };
