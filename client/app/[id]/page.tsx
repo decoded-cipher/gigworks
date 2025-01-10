@@ -128,7 +128,6 @@ const DevMorphixWebsite = () => {
       if (!token) {
         console.log("No JWT token found in cookies");
         localStorage.clear();
-        router.push("/");
         return null;
       }
 
