@@ -7,8 +7,8 @@ import { toast } from 'react-hot-toast';
 import Loader from './loader';
 
 // Add the cookie utility function at the top
-const setCookie = (name: string, value: string, minutes: number) => {
-  const expires = new Date(Date.now() + minutes * 60 * 1000).toUTCString();
+const setCookie = (name: string, value: string, days: number) => {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
   document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
 };
 
