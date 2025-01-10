@@ -353,7 +353,7 @@ export const UserLogout = async (data: any) => {
         }, 
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error in logout:', error);
     throw error;
