@@ -127,6 +127,7 @@ const DevMorphixWebsite = () => {
 
       if (!token) {
         console.log("No JWT token found in cookies");
+        localStorage.clear();
         return null;
       }
 
@@ -146,6 +147,9 @@ const DevMorphixWebsite = () => {
 
         if (isExpired) {
           console.log("Token has expired");
+          // Cookies.remove("token");
+          localStorage.removeItem("userData");
+          localStorage.removeItem("userProfiles");
           // Optionally remove expired token
           Cookies.remove("token");
           return null;
@@ -163,6 +167,8 @@ const DevMorphixWebsite = () => {
   useEffect(() => {
     const decoded = handleJWTToken();
     setTokenData(decoded);
+
+
   }, []);
 
   // Add this function to handle edit click
@@ -180,8 +186,9 @@ const DevMorphixWebsite = () => {
         return null;
       }
       const res = await UserLogout(token);
+      console.log();
       
-      if (res.message === "User logged out successfully") {
+      if (res.status=== 200) {
         Cookies.remove("token");
         localStorage.removeItem("userData"); 
         localStorage.removeItem("userProfiles"); 
