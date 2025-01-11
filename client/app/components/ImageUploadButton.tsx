@@ -103,7 +103,7 @@ const ImageUploadButton = ({
               <span>Change {label}</span>
               <input
                 type="file"
-                accept="image/*"
+                accept="image/*, video/*"
                 multiple={multiple}
                 onChange={handleFileSelect}
                 className="hidden"
@@ -120,7 +120,7 @@ const ImageUploadButton = ({
           <input
             type="file"
             multiple={multiple}
-            accept="image/*"
+            accept="image/*, video/*"
             onChange={handleFileSelect}
             className="hidden"
           />

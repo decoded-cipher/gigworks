@@ -23,6 +23,7 @@ const MediaGallery = ({
   const limitedMedia = media.slice(0, 15); // Limit to 15 items
   const hasReachedLimit = media.length >= 15;
 
+  
   const handleDelete = async (mediaId: string) => {
     try {
       await deletebusinessMedia(businessId, mediaId);

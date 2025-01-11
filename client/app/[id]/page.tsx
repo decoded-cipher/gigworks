@@ -673,7 +673,7 @@ const DevMorphixWebsite = () => {
                         <Phone className="h-4 w-4 text-muted-foreground" />
                         <span className="font-light text-md text-black">
                           <span>
-                            +91 {businessData?.user.phone || "Not available"}
+                            +91 {businessData?.profile.phone || businessData?.user.phone || "Not available"}
                           </span>
                         </span>
                       </div>
@@ -737,7 +737,7 @@ const DevMorphixWebsite = () => {
               <div className="hidden md:block flex flex-col items-center justify-center">
                 {/* <h2 className="text-xl font-medium mb-2">Contact us</h2> */}
                 <p className="text-4xl font-mediu mb-2">
-                  +91 {businessData?.user.phone || "Not available"}
+                  +91 {businessData?.profile.phone || businessData?.user.phone || "Not available"}
                 </p>
                 <div className="flex justify-center pb-11">
                   <svg

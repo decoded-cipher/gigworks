@@ -136,13 +136,19 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
     return null;
   }
 
-  const mediaImages = media.map((item, index) => ({
-    src: `${ASSET_BASE_URL}/${item.url}`,
-    alt: `Business Image ${index + 1}`,
-    size: item.size || 'medium' as const,
-    isVideo: item.type ? item.type.startsWith('video/') : false,
-  }));
+  const mediaImages = media.map((item, index) => {
+    const fileType = item.type || '';
+    const isVideo = fileType.includes('video') || item.url.endsWith('.mp4');
+    return {
+      src: `${ASSET_BASE_URL}/${item.url}`,
+      alt: `Business Image ${index + 1}`,
+      size: item.size || 'medium' as const,
+      isVideo,
+    };
+  });
 
+  console.log('mediaImages:', mediaImages);
+  
   const getBentoSpan = (imageSize?: 'small' | 'medium' | 'large') => {
     switch(imageSize) {
       case 'large':
