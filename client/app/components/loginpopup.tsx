@@ -233,7 +233,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
     const { token, user } = response?.data?.data || {};
     
     if (token) {
-      setCookie('token', token, 7);
+      setCookie('token', token, 1);
     }
   
     setLocalStorage('userData', {
