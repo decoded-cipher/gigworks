@@ -410,7 +410,7 @@ export default function EditBusinessPage() {
               <div>
                 <label className="block text-sm font-medium mb-1">Phone</label>
                 <input
-                  type="tel"
+                  type="number"
                   defaultValue={businessData.user.phone}
                   onChange={(e) => handleChange("phone", e.target.value)}
                   className="w-full p-2 border rounded-lg"
