@@ -1,6 +1,6 @@
 
 import { count, eq, sql } from "drizzle-orm";
-import { db } from '../config/database/connection';
+import { db } from '../config/database/turso';
 
 import { partnerIdProof } from '../config/database/schema';
 import { PartnerIdProof, partnerIdProofTypes } from '../config/database/interfaces';

@@ -2,7 +2,7 @@
 import { eachMonthOfInterval, format } from 'date-fns';
 
 import { count, eq, sql } from "drizzle-orm";
-import { db } from '../config/database/connection';
+import { db } from '../config/database/turso';
 
 import { user, profile, partner, partnerBank, partnerIdProof, partnerIdProofType } from '../config/database/schema';
 import { User, Partner, PartnerBank, PartnerIdProof, PartnerIdProofType, User } from '../config/database/interfaces';

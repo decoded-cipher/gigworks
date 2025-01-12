@@ -1,6 +1,6 @@
 
 import { count, eq, sql } from "drizzle-orm";
-import { db } from '../config/database/connection';
+import { db } from '../config/database/turso';
 
 import { tag, profileTag } from '../config/database/schema';
 import { Tag, ProfileTag } from '../config/database/interfaces';
