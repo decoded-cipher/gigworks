@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Upload, X } from 'lucide-react';
 import { GetURL, uploadToPresignedUrl, createBusinessMedia } from '@/app/api';
 import { toast } from 'react-hot-toast';
+import heic2any from 'heic2any';
 
 interface ImageUploadButtonProps {
   businessId: string;
@@ -28,10 +29,57 @@ const ImageUploadButton = ({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const convertHeicToPng = async (file: File): Promise<File> => {
+    if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+      try {
+        const convertedBlob = await heic2any({
+          blob: file,
+          toType: 'image/png',
+          quality: 0.8
+        });
+
+        // If the result is a Blob array, take the first item
+        const resultBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+        
+        // Create a new File from the converted Blob
+        const convertedFile = new File(
+          [resultBlob], 
+          file.name.replace(/\.heic$/i, '.png'),
+          { type: 'image/png' }
+        );
+
+        return convertedFile;
+      } catch (error) {
+        console.error('Error converting HEIC to PNG:', error);
+        throw new Error('Failed to convert HEIC image');
+      }
+    }
+    return file;
+  };
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const files = Array.from(event.target.files);
-      setSelectedFiles(files);
+      
+      try {
+        // Process all files, converting HEIC if necessary
+        const processedFiles = await Promise.all(
+          files.map(async (file) => {
+            if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+              toast.loading('Converting HEIC image...', { id: 'heic-conversion' });
+              const convertedFile = await convertHeicToPng(file);
+              toast.success('HEIC conversion complete', { id: 'heic-conversion' });
+              return convertedFile;
+            }
+            return file;
+          })
+        );
+        
+        setSelectedFiles(processedFiles);
+      } catch (error) {
+        console.error('Error processing files:', error);
+        toast.error('Error processing selected files');
+      }
     }
   };
 
@@ -53,6 +101,7 @@ const ImageUploadButton = ({
           type: file.type,
           category: category
         });
+
         console.log('URL Response:', urlResponse);
 
         if (!urlResponse || !urlResponse.presignedUrl || !urlResponse.assetpath) {
@@ -103,7 +152,7 @@ const ImageUploadButton = ({
               <span>Change {label}</span>
               <input
                 type="file"
-                accept="image/*, video/*"
+                accept="image/*, video/*, image/heic"
                 multiple={multiple}
                 onChange={handleFileSelect}
                 className="hidden"
@@ -120,7 +169,7 @@ const ImageUploadButton = ({
           <input
             type="file"
             multiple={multiple}
-            accept="image/*, video/*"
+            accept="image/*, video/*, image/heic"
             onChange={handleFileSelect}
             className="hidden"
           />
