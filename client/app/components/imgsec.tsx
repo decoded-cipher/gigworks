@@ -138,7 +138,7 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
 
   const mediaImages = media.map((item, index) => {
     const fileType = item.type || '';
-    const isVideo = fileType.includes('video') || item.url.endsWith('.mp4');
+    const isVideo = fileType.includes('video') || item.url.endsWith('.mp4') || item.url.endsWith('.quicktime') || item.url.endsWith('.mov');
     return {
       src: `${ASSET_BASE_URL}/${item.url}`,
       alt: `Business Image ${index + 1}`,
