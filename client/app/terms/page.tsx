@@ -88,7 +88,7 @@ function terms() {
         <p className='text-xl'>There are no specific items or services listed as non-refundable because the entire payment made for the subscription is non-refundable.</p>
 
         <p className='text-xl font-bold py-4'>5. Contact Us</p>
-        <p className='text-xl'>If you have any questions or concerns about this policy, please contact us at <span className='font-bold'>[Hyper link to  Contact contact page]</span>.</p>
+        <p className='text-xl'>If you have any questions or concerns about this policy, please contact us at <span className='font-bold'><a href=""></a></span>.</p>
         
       </div>
       <FooterSection/>

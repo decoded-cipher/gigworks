@@ -107,6 +107,7 @@ export const runtime = "edge";
 
 const DevMorphixWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [hoveredIcon, setHoveredIcon] = useState<{
     platform: string;
   } | null>(null);
@@ -116,8 +117,28 @@ const DevMorphixWebsite = () => {
   const [tokenData, setTokenData] = useState<JWTPayload | null>(null);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [userProfiles] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("userProfiles");
+      return stored ? JSON.parse(stored) : [];
+    }
+    return [];
+  });
+
   const params = useParams();
   const router = useRouter();
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const dropdown = document.getElementById("account-dropdown");
+      if (dropdown && !dropdown.contains(event.target as Node)) {
+        setIsAccountMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Add JWT token handler function
   const handleJWTToken = () => {
@@ -167,8 +188,6 @@ const DevMorphixWebsite = () => {
   useEffect(() => {
     const decoded = handleJWTToken();
     setTokenData(decoded);
-
-
   }, []);
 
   // Add this function to handle edit click
@@ -196,7 +215,6 @@ const DevMorphixWebsite = () => {
       } else {
         console.log("Error logging out:", res);
       }
-
     } catch (err) {
       console.error("Error logging out:", err);
     }
@@ -432,8 +450,9 @@ const DevMorphixWebsite = () => {
 
           {/* Navigation menu */}
           <div
-            className={`w-full md:block md:w-auto ${isMenuOpen ? "block" : "hidden"
-              }`}
+            className={`w-full md:block md:w-auto ${
+              isMenuOpen ? "block" : "hidden"
+            }`}
             id="navbar-default"
           >
             <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
@@ -454,10 +473,10 @@ const DevMorphixWebsite = () => {
         </div>
       </nav>
 
-      <div className="px-4 sm:px-6 lg:px-52">
+      <div className="px-4 mt-12 sm:px-6 lg:px-52">
         <main>
           <ScrollToTopButton isProfilePage={true} />
-          <section className="relative py-8 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
+          <section className="relative  flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
             <div className="absolute top-0 left-0 right-0 h-72 overflow-hidden">
               <img
                 src={
@@ -466,31 +485,128 @@ const DevMorphixWebsite = () => {
                     : "/assets/media/15879.png"
                 }
                 alt="Background"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
               />
             </div>
-
             {isOwner && (
-              <button
-                onClick={handlelogout}
-                className="absolute top-24 left-4 p-2 px-4 text-white bg-red-500 hover:bg-red-400 rounded-lg transition-colors"
-                title="Edit Business Profile"
-              >
-                Logout
-              </button>
+              <div className="absolute top-12 left-4" id="account-dropdown">
+                <button
+                  onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+                  className="p-2 px-4 text-white bg-black hover:bg-gray-800 rounded-lg transition-colors flex items-center gap-2"
+                >
+                  Account
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className={`transform transition-transform ${
+                      isAccountMenuOpen ? "rotate-180" : ""
+                    }`}
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+
+                {isAccountMenuOpen && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50">
+                    {userProfiles.map((profile: any) => (
+                      <button
+                        key={profile.id}
+                        onClick={() => {
+                          router.push(`/${profile.slug}`);
+                          setIsAccountMenuOpen(false);
+                        }}
+                        className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        {profile.name}
+                      </button>
+                    ))}
+                    <div className="border-t border-gray-200 my-1" />
+                    <button
+                      onClick={() => {
+                        router.push("/signup");
+                        setIsAccountMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-2 text-left text-green-600 hover:bg-green-600 hover:text-white flex items-center gap-2"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="mr-2"
+                      >
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                      Add new business
+                    </button>
+                    <div className="border-t border-gray-200 my-1" />
+                    <button
+                      onClick={() => {
+                        handlelogout();
+                        setIsAccountMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-600 hover:text-white flex items-center gap-2"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
 
             {isOwner && (
               <button
                 onClick={handleEditClick}
-                className="absolute top-24 right-4 p-2 bg-white  hover:bg-gray-300 rounded-full transition-colors"
+                className="absolute top-12 right-4 p-2 bg-white  hover:bg-gray-300 rounded-full transition-colors"
                 title="Edit Business Profile"
               >
                 <Pencil className="w-4 h-4 text-gray-600" />
               </button>
             )}
 
-            <div className="relative z-0 w-60 md:w-80 h-60 md:h-80 border border-white border-8 bg-black rounded-full overflow-hidden border-8 border-white rounded-full flex items-center justify-center mb-8 mt-20">
+            <div className="relative z-0 w-60 md:w-80 h-60 md:h-80 border border-white border-8 bg-black rounded-full overflow-hidden border-8 border-white rounded-full flex items-center justify-center mb-8 mt-32 md:mt-20">
               <img
                 src={
                   businessData?.profile.avatar
@@ -638,7 +754,8 @@ const DevMorphixWebsite = () => {
                           </a>
                         </div>
                       </>
-                    ) : businessData?.profile.name.toLowerCase() === "anjaneya gym" ? (
+                    ) : businessData?.profile.name.toLowerCase() ===
+                      "anjaneya gym" ? (
                       <>
                         <iframe
                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3935.6791870223733!2d76.5665951!3d9.4495045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b062528d37a641d%3A0x66e967f68f9994bb!2sAnjaneya%20Gym!5e0!3m2!1sen!2sin!4v1736680465049!5m2!1sen!2sin"
@@ -692,7 +809,10 @@ const DevMorphixWebsite = () => {
                         <Phone className="h-4 w-4 text-muted-foreground" />
                         <span className="font-light text-md text-black">
                           <span>
-                            +91 {businessData?.profile.phone || businessData?.user.phone || "Not available"}
+                            +91{" "}
+                            {businessData?.profile.phone ||
+                              businessData?.user.phone ||
+                              "Not available"}
                           </span>
                         </span>
                       </div>
@@ -756,7 +876,10 @@ const DevMorphixWebsite = () => {
               <div className="hidden md:block flex flex-col items-center justify-center">
                 {/* <h2 className="text-xl font-medium mb-2">Contact us</h2> */}
                 <p className="text-4xl font-mediu mb-2">
-                  +91 {businessData?.profile.phone || businessData?.user.phone || "Not available"}
+                  +91{" "}
+                  {businessData?.profile.phone ||
+                    businessData?.user.phone ||
+                    "Not available"}
                 </p>
                 <div className="flex justify-center pb-11">
                   <svg

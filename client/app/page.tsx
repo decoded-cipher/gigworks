@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation';
 import { GetPartner } from "./api";
 import "./globals.css"; // Ensure you have this import
 
+
 export default function GigWorkLandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [count, setCount] = useState(0);
@@ -29,9 +30,12 @@ export default function GigWorkLandingPage() {
   const [redirectPath, setRedirectPath] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true); // Add loading state
   const router = useRouter();
-
   
   useEffect(() => {
+    const token = document.cookie.includes('token');
+    if (!token) {
+      localStorage.clear();
+    }
     // Simulate fetching data
     const timer = setTimeout(() => {
       setIsLoading(false);
