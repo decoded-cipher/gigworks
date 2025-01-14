@@ -165,12 +165,16 @@ export default function SignupPage() {
         });
         return formattedHours;
       };
-
+      const userDataString:any = localStorage.getItem("userData");
+      const userData = JSON.parse(userDataString);
+      console.log(userDataString);
+      
       const profileData = {
         name: formData.businessName,
         slug: formData.slug,
         description: formData.businessDescription,
         email: formData.emailAddress,
+        phone: formData.whatsAppNumber,
         website: formData.websiteURL || "",
         category_id: formData.businessCategory,
         sub_category_id: formData.subCategory,
@@ -206,11 +210,11 @@ export default function SignupPage() {
         gstin: formData.gstin,
         referral_code: formData.referral_code
       };
-
+      
       const payload:any = {
         user: {
-          name: formData.ownerName,
-          phone: formData.whatsAppNumber
+          name: userData.name,
+          phone: userData.phone
         },
         profile: profileData,
         payment: {
