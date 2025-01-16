@@ -798,7 +798,30 @@ const DevMorphixWebsite = () => {
                           </a>
                         </div>
                       </>
-                    ) : (
+                    ) : businessData?.profile.name.toLowerCase() ===
+                    "pathil electricals sanitary" ? (
+                    <>
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1967.9015774093411!2d76.5679237!3d9.438655!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625eb50756337%3A0xde34a5bb2a767a61!2sPATHIL%20ELECTRICAL%20%26%20SANITARY!5e0!3m2!1sen!2sin!4v1737035238332!5m2!1sen!2sin"
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      ></iframe>
+                      <div className="mt-2">
+                        <a
+                          href="https://maps.app.goo.gl/wWFbsqCAxa5XUHpj9"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-500 hover:text-blue-700"
+                        >
+                          View on Google Maps →
+                        </a>
+                      </div>
+                    </>
+                  ) : (
                       <iframe
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d251482.44857791857!2d76.1643857954714!3d9.982669325611842!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d514abec6bf%3A0xbd582caa5844192!2sKochi%2C%20Kerala!5e0!3m2!1sen!2sin!4v1702359671799!5m2!1sen!2sin"
                         width="100%"

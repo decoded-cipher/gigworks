@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Editor from "react-simple-wysiwyg";
 import {
   fetchBusinessesByslug,
@@ -130,8 +130,8 @@ export default function EditBusinessPage() {
     fieldType: null,
   });
 
-  // Move fetchData function here
-  const fetchData = async () => {
+  // Wrap fetchData with useCallback
+  const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetchBusinessesByslug(params.id as string);
@@ -145,31 +145,20 @@ export default function EditBusinessPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params.id]); // Only depend on params.id
 
-  // Mounting effect
+  // Update useEffect to depend on the stable fetchData function
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // Authorization check
-  useEffect(() => {
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1];
-
-    if (!token) {
-      router.push(`/${params.id}`);
-    }
-  }, [params.id, router]);
-
-  // Data fetch effect
-  useEffect(() => {
-    if (params.id) {
+    if (params.id && isMounted) {
       fetchData();
     }
-  }, [params.id, fetchData]); // Add fetchData to dependency array
+  }, [params.id, fetchData, isMounted]); // Include isMounted to prevent unnecessary fetches
+
+  // Combine mounting and fetch effects
+  useEffect(() => {
+    setIsMounted(true);
+    return () => setIsMounted(false);
+  }, []);
 
   const handleFieldChange = (field: string, value: any) => {
     setPendingChanges(prev => {
