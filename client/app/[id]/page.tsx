@@ -920,10 +920,12 @@ const DevMorphixWebsite = () => {
                 </div>
               </div>
               <div className="flex items-center justify-center">
-                <p className="text-[#111111] text-md text-justify text-center font-medium leading-relaxed">
-                  {businessData?.profile.description ||
-                    "No description available"}
-                </p>
+                <p
+                  className="text-[#111111] text-md text-justify text-center font-medium leading-relaxed"
+                  dangerouslySetInnerHTML={{
+                    __html: businessData?.profile.description || "No description available"
+                  }}
+                />
               </div>
               {businessData?.profile.socials &&
                 Object.values(businessData.profile.socials).some(

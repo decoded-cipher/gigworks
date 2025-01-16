@@ -256,13 +256,31 @@ export default function EditBusinessPage() {
     try {
       if (businessData?.profile.id) {
         await deletebusinessMedia(businessData.profile.id, mediaId);
+        // Update local state instead of fetching all data again
+        setBusinessData(prev => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            media: prev.media.filter(item => item.id !== mediaId)
+          };
+        });
+        toast.success('Media item deleted successfully');
       }
-      fetchData();
-      toast.success('Media item deleted successfully');
     } catch (error) {
       console.error('Error deleting media:', error);
       toast.error('Failed to delete media item');
     }
+  };
+
+  // Add this new function to handle media updates
+  const handleMediaUpdate = (newMedia: MediaItem) => {
+    setBusinessData(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        media: [...prev.media, newMedia]
+      };
+    });
   };
 
   const [cropperState, setCropperState] = useState<{
@@ -650,7 +668,7 @@ export default function EditBusinessPage() {
             <MediaGallery
               media={businessData.media}
               businessId={businessData.profile.id} // Changed from _id to profile.id
-              onUpdate={() => fetchData()}
+              onUpdate={handleMediaUpdate}
               onDelete={handleMediaDelete}
             />
           </section>

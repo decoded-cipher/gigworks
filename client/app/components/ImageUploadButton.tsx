@@ -8,7 +8,7 @@ import heic2any from 'heic2any';
 
 interface ImageUploadButtonProps {
   businessId: string;
-  onUploadComplete: (assetpath?: string) => void;
+  onUploadComplete: (assetPath: string, mediaId?: string) => void;
   category: 'media' | 'avatar' | 'banner' |'identity';
   label?: string;
   showPreview?: boolean;
@@ -117,11 +117,11 @@ const ImageUploadButton = ({
           onUploadComplete(urlResponse.assetpath);
         } else {
           // For media, create media record
-          await createBusinessMedia(businessId, {
+          const response = await createBusinessMedia(businessId, {
             url: urlResponse.assetpath,
             type: file.type,
           });
-          onUploadComplete();
+          onUploadComplete(urlResponse.assetpath, response.data.id);
         }
 
         setUploadProgress(100);
