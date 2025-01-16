@@ -87,6 +87,7 @@ interface BusinessProfile {
   type: string;
   additional_services: string;
   gstin: string;
+  slug: string; // Add slug property
 }
 
 interface BusinessData {
@@ -912,7 +913,7 @@ const DevMorphixWebsite = () => {
             <hr className="my-4 mx-10 "></hr>
 
             <section
-              className="bg-white  rounded-lg p-6 mb-8 text-center"
+              className="bg-white  rounded-lg p-6 mb-8 px-5 text-center"
               id="about"
               style={{ scrollMarginTop: "100px" }}
             >
@@ -1033,7 +1034,7 @@ const DevMorphixWebsite = () => {
             id="qr"
             style={{ scrollMarginTop: "100px" }}
           >
-            <DynamicQRCode />
+            <DynamicQRCode slug={businessData?.profile.slug || ''}/>
           </section>
         </main>
       </div>

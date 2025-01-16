@@ -484,7 +484,8 @@ export default function BusinessOverview({
             </label>
             <input
               type="tel"
-              name="whatsAppNumber"
+              name="whatsAppNumber" 
+              maxLength={10}
               value={formData.whatsAppNumber}
               onChange={handleInputChange}
               placeholder="WhatsApp Number"
