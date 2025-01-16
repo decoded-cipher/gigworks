@@ -31,19 +31,19 @@ import { toast } from "react-hot-toast"; // Add toast for notifications
 import { s } from "framer-motion/client";
 import ImageCropper from "@/app/components/ImageCropper";
 
+// Define MediaItem interface locally if import fails
+interface MediaItem {
+  id: string;
+  url: string;
+  type: string;
+}
+
 // Add License interface before other interfaces
 interface License {
   name: string;
   number: string;
   url: string;
   description: string;
-}
-
-// Add MediaItem interface
-interface MediaItem {
-  id: string;
-  url: string;
-  type: string;
 }
 
 interface BusinessProfile {
@@ -84,7 +84,7 @@ interface BusinessData {
     phone: string;
   };
   _id: string;
-  media: MediaItem[]; // Add this field
+  media: MediaItem[]; // Using the imported MediaItem type
   category: string;
   subCategory: string;
   subCategoryOption: string;
@@ -112,14 +112,25 @@ const socialMediaConfig = {
   medium: { label: "Medium Profile", icon: "/icon/medium.svg" },
 };
 export default function EditBusinessPage() {
+  // Move all hooks to the top, before any conditional logic
+  const [isMounted, setIsMounted] = useState(false);
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pendingChanges, setPendingChanges] = useState<Record<string, any>>({});
   const params = useParams();
   const router = useRouter();
+  const [cropperState, setCropperState] = useState<{
+    isOpen: boolean;
+    imageUrl: string;
+    fieldType: "avatar" | "banner" | null;
+  }>({
+    isOpen: false,
+    imageUrl: "",
+    fieldType: null,
+  });
 
-  // Move fetchData outside useEffect so it can be referenced anywhere in the component
+  // Move fetchData function here
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -136,7 +147,12 @@ export default function EditBusinessPage() {
     }
   };
 
-  // Check authorization
+  // Mounting effect
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Authorization check
   useEffect(() => {
     const token = document.cookie
       .split("; ")
@@ -148,12 +164,12 @@ export default function EditBusinessPage() {
     }
   }, [params.id, router]);
 
-  // Initial data fetch
+  // Data fetch effect
   useEffect(() => {
     if (params.id) {
       fetchData();
     }
-  }, [params.id]);
+  }, [params.id, fetchData]); // Add fetchData to dependency array
 
   const handleFieldChange = (field: string, value: any) => {
     setPendingChanges(prev => {
@@ -278,20 +294,14 @@ export default function EditBusinessPage() {
       if (!prev) return null;
       return {
         ...prev,
-        media: [...prev.media, newMedia]
+        media: [...prev.media, {
+          id: newMedia.id,
+          url: newMedia.url,
+          type: newMedia.type || 'image/jpeg' // Provide a default type if none exists
+        }]
       };
     });
   };
-
-  const [cropperState, setCropperState] = useState<{
-    isOpen: boolean;
-    imageUrl: string;
-    fieldType: "avatar" | "banner" | null;
-  }>({
-    isOpen: false,
-    imageUrl: "",
-    fieldType: null,
-  });
 
   const handleImageSelect = async (file: File, fieldType: "avatar" | "banner") => {
     const imageUrl = URL.createObjectURL(file);
@@ -341,7 +351,8 @@ export default function EditBusinessPage() {
     }
   };
 
-  if (isLoading) {
+  // Loading and error states can now be checked after all hooks are declared
+  if (!isMounted || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         Loading...

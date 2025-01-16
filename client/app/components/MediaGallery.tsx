@@ -5,10 +5,11 @@ import ImageUploadButton from './ImageUploadButton';
 import { toast } from 'react-hot-toast';
 import { cn } from "@/lib/utils";
 
+// Define MediaItem interface locally
 interface MediaItem {
   id: string;
   url: string;
-  type?: string; // Make type optional since it might not always be present
+  type: string;
 }
 
 interface MediaGalleryProps {
@@ -103,7 +104,11 @@ export default function MediaGallery({
             label="Add Media"
             multiple={true}
             onUploadComplete={(assetPath, mediaId) => {
-              // Pass the new media item to parent
+              if (!mediaId) {
+                console.error('No media ID returned from upload');
+                return;
+              }
+              // Pass the new media item to parent only if we have a mediaId
               onUpdate({
                 id: mediaId,
                 url: assetPath,
