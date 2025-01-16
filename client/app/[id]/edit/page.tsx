@@ -6,6 +6,9 @@ import {
   fetchBusinessesByslug,
   ASSET_BASE_URL,
   updateBusiness,
+  GetURL,
+  uploadToPresignedUrl,
+  createBusinessMedia,
 } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -26,6 +29,7 @@ import OperatingHours from "@/app/components/OperatingHours";
 import { deletebusinessMedia } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
 import { s } from "framer-motion/client";
+import ImageCropper from "@/app/components/ImageCropper";
 
 // Add License interface before other interfaces
 interface License {
@@ -267,6 +271,64 @@ export default function EditBusinessPage() {
     }
   };
 
+  const [cropperState, setCropperState] = useState<{
+    isOpen: boolean;
+    imageUrl: string;
+    fieldType: "avatar" | "banner" | null;
+  }>({
+    isOpen: false,
+    imageUrl: "",
+    fieldType: null,
+  });
+
+  const handleImageSelect = async (file: File, fieldType: "avatar" | "banner") => {
+    const imageUrl = URL.createObjectURL(file);
+    setCropperState({
+      isOpen: true,
+      imageUrl,
+      fieldType,
+    });
+  };
+
+  const handleCroppedImage = async (croppedImageUrl: string) => {
+    try {
+      if (!cropperState.fieldType || !businessData?.profile.id) return;
+
+      // Convert base64/URL to blob
+      const response = await fetch(croppedImageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "cropped-image.jpg", { type: "image/jpeg" });
+
+      // Get presigned URL
+      const uploadResponse = await GetURL({
+        type: file.type,
+        category: cropperState.fieldType,
+      });
+
+      if (!uploadResponse.presignedUrl) {
+        throw new Error("Failed to get presigned URL");
+      }
+
+      // Upload to storage
+      await uploadToPresignedUrl(uploadResponse.presignedUrl, file);
+
+      // Update business profile
+      await handleFieldSave(cropperState.fieldType, uploadResponse.assetpath);
+
+      // Close cropper
+      setCropperState({
+        isOpen: false,
+        imageUrl: "",
+        fieldType: null,
+      });
+
+      toast.success("Image updated successfully");
+    } catch (error) {
+      console.error("Error handling cropped image:", error);
+      toast.error("Failed to update image");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -322,51 +384,79 @@ export default function EditBusinessPage() {
                {/* Profile Avatar */}
               <div>
                 <h3 className="text-sm font-medium mb-2">Profile Image</h3>
-                <ImageUploadButton
-                
-                  businessId={businessData.profile.id} // Changed from _id to profile.id
-                  category="avatar"
-                  label="Upload Avatar"
-                  showPreview={true}
-                  currentImage={
-                    businessData.profile.avatar
-                      ? `${ASSET_BASE_URL}/${businessData.profile.avatar}`
-                      : undefined
-                  }
-                  multiple={false}
-                  onUploadComplete={(assetpath) => {
-                    if (assetpath) {
-                      handleImageUpload(assetpath, 'avatar');
-                      businessData.profile.avatar = assetpath;
-                    }
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageSelect(file, "avatar");
                   }}
+                  className="hidden"
+                  id="avatar-input"
                 />
+                <div className="relative">
+                  <img
+                    src={
+                      businessData.profile.avatar
+                        ? `${ASSET_BASE_URL}/${businessData.profile.avatar}`
+                        : "/placeholder-avatar.png"
+                    }
+                    alt="Avatar"
+                    className="w-32 h-32 object-cover rounded-full"
+                  />
+                  <label
+                    htmlFor="avatar-input"
+                    className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow cursor-pointer"
+                  >
+                    <Pencil size={16} />
+                  </label>
+                </div>
               </div>
               {/* Banner Image */}
               <div>
                 <h3 className="text-sm font-medium mb-2">Banner Image</h3>
-                <ImageUploadButton
-                  businessId={businessData.profile.id} // Changed from _id to profile.id
-                  category="banner"
-                  label="Upload Banner"
-                  showPreview={true}
-                  currentImage={
-                    businessData.profile.banner
-                      ? `${ASSET_BASE_URL}/${businessData.profile.banner}`
-                      : undefined
-                  }
-                  multiple={false}
-                  onUploadComplete={(assetpath) => {
-                    if (assetpath) {
-                      handleImageUpload(assetpath, 'avatar');
-                      businessData.profile.avatar = assetpath;
-                    }
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageSelect(file, "banner");
                   }}
+                  className="hidden"
+                  id="banner-input"
                 />
+                <div className="relative">
+                  <img
+                    src={
+                      businessData.profile.banner
+                        ? `${ASSET_BASE_URL}/${businessData.profile.banner}`
+                        : "/placeholder-banner.png"
+                    }
+                    alt="Banner"
+                    className="w-full h-32 object-cover rounded-lg"
+                  />
+                  <label
+                    htmlFor="banner-input"
+                    className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow cursor-pointer"
+                  >
+                    <Pencil size={16} />
+                  </label>
+                </div>
               </div>
 
              
             </div>
+            {/* Image Cropper Modal */}
+            {cropperState.isOpen && (
+              <ImageCropper
+                imageUrl={cropperState.imageUrl}
+                aspect={cropperState.fieldType === "avatar" ? 1 : 16 / 9}
+                onCropComplete={handleCroppedImage}
+                onCancel={() =>
+                  setCropperState({ isOpen: false, imageUrl: "", fieldType: null })
+                }
+              />
+            )}
           </section>
 
           {/* Basic Information */}
@@ -554,23 +644,6 @@ export default function EditBusinessPage() {
               onUpdate={handleOperatingHoursUpdate}
             />
           </section>
-
-          {/* Tags */}
-          {/* <section className="bg-white rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Business Tags</h2>
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Add tags (comma separated)"
-                defaultValue={businessData.tags?.join(', ')}
-                onChange={(e) => handleChange('tags', e.target.value)}
-                className="w-full p-2 border rounded-lg"
-              />
-              <p className="text-sm text-gray-500">
-                Enter tags separated by commas (e.g., web design, development, marketing)
-              </p>
-            </div>
-          </section> */}
 
           {/* Media Gallery */}
           <section className="bg-white rounded-lg p-6 shadow-sm">
