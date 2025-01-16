@@ -475,8 +475,8 @@ const DevMorphixWebsite = () => {
       <div className="px-4 mt-12 sm:px-6 lg:px-52">
         <main>
           <ScrollToTopButton isProfilePage={true} />
-          <section className="relative  flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
-            <div className="absolute top-0 left-0 right-0 h-72 overflow-hidden">
+          <section className="relative py-16 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
+            <div className="absolute  top-0 left-0 right-0 h-72 overflow-hidden">
               <img
                 src={
                   businessData?.profile.banner
