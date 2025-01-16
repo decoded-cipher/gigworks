@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import Editor from "react-simple-wysiwyg";
+import Editor, { ContentEditableEvent } from "react-simple-wysiwyg";
 import { Textarea } from "@nextui-org/input";
 import type { FormData } from "../../signup/page";
 import ReactCrop, { Crop } from "react-image-crop";
@@ -376,7 +376,7 @@ export default function BusinessOverview({
     }
   }, []);
 
-  const handleEditorChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleEditorChange = (e: ContentEditableEvent) => {
     updateFormData({
       businessDescription: e.target.value
     });

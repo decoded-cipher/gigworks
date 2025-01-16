@@ -450,9 +450,8 @@ const DevMorphixWebsite = () => {
 
           {/* Navigation menu */}
           <div
-            className={`w-full md:block md:w-auto ${
-              isMenuOpen ? "block" : "hidden"
-            }`}
+            className={`w-full md:block md:w-auto ${isMenuOpen ? "block" : "hidden"
+              }`}
             id="navbar-default"
           >
             <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
@@ -476,7 +475,7 @@ const DevMorphixWebsite = () => {
       <div className="px-4 mt-12 sm:px-6 lg:px-52">
         <main>
           <ScrollToTopButton isProfilePage={true} />
-          <section className="relative py-16 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
+          <section className="relative  flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
             <div className="absolute top-0 left-0 right-0 h-72 overflow-hidden">
               <img
                 src={
@@ -505,9 +504,8 @@ const DevMorphixWebsite = () => {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className={`transform transition-transform ${
-                      isAccountMenuOpen ? "rotate-180" : ""
-                    }`}
+                    className={`transform transition-transform ${isAccountMenuOpen ? "rotate-180" : ""
+                      }`}
                   >
                     <path d="m6 9 6 6 6-6" />
                   </svg>
@@ -516,8 +514,6 @@ const DevMorphixWebsite = () => {
                 {isAccountMenuOpen && (
                   <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50">
                     {userProfiles.map((profile: any) => (
-                      console.log("profile aney", profile),
-                      
                       <button
                         key={profile.id}
                         onClick={() => {
@@ -761,6 +757,29 @@ const DevMorphixWebsite = () => {
                       <>
                         <iframe
                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3935.6791870223733!2d76.5665951!3d9.4495045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b062528d37a641d%3A0x66e967f68f9994bb!2sAnjaneya%20Gym!5e0!3m2!1sen!2sin!4v1736680465049!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                        <div className="mt-2">
+                          <a
+                            href="https://maps.app.goo.gl/wWFbsqCAxa5XUHpj9"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-blue-500 hover:text-blue-700"
+                          >
+                            View on Google Maps →
+                          </a>
+                        </div>
+                      </>
+                    ) : businessData?.profile.name.toLowerCase() ===
+                      "acme decor" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3935.722946930944!2d76.5714552!3d9.4456761!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625808d39e54d%3A0x2b8378272ddf82aa!2sacme%20DECOR!5e0!3m2!1sen!2sin!4v1737032116084!5m2!1sen!2sin"
                           width="100%"
                           height="100%"
                           style={{ border: 0 }}
