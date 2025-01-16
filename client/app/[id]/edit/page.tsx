@@ -555,7 +555,7 @@ export default function EditBusinessPage() {
                 <input
                   type="tel"
                   maxLength={10}
-                  defaultValue={businessData.user.phone}
+                  defaultValue={businessData.profile.phone || ""}
                   onChange={(e) => handleFieldChange("phone", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />

@@ -78,7 +78,7 @@ const ScrollToTopButton = ({
         fixed z-50 text-white 
         rounded-full shadow-lg hover:bg-opacity-80 
         transition-all duration-300 ease-in-out
-        flex items-center justify-center
+        flex items-center justify-center border-2 border-white
         ${isProfilePage ? 'bg-black' : 'bg-green-500'}
       `}
       style={{

@@ -67,9 +67,9 @@ export interface FormData {
   };
 }
 
-const setLocalStorage = (key: string, value: any) => {
-  localStorage.setItem(key, JSON.stringify(value));
-};
+// const setLocalStorage = (key: string, value: any) => {
+//   localStorage.setItem(key, JSON.stringify(value));
+// };
 
 export default function SignupPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -236,11 +236,11 @@ export default function SignupPage() {
 
       const response = await createBusiness(payload);
 
-      setLocalStorage('userProfiles', {
-        name:  formData.businessName,
-        slug: formData.slug,
-        avatar: formData.avatar,
-      });
+      // setLocalStorage('userProfiles', {
+      //   name:  formData.businessName,
+      //   slug: formData.slug,
+      //   avatar: formData.avatar,
+      // });
       // Extract the slug from the response
       const profileSlug = response.data.profile.slug;
       
