@@ -1,7 +1,7 @@
 "use client";
 
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import Editor from "react-simple-wysiwyg";
 import {
   fetchBusinessesByslug,
   ASSET_BASE_URL,
@@ -31,19 +31,19 @@ import { toast } from "react-hot-toast"; // Add toast for notifications
 import { s } from "framer-motion/client";
 import ImageCropper from "@/app/components/ImageCropper";
 
+// Define MediaItem interface locally if import fails
+interface MediaItem {
+  id: string;
+  url: string;
+  type: string;
+}
+
 // Add License interface before other interfaces
 interface License {
   name: string;
   number: string;
   url: string;
   description: string;
-}
-
-// Add MediaItem interface
-interface MediaItem {
-  id: string;
-  url: string;
-  type: string;
 }
 
 interface BusinessProfile {
@@ -84,7 +84,7 @@ interface BusinessData {
     phone: string;
   };
   _id: string;
-  media: MediaItem[]; // Add this field
+  media: MediaItem[]; // Using the imported MediaItem type
   category: string;
   subCategory: string;
   subCategoryOption: string;
@@ -112,15 +112,26 @@ const socialMediaConfig = {
   medium: { label: "Medium Profile", icon: "/icon/medium.svg" },
 };
 export default function EditBusinessPage() {
+  // Move all hooks to the top, before any conditional logic
+  const [isMounted, setIsMounted] = useState(false);
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [changes, setChanges] = useState<Partial<BusinessProfile>>({});
+  const [pendingChanges, setPendingChanges] = useState<Record<string, any>>({});
   const params = useParams();
   const router = useRouter();
+  const [cropperState, setCropperState] = useState<{
+    isOpen: boolean;
+    imageUrl: string;
+    fieldType: "avatar" | "banner" | null;
+  }>({
+    isOpen: false,
+    imageUrl: "",
+    fieldType: null,
+  });
 
-  // Move fetchData outside useEffect so it can be referenced anywhere in the component
-  const fetchData = async () => {
+  // Wrap fetchData with useCallback
+  const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetchBusinessesByslug(params.id as string);
@@ -134,99 +145,115 @@ export default function EditBusinessPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params.id]); // Only depend on params.id
 
-  // Check authorization
+  // Update useEffect to depend on the stable fetchData function
   useEffect(() => {
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1];
-
-    if (!token) {
-      router.push(`/${params.id}`);
-    }
-  }, [params.id, router]);
-
-  // Initial data fetch
-  useEffect(() => {
-    if (params.id) {
+    if (params.id && isMounted) {
       fetchData();
     }
-  }, [params.id]);
+  }, [params.id, fetchData, isMounted]); // Include isMounted to prevent unnecessary fetches
 
-  const handleFieldSave = async (field: string, value: any) => {
-    try {
-      if (!businessData?.profile.id) return;
+  // Combine mounting and fetch effects
+  useEffect(() => {
+    setIsMounted(true);
+    return () => setIsMounted(false);
+  }, []);
 
+  const handleFieldChange = (field: string, value: any) => {
+    setPendingChanges(prev => {
       const fieldParts = field.split(".");
-      let updateData: Record<string, any> = {};
-
       if (fieldParts.length > 1 && fieldParts[0] === "socials") {
-        // Handle social media fields specifically
-        updateData.socials = {
-          ...(businessData.profile.socials || {}),
-          [fieldParts[1]]: value,
+        return {
+          ...prev,
+          socials: {
+            ...(prev.socials || {}),
+            [fieldParts[1]]: value,
+          },
         };
-      } else {
-        // Handle regular fields
-        updateData[field] = value;
       }
+      return {
+        ...prev,
+        [field]: value,
+      };
+    });
 
-      // Ensure updateData is not empty before making the API call
-      if (Object.keys(updateData).length === 0) {
-        console.warn("No values to update");
-        return;
-      }
-
-      // Log the updateData object
-      console.log("Updating business with data:", updateData);
-
-      await updateBusiness(businessData.profile.id, updateData);
-      toast.success(`${field} updated successfully`);
-
-      // Update local state
-      setBusinessData((prev) => {
-        if (!prev) return null;
+    // Update local state for immediate UI feedback
+    setBusinessData(prev => {
+      if (!prev) return null;
+      if (field.startsWith("socials.")) {
+        const socialField = field.split(".")[1];
         return {
           ...prev,
           profile: {
             ...prev.profile,
-            ...(fieldParts[0] === "socials"
-              ? {
-                  socials: {
-                    ...prev.profile.socials,
-                    [fieldParts[1]]: value,
-                  },
-                }
-              : updateData),
+            socials: {
+              ...prev.profile.socials,
+              [socialField]: value,
+            },
           },
         };
-      });
-    } catch (error) {
-      console.error("Error updating field:", error);
-      toast.error(`Failed to update ${field}`);
-    }
+      }
+      return {
+        ...prev,
+        profile: {
+          ...prev.profile,
+          [field]: value,
+        },
+      };
+    });
+  };
+
+  const handleOperatingHoursUpdate = (newHours: { [key: string]: string }) => {
+    setPendingChanges(prev => ({
+      ...prev,
+      operating_hours: newHours,
+    }));
+
+    setBusinessData(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        profile: {
+          ...prev.profile,
+          operating_hours: newHours,
+        },
+      };
+    });
   };
 
   const handleImageUpload = (assetpath: string, field: 'avatar' | 'banner') => {
-    console.log('Image uploaded:', assetpath);
-    // console.log('Field:', field);
-    handleFieldSave(field, assetpath);
+    setPendingChanges(prev => ({
+      ...prev,
+      [field]: assetpath,
+    }));
 
-  };
-
-  // Replace handleChange with immediate save
-  const handleChange = async (field: string, value: string) => {
-    await handleFieldSave(field, value);
+    setBusinessData(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        profile: {
+          ...prev.profile,
+          [field]: assetpath,
+        },
+      };
+    });
   };
 
   const handleSave = async () => {
     try {
-      // TODO: Implement API call to save all changes
+      if (!businessData?.profile.id || Object.keys(pendingChanges).length === 0) {
+        router.push(`/${params.id}`);
+        return;
+      }
+
+      await updateBusiness(businessData.profile.id, pendingChanges);
+      toast.success("All changes saved successfully");
+      setPendingChanges({});
       router.push(`/${params.id}`);
     } catch (error) {
       console.error("Error saving changes:", error);
+      toast.error("Failed to save changes");
     }
   };
 
@@ -234,52 +261,36 @@ export default function EditBusinessPage() {
     try {
       if (businessData?.profile.id) {
         await deletebusinessMedia(businessData.profile.id, mediaId);
+        // Update local state instead of fetching all data again
+        setBusinessData(prev => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            media: prev.media.filter(item => item.id !== mediaId)
+          };
+        });
+        toast.success('Media item deleted successfully');
       }
-      fetchData();
-      toast.success('Media item deleted successfully');
     } catch (error) {
       console.error('Error deleting media:', error);
       toast.error('Failed to delete media item');
     }
   };
 
-  const handleOperatingHoursUpdate = async (newHours: {
-    [key: string]: string;
-  }) => {
-    try {
-      if (!businessData?.profile.id) return;
-
-      await updateBusiness(businessData.profile.id, {
-        operating_hours: newHours,
-      });
-      toast.success("Operating hours updated successfully");
-
-      // Update local state
-      setBusinessData((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          profile: {
-            ...prev.profile,
-            operating_hours: newHours,
-          },
-        };
-      });
-    } catch (error) {
-      console.error("Error updating operating hours:", error);
-      toast.error("Failed to update operating hours");
-    }
+  // Add this new function to handle media updates
+  const handleMediaUpdate = (newMedia: MediaItem) => {
+    setBusinessData(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        media: [...prev.media, {
+          id: newMedia.id,
+          url: newMedia.url,
+          type: newMedia.type || 'image/jpeg' // Provide a default type if none exists
+        }]
+      };
+    });
   };
-
-  const [cropperState, setCropperState] = useState<{
-    isOpen: boolean;
-    imageUrl: string;
-    fieldType: "avatar" | "banner" | null;
-  }>({
-    isOpen: false,
-    imageUrl: "",
-    fieldType: null,
-  });
 
   const handleImageSelect = async (file: File, fieldType: "avatar" | "banner") => {
     const imageUrl = URL.createObjectURL(file);
@@ -313,7 +324,7 @@ export default function EditBusinessPage() {
       await uploadToPresignedUrl(uploadResponse.presignedUrl, file);
 
       // Update business profile
-      await handleFieldSave(cropperState.fieldType, uploadResponse.assetpath);
+      await handleFieldChange(cropperState.fieldType, uploadResponse.assetpath);
 
       // Close cropper
       setCropperState({
@@ -329,7 +340,8 @@ export default function EditBusinessPage() {
     }
   };
 
-  if (isLoading) {
+  // Loading and error states can now be checked after all hooks are declared
+  if (!isMounted || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         Loading...
@@ -470,7 +482,7 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.profile.name}
-                  onBlur={(e) => handleFieldSave("name", e.target.value)}
+                  onChange={(e) => handleFieldChange("name", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -481,7 +493,7 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.category}
-                  onBlur={(e) => handleFieldSave("category", e.target.value)}
+                  onChange={(e) => handleFieldChange("category", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -492,7 +504,7 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.subCategory}
-                  onBlur={(e) => handleFieldSave("subCategory", e.target.value)}
+                  onChange={(e) => handleFieldChange("subCategory", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -503,7 +515,7 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.subCategoryOption}
-                  onBlur={(e) => handleFieldSave("subCategoryOption", e.target.value)}
+                  onChange={(e) => handleFieldChange("subCategoryOption", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -512,11 +524,15 @@ export default function EditBusinessPage() {
                 <label className="block text-sm font-medium mb-1">
                   Description
                 </label>
-                <textarea
-                  defaultValue={businessData.profile.description}
-                  onBlur={(e) => handleFieldSave("description", e.target.value)}
-                  className="w-full p-2 border rounded-lg min-h-[100px]"
-                />
+                <div className="border rounded-lg">
+                  <Editor 
+                    value={businessData.profile.description || ''}
+                    onChange={(e) => handleFieldChange("description", e.target.value)}
+                    containerProps={{
+                      className: "min-h-[150px] p-2"
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </section>
@@ -530,7 +546,7 @@ export default function EditBusinessPage() {
                 <input
                   type="email"
                   defaultValue={businessData.profile.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
+                  onChange={(e) => handleFieldChange("email", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -538,8 +554,9 @@ export default function EditBusinessPage() {
                 <label className="block text-sm font-medium mb-1">Phone</label>
                 <input
                   type="tel"
+                  maxLength={10}
                   defaultValue={businessData.user.phone}
-                  onChange={(e) => handleChange("phone", e.target.value)}
+                  onChange={(e) => handleFieldChange("phone", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -550,7 +567,7 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.profile.address}
-                  onChange={(e) => handleChange("address", e.target.value)}
+                  onChange={(e) => handleFieldChange("address", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -589,7 +606,7 @@ export default function EditBusinessPage() {
                   type="text"
                   defaultValue={businessData.profile.additional_services}
                   onBlur={(e) =>
-                    handleFieldSave("additional_services", e.target.value)
+                    handleFieldChange("additional_services", e.target.value)
                   }
                   className="w-full p-2 border rounded-lg"
                   placeholder="e.g., customOrders, afterSalesSupport"
@@ -624,7 +641,7 @@ export default function EditBusinessPage() {
                           ] || ""
                         }
                         onBlur={(e) =>
-                          handleFieldSave(`socials.${key}`, e.target.value)
+                          handleFieldChange(`socials.${key}`, e.target.value)
                         }
                         className="w-full p-2 border rounded-lg"
                         placeholder={`Enter ${label}`}
@@ -651,7 +668,7 @@ export default function EditBusinessPage() {
             <MediaGallery
               media={businessData.media}
               businessId={businessData.profile.id} // Changed from _id to profile.id
-              onUpdate={() => fetchData()}
+              onUpdate={handleMediaUpdate}
               onDelete={handleMediaDelete}
             />
           </section>
@@ -663,7 +680,7 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.profile.gstin}
-                  onChange={(e) => handleChange("gstin", e.target.value)}
+                  onChange={(e) => handleFieldChange("gstin", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -673,7 +690,7 @@ export default function EditBusinessPage() {
                 <input
                   type="tel"
                   defaultValue={businessData.licenses[0].name}
-                  onChange={(e) => handleChange("licenses", e.target.value)}
+                  onChange={(e) => handleFieldChange("licenses", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -684,7 +701,7 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.licenses[0].number}
-                  onChange={(e) => handleChange("licenses", e.target.value)}
+                  onChange={(e) => handleFieldChange("licenses", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -717,3 +734,4 @@ export default function EditBusinessPage() {
     </div>
   );
 }
+

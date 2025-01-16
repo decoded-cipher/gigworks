@@ -4,12 +4,18 @@ import React, { useState } from 'react';
 import { Upload, X } from 'lucide-react';
 import { GetURL, uploadToPresignedUrl, createBusinessMedia } from '@/app/api';
 import { toast } from 'react-hot-toast';
-import heic2any from 'heic2any';
+
+// Define MediaItem interface locally if needed
+interface MediaItem {
+  id: string;
+  url: string;
+  type: string;
+}
 
 interface ImageUploadButtonProps {
   businessId: string;
-  onUploadComplete: (assetpath?: string) => void;
-  category: 'media' | 'avatar' | 'banner' |'identity';
+  onUploadComplete: (assetPath: string, mediaId?: string) => void;
+  category: 'media' | 'avatar' | 'banner' | 'identity';
   label?: string;
   showPreview?: boolean;
   currentImage?: string;
@@ -30,8 +36,13 @@ const ImageUploadButton = ({
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   const convertHeicToPng = async (file: File): Promise<File> => {
+    if (typeof window === 'undefined') return file; // Skip conversion on server-side
+
     if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
       try {
+        // Import heic2any dynamically only when needed
+        const heic2any = (await import('heic2any')).default;
+        
         const convertedBlob = await heic2any({
           blob: file,
           toType: 'image/png',
@@ -115,13 +126,12 @@ const ImageUploadButton = ({
         if (category === 'avatar' || category === 'banner' || category === 'identity') {
           console.log(`Completing ${category} upload with assetpath:`, urlResponse.assetpath);
           onUploadComplete(urlResponse.assetpath);
-        } else {
-          // For media, create media record
-          await createBusinessMedia(businessId, {
+        } else if (category === 'media') {
+          const response = await createBusinessMedia(businessId, {
             url: urlResponse.assetpath,
             type: file.type,
           });
-          onUploadComplete();
+          onUploadComplete(urlResponse.assetpath, response.data.id);
         }
 
         setUploadProgress(100);

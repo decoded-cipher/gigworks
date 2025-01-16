@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Editor, { ContentEditableEvent } from "react-simple-wysiwyg";
 import { Textarea } from "@nextui-org/input";
 import type { FormData } from "../../signup/page";
 import ReactCrop, { Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 
-import { GetURL, uploadToPresignedUrl } from "../../api/index"; // Add this import
+import { GetURL, uploadToPresignedUrl } from "../../api/index";
 import {
   fetchBusinessData,
   fetchsubCategoryByCategory,
@@ -375,6 +376,12 @@ export default function BusinessOverview({
     }
   }, []);
 
+  const handleEditorChange = (e: ContentEditableEvent) => {
+    updateFormData({
+      businessDescription: e.target.value
+    });
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold py-4">Business Overview</h1>
@@ -577,22 +584,18 @@ export default function BusinessOverview({
         </div>
 
         <div className="mb-6 col-span-3">
-          <label
-            htmlFor="businessDescription"
-            className="block text-lg font-bold mb-2 "
-          >
+          <label className="block text-lg font-bold mb-2">
             Business Description
           </label>
-          <textarea
-            id="businessDescription"
-            name="businessDescription"
-            value={formData.businessDescription}
-            onChange={handleInputChange}
-            placeholder="Tell us about your business..."
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030] resize-none"
-            required
-          />
+          <div className="border border-gray-300 rounded-md">
+            <Editor 
+              value={formData.businessDescription || ''}
+              onChange={handleEditorChange}
+              containerProps={{
+                className: "min-h-[150px]"
+              }}
+            />
+          </div>
         </div>
 
         <div className="col-span-full">
@@ -641,7 +644,7 @@ export default function BusinessOverview({
                         >
                           <path
                             fillRule="evenodd"
-                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 111.414 1.414L11.414 10l4.293 4.293a1 1 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
                             clipRule="evenodd"
                           />
                         </svg>
@@ -788,7 +791,7 @@ export default function BusinessOverview({
         </div>
       </form>
 
-      {/* Crop Modal */}
+     {/* Crop Modal */}
       {isCropModalOpen && currentImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg w-[95vw] max-w-[800px] max-h-[90vh] flex flex-col">

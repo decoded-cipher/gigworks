@@ -5,23 +5,26 @@ import ImageUploadButton from './ImageUploadButton';
 import { toast } from 'react-hot-toast';
 import { cn } from "@/lib/utils";
 
+// Define MediaItem interface locally
+interface MediaItem {
+  id: string;
+  url: string;
+  type: string;
+}
+
 interface MediaGalleryProps {
   businessId: string;
-  media: Array<{
-    id: string;
-    url: string;
-    type: string;
-  }>;
-  onUpdate: () => void;
+  media: MediaItem[];
+  onUpdate: (newMedia: MediaItem) => void;
   onDelete?: (mediaId: string) => Promise<void>;
 }
 
-const MediaGallery = ({ 
+export default function MediaGallery({
   businessId,
-  media, 
-  onUpdate, 
-  onDelete 
-}: MediaGalleryProps) => {
+  media,
+  onUpdate,
+  onDelete
+}: MediaGalleryProps) {
   const [selectedMedia, setSelectedMedia] = useState<null | {
     id: string;
     url: string;
@@ -30,27 +33,29 @@ const MediaGallery = ({
   }>(null);
   const [playingStates, setPlayingStates] = useState<{ [key: string]: boolean }>({});
   const [mutedStates, setMutedStates] = useState<{ [key: string]: boolean }>({});
-  
+
   const limitedMedia = media.slice(0, 15);
   const hasReachedLimit = media.length >= 15;
 
-  const handleDelete = async (mediaId: string) => {
+  const handleDelete = async (mediaId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering media selection
     try {
-      await deletebusinessMedia(businessId, mediaId);
-      onUpdate();
-      toast.success('Media item deleted successfully');
+      if (onDelete) {
+        await onDelete(mediaId);
+        toast.success('Media item deleted successfully');
+      }
     } catch (error) {
       console.error('Error deleting media item:', error);
       toast.error('Failed to delete media item');
     }
   };
 
-  const mediaItems = limitedMedia.map((item, index) => {
-    const fileType = item.type || '';
-    const isVideo = fileType.includes('video') || 
-                   item.url.endsWith('.mp4') || 
-                   item.url.endsWith('.quicktime') || 
-                   item.url.endsWith('.mov');
+  const mediaItems = limitedMedia.map((item: MediaItem, index) => {
+    const fileType = item.type || ''; // Use logical OR instead of nullish coalescing
+    const isVideo = fileType.includes('video') ||
+      item.url.endsWith('.mp4') ||
+      item.url.endsWith('.quicktime') ||
+      item.url.endsWith('.mov');
     return {
       id: item.id,
       src: `${ASSET_BASE_URL}/${item.url}`,
@@ -98,7 +103,18 @@ const MediaGallery = ({
             category="media"
             label="Add Media"
             multiple={true}
-            onUploadComplete={onUpdate}
+            onUploadComplete={(assetPath, mediaId) => {
+              if (!mediaId) {
+                console.error('No media ID returned from upload');
+                return;
+              }
+              // Pass the new media item to parent only if we have a mediaId
+              onUpdate({
+                id: mediaId,
+                url: assetPath,
+                type: 'image' // or determine type from the uploaded file
+              });
+            }}
           />
         )}
       </div>
@@ -106,8 +122,8 @@ const MediaGallery = ({
       {/* Grid Gallery */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {mediaItems.map((item) => (
-          <div 
-            key={item.id} 
+          <div
+            key={item.id}
             className={cn(
               "relative rounded-xl overflow-hidden group cursor-pointer",
               "transform transition-all duration-300",
@@ -125,7 +141,7 @@ const MediaGallery = ({
             <div className="aspect-square">
               {item.isVideo ? (
                 <div className="relative w-full h-full">
-                  <video 
+                  <video
                     id={`video-${item.id}`}
                     className="w-full h-full object-cover"
                     preload="metadata"
@@ -165,15 +181,12 @@ const MediaGallery = ({
                 </div>
               )}
             </div>
-            
+
             {/* Delete button overlay */}
             <div className="absolute top-2 right-2 z-10">
               {onDelete && (
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(item.id);
-                  }}
+                  onClick={(e) => handleDelete(item.id, e)}
                   className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
                 >
                   <Trash2 size={20} />
@@ -186,12 +199,12 @@ const MediaGallery = ({
 
       {/* Modal */}
       {selectedMedia && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
           onClick={() => setSelectedMedia(null)}
         >
           <div className="relative max-w-7xl w-full mx-auto transform transition-all duration-300">
-            <button 
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedMedia(null);
@@ -200,12 +213,12 @@ const MediaGallery = ({
             >
               <X size={24} />
             </button>
-            
+
             {selectedMedia.isVideo ? (
               <div className="relative">
-                <video 
+                <video
                   id={`modal-video-${selectedMedia.id}`}
-                  className="w-full max-h-[90vh] object-contain rounded-lg" 
+                  className="w-full max-h-[90vh] object-contain rounded-lg"
                   controls
                   autoPlay
                   playsInline
@@ -216,7 +229,7 @@ const MediaGallery = ({
                 </video>
               </div>
             ) : (
-              <img 
+              <img
                 src={`${ASSET_BASE_URL}/${selectedMedia.url}`}
                 alt="Gallery item"
                 className="w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
@@ -228,6 +241,4 @@ const MediaGallery = ({
     </div>
   );
 };
-
-export default MediaGallery;
 
