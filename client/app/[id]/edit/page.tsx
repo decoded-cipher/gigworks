@@ -393,7 +393,7 @@ export default function EditBusinessPage() {
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Profile Images</h2>
             <div className="grid md:grid-cols-2 gap-6">
-               {/* Profile Avatar */}
+              {/* Profile Avatar */}
               <div>
                 <h3 className="text-sm font-medium mb-2">Profile Image</h3>
                 <input
@@ -456,7 +456,7 @@ export default function EditBusinessPage() {
                 </div>
               </div>
 
-             
+
             </div>
             {/* Image Cropper Modal */}
             {cropperState.isOpen && (
@@ -519,13 +519,13 @@ export default function EditBusinessPage() {
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-1">
                   Description
                 </label>
                 <div className="border rounded-lg">
-                  <Editor 
+                  <Editor
                     value={businessData.profile.description || ''}
                     onChange={(e) => handleFieldChange("description", e.target.value)}
                     containerProps={{
@@ -637,7 +637,7 @@ export default function EditBusinessPage() {
                         type="url"
                         defaultValue={
                           businessData.profile.socials?.[
-                            key as keyof typeof businessData.profile.socials
+                          key as keyof typeof businessData.profile.socials
                           ] || ""
                         }
                         onBlur={(e) =>
@@ -674,59 +674,40 @@ export default function EditBusinessPage() {
           </section>
 
           <section className="bg-white rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Business operation</h2>
-              <div>
-                <label className="block text-sm font-medium mb-1">GSTIN</label>
-                <input
-                  type="text"
-                  defaultValue={businessData.profile.gstin}
-                  onChange={(e) => handleFieldChange("gstin", e.target.value)}
-                  className="w-full p-2 border rounded-lg"
-                />
-              </div>
+            <h2 className="text-xl font-semibold mb-4">Business Operation</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Licenses</label>
-                <input
-                  type="tel"
-                  defaultValue={businessData.licenses[0].name}
-                  onChange={(e) => handleFieldChange("licenses", e.target.value)}
-                  className="w-full p-2 border rounded-lg"
-                />
+                <h3 className="text-sm font-medium mb-1">GSTIN</h3>
+                <p className="p-2 bg-gray-50 rounded-lg">
+                  {businessData.profile.gstin || "Not provided"}
+                </p>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                Licenses number
-                </label>
-                <input
-                  type="text"
-                  defaultValue={businessData.licenses[0].number}
-                  onChange={(e) => handleFieldChange("licenses", e.target.value)}
-                  className="w-full p-2 border rounded-lg"
-                />
-              </div>
-              <div>
-                <h3 className="text-sm font-medium mb-2">Licenses Certificate</h3>
-                <ImageUploadButton
-                
-                  businessId={businessData.profile.id} // Changed from _id to profile.id
-                  category="identity"
-                  label="Licenses Certificate"
-                  showPreview={true}
-                  currentImage={
-                    businessData.profile.avatar
-                      ? `${ASSET_BASE_URL}/${businessData.licenses[0].url}`
-                      : undefined
-                  }
-                  multiple={false}
-                  onUploadComplete={(assetpath) => {
-                    if (assetpath) {
-                      handleImageUpload(assetpath, 'avatar');
-                      businessData.profile.avatar = assetpath;
-                    }
-                  }}
-                />
-              </div>
+              {businessData.licenses.map((license, index) => (
+                <div key={index} className="space-y-2">
+                  <h3 className="text-sm font-medium mb-1">
+                    License {index + 1}
+                  </h3>
+                  <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+                    <p>
+                      <span className="font-medium">Name:</span> {license.name}
+                    </p>
+                    <p>
+                      <span className="font-medium">Number:</span>{" "}
+                      {license.number}
+                    </p>
+                    {license.url && (
+                      <div>
+                        <span className="font-medium">Certificate:</span>
+                        <img
+                          src={`${ASSET_BASE_URL}/${license.url}`}
+                          alt={`License certificate for ${license.name}`}
+                          className="mt-2 max-w-full h-auto rounded-lg border"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
         </div>
