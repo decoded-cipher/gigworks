@@ -8,7 +8,8 @@ import ImageGrid from "../components/imgsec";
 import { FooterSection } from "../components/FooterSection";
 import { div } from "framer-motion/client";
 import ScrollToTopButton from "../components/ScrollToTop";
-import { GetPartner, GetPartnerAnalytics, ASSET_BASE_URL } from "../api";
+import { GetPartner, GetPartnerAnalytics, ASSET_BASE_URL ,UserLogout} from "../api";
+import Cookies from "js-cookie";
 
 interface PartnerData {
   name: string;
@@ -70,6 +71,33 @@ const DevMorphixWebsite = () => {
 
     fetchPartnerData();
   }, [dateRange, router]); // Re-fetch when date range changes
+
+
+
+  const handlelogout = async () => {
+    try {
+      const token = Cookies.get("token");
+      // console.log("Raw JWT Token:", token);
+
+      if (!token) {
+        console.log("No JWT token found in cookies");
+        return null;
+      }
+      const res = await UserLogout(token);
+      console.log();
+
+      if (res.status === 200) {
+        Cookies.remove("token");
+        localStorage.removeItem("userData");
+        localStorage.removeItem("userProfiles");
+        router.push("/");
+      } else {
+        console.log("Error logging out:", res);
+      }
+    } catch (err) {
+      console.error("Error logging out:", err);
+    }
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -187,6 +215,29 @@ const DevMorphixWebsite = () => {
                 className="w-full h-full object-cover"
               />
             </div>
+            <button
+                onClick={handlelogout}
+                className="absolute top-12 left-4 p-2 text-left text-red-600 hover:bg-red-600 hover:text-white flex items-center gap-2 rounded-lg"
+                title="Edit Business Profile"
+              >
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                Logout
+                {/* <Pencil className="w-4 h-4 text-gray-600" /> */}
+              </button>
 
             <div className="relative z-10 w-80 h-80 border border-white border-8 bg-black rounded-full flex items-center justify-center mb-8 mt-20">
               {partnerData?.avatar ? (

@@ -1,5 +1,6 @@
 "use client";
 
+
 import React, { useState, useEffect } from "react";
 import {
   fetchBusinessesByslug,
@@ -204,10 +205,11 @@ export default function EditBusinessPage() {
     }
   };
 
-  const handleImageUpload = (assetpath: string, field: "avatar" | "banner") => {
-    console.log("Image uploaded:", assetpath);
+  const handleImageUpload = (assetpath: string, field: 'avatar' | 'banner') => {
+    console.log('Image uploaded:', assetpath);
     // console.log('Field:', field);
     handleFieldSave(field, assetpath);
+
   };
 
   // Replace handleChange with immediate save
@@ -230,10 +232,10 @@ export default function EditBusinessPage() {
         await deletebusinessMedia(businessData.profile.id, mediaId);
       }
       fetchData();
-      toast.success("Media item deleted successfully");
+      toast.success('Media item deleted successfully');
     } catch (error) {
-      console.error("Error deleting media:", error);
-      toast.error("Failed to delete media item");
+      console.error('Error deleting media:', error);
+      toast.error('Failed to delete media item');
     }
   };
 
@@ -293,9 +295,7 @@ export default function EditBusinessPage() {
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex md:flex-row flex-col justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold md:pb-0 pb-2">
-            Edit Business Profile
-          </h1>
+          <h1 className="text-2xl font-bold md:pb-0 pb-2">Edit Business Profile</h1>
           <div className="flex gap-4">
             <button
               onClick={() => router.push(`/${params.id}`)}
@@ -319,10 +319,11 @@ export default function EditBusinessPage() {
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Profile Images</h2>
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Profile Avatar */}
+               {/* Profile Avatar */}
               <div>
                 <h3 className="text-sm font-medium mb-2">Profile Image</h3>
                 <ImageUploadButton
+                
                   businessId={businessData.profile.id} // Changed from _id to profile.id
                   category="avatar"
                   label="Upload Avatar"
@@ -335,7 +336,7 @@ export default function EditBusinessPage() {
                   multiple={false}
                   onUploadComplete={(assetpath) => {
                     if (assetpath) {
-                      handleImageUpload(assetpath, "avatar");
+                      handleImageUpload(assetpath, 'avatar');
                       businessData.profile.avatar = assetpath;
                     }
                   }}
@@ -357,12 +358,14 @@ export default function EditBusinessPage() {
                   multiple={false}
                   onUploadComplete={(assetpath) => {
                     if (assetpath) {
-                      handleImageUpload(assetpath, "banner");
-                      businessData.profile.banner = assetpath;
+                      handleImageUpload(assetpath, 'avatar');
+                      businessData.profile.avatar = assetpath;
                     }
                   }}
                 />
               </div>
+
+             
             </div>
           </section>
 
@@ -381,6 +384,40 @@ export default function EditBusinessPage() {
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Business Category
+                </label>
+                <input
+                  type="text"
+                  defaultValue={businessData.category}
+                  onBlur={(e) => handleFieldSave("category", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Business Sub-Category
+                </label>
+                <input
+                  type="text"
+                  defaultValue={businessData.subCategory}
+                  onBlur={(e) => handleFieldSave("subCategory", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Business Sub-Category options
+                </label>
+                <input
+                  type="text"
+                  defaultValue={businessData.subCategoryOption}
+                  onBlur={(e) => handleFieldSave("subCategoryOption", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              
               <div>
                 <label className="block text-sm font-medium mb-1">
                   Description
@@ -410,7 +447,7 @@ export default function EditBusinessPage() {
               <div>
                 <label className="block text-sm font-medium mb-1">Phone</label>
                 <input
-                  type="number"
+                  type="tel"
                   defaultValue={businessData.user.phone}
                   onChange={(e) => handleChange("phone", e.target.value)}
                   className="w-full p-2 border rounded-lg"
@@ -547,40 +584,59 @@ export default function EditBusinessPage() {
           </section>
 
           <section className="bg-white rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Business Operation</h2>
+            <h2 className="text-xl font-semibold mb-4">Business operation</h2>
+              <div>
+                <label className="block text-sm font-medium mb-1">GSTIN</label>
+                <input
+                  type="text"
+                  defaultValue={businessData.profile.gstin}
+                  onChange={(e) => handleChange("gstin", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-medium mb-1">GSTIN</h3>
-                <p className="p-2 bg-gray-50 rounded-lg">
-                  {businessData.profile.gstin || "Not provided"}
-                </p>
+                <label className="block text-sm font-medium mb-1">Licenses</label>
+                <input
+                  type="tel"
+                  defaultValue={businessData.licenses[0].name}
+                  onChange={(e) => handleChange("licenses", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
               </div>
-              {businessData.licenses.map((license, index) => (
-                <div key={index} className="space-y-2">
-                  <h3 className="text-sm font-medium mb-1">
-                    License {index + 1}
-                  </h3>
-                  <div className="p-4 bg-gray-50 rounded-lg space-y-2">
-                    <p>
-                      <span className="font-medium">Name:</span> {license.name}
-                    </p>
-                    <p>
-                      <span className="font-medium">Number:</span>{" "}
-                      {license.number}
-                    </p>
-                    {license.url && (
-                      <div>
-                        <span className="font-medium">Certificate:</span>
-                        <img
-                          src={`${ASSET_BASE_URL}/${license.url}`}
-                          alt={`License certificate for ${license.name}`}
-                          className="mt-2 max-w-full h-auto rounded-lg border"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                Licenses number
+                </label>
+                <input
+                  type="text"
+                  defaultValue={businessData.licenses[0].number}
+                  onChange={(e) => handleChange("licenses", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium mb-2">Licenses Certificate</h3>
+                <ImageUploadButton
+                
+                  businessId={businessData.profile.id} // Changed from _id to profile.id
+                  category="identity"
+                  label="Licenses Certificate"
+                  showPreview={true}
+                  currentImage={
+                    businessData.profile.avatar
+                      ? `${ASSET_BASE_URL}/${businessData.licenses[0].url}`
+                      : undefined
+                  }
+                  multiple={false}
+                  onUploadComplete={(assetpath) => {
+                    if (assetpath) {
+                      handleImageUpload(assetpath, 'avatar');
+                      businessData.profile.avatar = assetpath;
+                    }
+                  }}
+                />
+              </div>
             </div>
           </section>
         </div>

@@ -365,7 +365,7 @@ export default function BusinessOverview({
           updateFormData({
             ownerName: userData.name,
             // You can also auto-fill other fields if needed, for example:
-            whatsAppNumber: userData.phone || formData.whatsAppNumber,
+            whatsAppNumber:formData.whatsAppNumber || userData.phone ,
             emailAddress: userData.email || formData.emailAddress,
           });
         }
