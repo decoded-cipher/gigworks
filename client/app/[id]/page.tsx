@@ -779,6 +779,28 @@ const DevMorphixWebsite = () => {
                           </a>
                         </div>
                       </>
+                    ) : businessData?.profile.name.toLocaleLowerCase()=== "acme decore"?(
+                      <>
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3935.6791870223733!2d76.5665951!3d9.4495045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b062528d37a641d%3A0x66e967f68f9994bb!2sAnjaneya%20Gym!5e0!3m2!1sen!2sin!4v1736680465049!5m2!1sen!2sin"
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      ></iframe>
+                      <div className="mt-2">
+                        <a
+                          href="https://maps.app.goo.gl/8nCx3rodjDErVuMN9"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-500 hover:text-blue-700"
+                        >
+                          View on Google Maps →
+                        </a>
+                      </div>
+                    </>
                     ) : (
                       <iframe
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d251482.44857791857!2d76.1643857954714!3d9.982669325611842!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d514abec6bf%3A0xbd582caa5844192!2sKochi%2C%20Kerala!5e0!3m2!1sen!2sin!4v1702359671799!5m2!1sen!2sin"
