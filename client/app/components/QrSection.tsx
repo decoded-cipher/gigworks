@@ -5,10 +5,9 @@ import { Share2 } from "lucide-react";
 import html2canvas from 'html2canvas';
 
 interface DynamicQRCodeProps {
-
-  slug: string;
-
+  slug: string; // Required
 }
+
 
 
 const DynamicQRCode: React.FC<DynamicQRCodeProps> = ({ slug }) => {

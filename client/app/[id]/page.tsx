@@ -128,6 +128,7 @@ const DevMorphixWebsite = () => {
 
   const params = useParams();
   const router = useRouter();
+  
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -285,6 +286,8 @@ const DevMorphixWebsite = () => {
     }
   }, [params.id, router]);
 
+  const slug = businessData?.profile.slug || "";
+
   // Add share handlers
   const handleShare = async () => {
     try {
@@ -332,6 +335,7 @@ const DevMorphixWebsite = () => {
   if (error) {
     return <div>Error: {error}</div>; // Add your error component here
   }
+
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -409,6 +413,7 @@ const DevMorphixWebsite = () => {
       hours,
     }));
   }
+  
 
   return (
     <div className="font-circular">
@@ -1034,7 +1039,7 @@ const DevMorphixWebsite = () => {
             id="qr"
             style={{ scrollMarginTop: "100px" }}
           >
-            <DynamicQRCode slug={businessData?.profile.slug || ''}/>
+            <DynamicQRCode slug={slug || ""} />
           </section>
         </main>
       </div>
