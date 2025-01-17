@@ -594,7 +594,7 @@ export default function GigWorkLandingPage() {
                 2500
               </span>
               <span className="ms-1 text-xl font-normal text-gray-500 dark:text-gray-400">
-                /month
+                /year
               </span>
             </div>
             <div className="flex items-baseline text-white">
@@ -603,7 +603,7 @@ export default function GigWorkLandingPage() {
                 1500
               </span>
               <span className="ms-1 text-xl font-normal text-gray-500 dark:text-gray-400">
-                /month
+                /year
               </span>
             </div>
             <ul role="list" className="space-y-5 my-7">
