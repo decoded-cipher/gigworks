@@ -9,6 +9,7 @@ import LoginPopup from "./components/loginpopup";
 import man from "../public/assets/media/man.svg";
 import whatsapp from "../public/assets/media/whatsapp.png";
 import { ContactForm } from "./components/ContactForm";
+import PriceTag from "./components/priceTag";
 import { SearchSection } from "./components/SearchSection";
 import AnimatedGridPattern from "./components/ui/AnimatedGridPattern";
 import FeatureCardsWithImage from "./components/features";
@@ -17,22 +18,23 @@ import { NumberTicker } from "./components/ui/AnimatedNumberTicket";
 import { FooterSection } from "./components/FooterSection";
 import ScrollToTopButton from "./components/ScrollToTop";
 import { fetchBusinessCount } from "./api";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { GetPartner } from "./api";
 import "./globals.css"; // Ensure you have this import
-
 
 export default function GigWorkLandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [count, setCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
-  const [redirectPath, setRedirectPath] = useState<string | undefined>(undefined);
+  const [redirectPath, setRedirectPath] = useState<string | undefined>(
+    undefined
+  );
   const [isLoading, setIsLoading] = useState(true); // Add loading state
   const router = useRouter();
-  
+
   useEffect(() => {
-    const token = document.cookie.includes('token');
+    const token = document.cookie.includes("token");
     if (!token) {
       localStorage.clear();
     }
@@ -44,16 +46,14 @@ export default function GigWorkLandingPage() {
     return () => clearTimeout(timer);
   }, []);
 
-
   useEffect(() => {
     const fetchCount = async () => {
       try {
         const response = await fetchBusinessCount();
         const count = response.data;
         setCount(count);
-        
       } catch (error) {
-        console.error('Error fetching business count:', error);
+        console.error("Error fetching business count:", error);
       }
     };
 
@@ -71,23 +71,23 @@ export default function GigWorkLandingPage() {
   }, []);
 
   const isLoggedIn = () => {
-    return document.cookie.includes('token=');
+    return document.cookie.includes("token=");
   };
 
   const handleJoinClick = () => {
     if (!isLoggedIn()) {
       setIsLoginPopupOpen(true);
-      setRedirectPath('/signup');
+      setRedirectPath("/signup");
     } else {
       // check if the profile in local storage is empty or not
-      const profile = localStorage.getItem('profile');
+      const profile = localStorage.getItem("profile");
       if (profile) {
         // fetch slug from profile and redirect to profile page
         const { slug } = JSON.parse(profile);
         router.push(`/${slug}`);
       } else {
         // redirect to the signup page
-        router.push('/signup');
+        router.push("/signup");
       }
     }
   };
@@ -95,22 +95,22 @@ export default function GigWorkLandingPage() {
   const handlePartnerClick = async () => {
     if (!isLoggedIn()) {
       setIsLoginPopupOpen(true);
-      setRedirectPath('/partnerSignup/1');
+      setRedirectPath("/partnerSignup/1");
       return;
     }
 
     try {
       const response = await GetPartner();
       if (response.data) {
-        router.push('/partnerProfile');
+        router.push("/partnerProfile");
       } else {
         // If no partner profile, redirect to partner signup
-        router.push('/partnerSignup/1');
+        router.push("/partnerSignup/1");
       }
     } catch (error) {
-      console.error('Error checking partner status:', error);
+      console.error("Error checking partner status:", error);
       // If error occurs, redirect to partner signup
-      router.push('/partnerSignup/1');
+      router.push("/partnerSignup/1");
     }
   };
 
@@ -223,13 +223,13 @@ export default function GigWorkLandingPage() {
                         setIsLoginPopupOpen(true);
                       } else {
                         // check if the profile in local storage is empty or not
-                        const profile = localStorage.getItem('profile');
+                        const profile = localStorage.getItem("profile");
                         if (profile) {
                           // fetch slug from profile and redirect to profile page
                           const { slug } = JSON.parse(profile);
                           router.push(`/${slug}`);
                         } else {
-                          // ask login popup 
+                          // ask login popup
                           setIsLoginPopupOpen(true);
                         }
                       }
@@ -501,7 +501,11 @@ export default function GigWorkLandingPage() {
       </section>
       <section className="bg-white  relative z-10">
         {/* About GigWork */}
-        <section className=" container mx-auto px-4 py-16 flex flex-col items-center justify-center" id="about" style={{ scrollMarginTop: '100px' }}>
+        <section
+          className=" container mx-auto px-4 py-16 flex flex-col items-center justify-center"
+          id="about"
+          style={{ scrollMarginTop: "100px" }}
+        >
           <h2 className="text-4xl text-center text-black font-bold mb-2 ">
             Get to Know<span className="text-green-600"> GigWork</span>
           </h2>
@@ -540,7 +544,11 @@ export default function GigWorkLandingPage() {
       </section>
 
       {/* Join Community */}
-      <section className="bg-black py-16 relative z-10"id="partner" style={{ scrollMarginTop: '80px' }}>
+      <section
+        className="bg-black py-16 relative z-10"
+        id="partner"
+        style={{ scrollMarginTop: "80px" }}
+      >
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-8">
             Join Our <span className="text-green-600">Community</span>
@@ -552,13 +560,13 @@ export default function GigWorkLandingPage() {
             enterprise, Gig Work offers the tools you need to succeed.
           </p>
           <div className="flex justify-center space-x-4">
-            <button 
+            <button
               onClick={handleJoinClick}
               className="bg-tertiary hover:bg-green-500 text-white px-6 py-2 rounded-md transition duration-300"
             >
               Join with us
             </button>
-            <button 
+            <button
               onClick={handlePartnerClick}
               className="border border-green-500 text-white hover:bg-green-600 px-6 py-2 rounded-md transition duration-300"
             >
@@ -568,11 +576,143 @@ export default function GigWorkLandingPage() {
         </div>
       </section>
 
+      {/* price tag */}
+
+      <section
+        className="bg-black py-16 px-4 relative z-10 flex justify-center"
+        id="partner"
+        style={{ scrollMarginTop: "80px" }}
+      >
+        <div className="w-full flex flex-col items-center justify-center">
+          <div className="w-full max-w-sm p-4 border rounded-lg shadow sm:p-8 bg-green-900 border-gray-700">
+            <h5 className="mb-4 text-xl font-medium text-white">
+              Standard plan
+            </h5>
+            <div className="flex items-baseline text-gray-200 ">
+              <span className="text-1xl font-semibold line-through">₹</span>
+              <span className="text-3xl font-extrabold tracking-tight line-through">
+                2500
+              </span>
+              <span className="ms-1 text-xl font-normal text-gray-500 dark:text-gray-400">
+                /month
+              </span>
+            </div>
+            <div className="flex items-baseline text-white">
+              <span className="text-3xl font-semibold">₹</span>
+              <span className="text-5xl font-extrabold tracking-tight">
+                1500
+              </span>
+              <span className="ms-1 text-xl font-normal text-gray-500 dark:text-gray-400">
+                /month
+              </span>
+            </div>
+            <ul role="list" className="space-y-5 my-7">
+              <li className="flex items-center">
+                <svg
+                  className="flex-shrink-0 w-4 h-4 text-green-500"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+                </svg>
+                <span className="text-base font-normal leading-tight text-gray-400 ms-3">
+                  Your Own Personalized Webpage
+                </span>
+              </li>
+              <li className="flex">
+                <svg
+                  className="flex-shrink-0 w-4 h-4 text-green-500"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+                </svg>
+                <span className="text-base font-normal leading-tight text-gray-400 ms-3">
+                  Showcase your business with a professional portfolio designed
+                  to impress your customers.
+                </span>
+              </li>
+              <li className="flex">
+                <svg
+                  className="flex-shrink-0 w-4 h-4 text-green-500"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+                </svg>
+                <span className="text-base font-normal leading-tight text-gray-400 ms-3">
+                  Boost your online visibility and reach the top with zero
+                  hassle.
+                </span>
+              </li>
+              <li className="flex">
+                <svg
+                  className="flex-shrink-0 w-4 h-4 text-green-500"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+                </svg>
+                <span className="text-base font-normal leading-tight text-gray-400 ms-3">
+                  Seamless WhatsApp Chatbot
+                </span>
+              </li>
+              <li className="flex">
+                <svg
+                  className="flex-shrink-0 w-4 h-4 text-green-500"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+                </svg>
+                <span className="text-base font-normal leading-tight text-gray-400 ms-3">
+                  Let your customers find you instantly through our easy-to-use
+                  WhatsApp-based search tool.
+                </span>
+              </li>
+            </ul>
+            <button
+              type="button"
+              onClick={() => {
+                if (!isLoggedIn()) {
+                  setIsLoginPopupOpen(true);
+                } else {
+                  // check if the profile in local storage is empty or not
+                  const profile = localStorage.getItem("profile");
+                  if (profile) {
+                    // fetch slug from profile and redirect to profile page
+                    const { slug } = JSON.parse(profile);
+                    router.push(`/${slug}`);
+                  } else {
+                    // ask login popup
+                    setIsLoginPopupOpen(true);
+                  }
+                }
+              }}
+              className="text-white focus:ring-4 focus:outline-none bg-green-700 hover:bg-green-600 focus:ring-blue-900 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex justify-center w-full text-center"
+            >
+              Start now
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Us */}
       <section className="bg-cbg w-full">
         <section
           id="contact"
-          className="container bg-cbg mx-auto px-3 md:px-[42px] py-16 flex flex-col items-center" style={{ scrollMarginTop: '100px' }}
+          className="container bg-cbg mx-auto px-3 md:px-[42px] py-16 flex flex-col items-center"
+          style={{ scrollMarginTop: "100px" }}
         >
           <h2 className="text-3xl font-bold mb-8 ">
             Contact <span className="text-green-600">Us</span>
@@ -602,7 +742,9 @@ export default function GigWorkLandingPage() {
                       fill="white"
                     />
                   </svg>
-                  +91 73061 04563
+                  <a href="tel:+917306104563" className="hover:underline">
+                    +91 73061 04563
+                  </a>
                 </p>
                 <p className="flex items-center text-xl">
                   <svg
@@ -617,7 +759,12 @@ export default function GigWorkLandingPage() {
                     <path d="M2.038 5.61A2.01 2.01 0 0 0 2 6v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6c0-.12-.01-.238-.03-.352l-.866.65-7.89 6.032a2 2 0 0 1-2.429 0L2.884 6.288l-.846-.677Z" />
                     <path d="M20.677 4.117A1.996 1.996 0 0 0 20 4H4c-.225 0-.44.037-.642.105l.758.607L12 10.742 19.9 4.7l.777-.583Z" />
                   </svg>
-                  mail@gigwork.co.in
+                  <a
+                    href="mailto:mail@gigwork.co.in"
+                    className="hover:underline"
+                  >
+                    mail@gigwork.co.in
+                  </a>
                 </p>
                 <p className="flex items-center text-xl">
                   <svg
@@ -683,4 +830,3 @@ export default function GigWorkLandingPage() {
     </div>
   );
 }
-
