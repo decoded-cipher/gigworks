@@ -61,7 +61,7 @@ const DynamicQRCode: React.FC<DynamicQRCodeProps> = ({ slug }) => {
     <div>
       <div 
         ref={shareRef} 
-        className="w-80 mx-auto bg-white border rounded-lg shadow-lg p-6"
+        className="w-60 sm:w-80 mx-auto bg-white border rounded-lg shadow-lg p-6"
       >
         <div className="space-y-4">
           <h2 className="text-center font-medium mb-4">Scan Me</h2>

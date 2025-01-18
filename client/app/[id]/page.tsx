@@ -479,8 +479,8 @@ const DevMorphixWebsite = () => {
       <div className="px-4 mt-12 sm:px-6 lg:px-52">
         <main>
           <ScrollToTopButton isProfilePage={true} />
-          <section className="relative py-16 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
-            <div className="absolute  top-0 left-0 right-0 h-72 overflow-hidden">
+          <section className="relative pb-8 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
+            <div className="w-full relative ">
               <img
                 src={
                   businessData?.profile.banner
@@ -488,7 +488,7 @@ const DevMorphixWebsite = () => {
                     : "/assets/media/15879.png"
                 }
                 alt="Background"
-                className="w-full h-full object-cover object-top"
+                className="bsolute top-0 left-0 w-full h-full object-cover"
               />
             </div>
             {isOwner && (
@@ -609,7 +609,7 @@ const DevMorphixWebsite = () => {
               </button>
             )}
 
-            <div className="relative z-0 w-60 md:w-80 h-60 md:h-80 border border-white border-8 bg-black rounded-full overflow-hidden border-8 border-white rounded-full flex items-center justify-center mb-8 mt-32 md:mt-20">
+            <div className="absolute left-1/2 w-40 sm:w-60 h-auto transform -translate-x-1/2 bottom-[14rem] sm:bottom-[14rem] ">
               <img
                 src={
                   businessData?.profile.avatar
@@ -617,12 +617,12 @@ const DevMorphixWebsite = () => {
                     : "/444.png"
                 }
                 alt="Logo"
-                className="w-full h-full object-cover"
+                className="w-full h-full rounded-full border-4 border-white object-cover shadow-lg"
               />
             </div>
 
-            <div className="relative inline-flex items-center">
-              <h2 className="sm:text-6xl text-4xl font-bold mb-4">
+            <div className="relative inline-flex items-center mt-24 sm:mt-32">
+              <h2 className="sm:text-4xl text-3xl font-bold mb-4">
                 {businessData?.profile.name}
               </h2>
             </div>
