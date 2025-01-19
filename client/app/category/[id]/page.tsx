@@ -4,7 +4,7 @@ import Navbar from '@/app/components/navSection'
 import React, { useState, useEffect } from 'react'
 import Link from "next/link"
 import Image from 'next/image'
-import { fetchBusinessesByCategory, fetchBusinessData } from '../../api/index'
+import { fetchBusinessesByCategory, fetchBusinessData,ASSET_BASE_URL } from '../../api/index'
 import { Skeleton } from "../../components/ui/skelton"
 import { BusinessCardSkeleton } from "../../components/businessCardSkeleton"
 
@@ -41,12 +41,11 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         
         if (category?.id) {
           setCategoryName(category.name)
-          const response = await fetchBusinessesByCategory(category.id)
-          
+          const response = await fetchBusinessesByCategory(category.id)      
           const validBusinesses = response.data?.profiles?.map((business: any) => ({
             title: business.title || business.name || 'Untitled',
             slug: business.slug || business.title?.toLowerCase().replace(/\s+/g, '-') || 'untitled',
-            src: business.src || "/assets/media/defaultbusiness.png",
+            src: `${ASSET_BASE_URL}/${business.avatar}` || "/assets/media/defaultbusiness.png",
             location: business.location,
             type: business.type
           })) || []
@@ -65,7 +64,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 
   const filteredEmploys = employs.filter(employs => 
     employs.title.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  )  
 
   const handleLoadMore = () => {
     setVisibleEmploys(prev => prev + 16)

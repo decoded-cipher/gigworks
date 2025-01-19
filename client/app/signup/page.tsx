@@ -67,6 +67,10 @@ export interface FormData {
   };
 }
 
+// const setLocalStorage = (key: string, value: any) => {
+//   localStorage.setItem(key, JSON.stringify(value));
+// };
+
 export default function SignupPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
@@ -165,12 +169,16 @@ export default function SignupPage() {
         });
         return formattedHours;
       };
-
+      const userDataString:any = localStorage.getItem("userData");
+      const userData = JSON.parse(userDataString);
+      console.log(userDataString);
+      
       const profileData = {
         name: formData.businessName,
         slug: formData.slug,
         description: formData.businessDescription,
         email: formData.emailAddress,
+        phone: formData.whatsAppNumber,
         website: formData.websiteURL || "",
         category_id: formData.businessCategory,
         sub_category_id: formData.subCategory,
@@ -206,11 +214,11 @@ export default function SignupPage() {
         gstin: formData.gstin,
         referral_code: formData.referral_code
       };
-
+      
       const payload:any = {
         user: {
-          name: formData.ownerName,
-          phone: formData.whatsAppNumber
+          name: userData.name,
+          phone: userData.phone
         },
         profile: profileData,
         payment: {
@@ -227,7 +235,12 @@ export default function SignupPage() {
       };
 
       const response = await createBusiness(payload);
-      
+
+      // setLocalStorage('userProfiles', {
+      //   name:  formData.businessName,
+      //   slug: formData.slug,
+      //   avatar: formData.avatar,
+      // });
       // Extract the slug from the response
       const profileSlug = response.data.profile.slug;
       

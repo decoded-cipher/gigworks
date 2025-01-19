@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import Editor from "react-simple-wysiwyg";
 import {
   fetchBusinessesByslug,
   ASSET_BASE_URL,
   updateBusiness,
+  GetURL,
+  uploadToPresignedUrl,
+  createBusinessMedia,
 } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -25,6 +29,14 @@ import OperatingHours from "@/app/components/OperatingHours";
 import { deletebusinessMedia } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
 import { s } from "framer-motion/client";
+import ImageCropper from "@/app/components/ImageCropper";
+
+// Define MediaItem interface locally if import fails
+interface MediaItem {
+  id: string;
+  url: string;
+  type: string;
+}
 
 // Add License interface before other interfaces
 interface License {
@@ -32,13 +44,6 @@ interface License {
   number: string;
   url: string;
   description: string;
-}
-
-// Add MediaItem interface
-interface MediaItem {
-  id: string;
-  url: string;
-  type: string;
 }
 
 interface BusinessProfile {
@@ -79,7 +84,7 @@ interface BusinessData {
     phone: string;
   };
   _id: string;
-  media: MediaItem[]; // Add this field
+  media: MediaItem[]; // Using the imported MediaItem type
   category: string;
   subCategory: string;
   subCategoryOption: string;
@@ -107,15 +112,26 @@ const socialMediaConfig = {
   medium: { label: "Medium Profile", icon: "/icon/medium.svg" },
 };
 export default function EditBusinessPage() {
+  // Move all hooks to the top, before any conditional logic
+  const [isMounted, setIsMounted] = useState(false);
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [changes, setChanges] = useState<Partial<BusinessProfile>>({});
+  const [pendingChanges, setPendingChanges] = useState<Record<string, any>>({});
   const params = useParams();
   const router = useRouter();
+  const [cropperState, setCropperState] = useState<{
+    isOpen: boolean;
+    imageUrl: string;
+    fieldType: "avatar" | "banner" | null;
+  }>({
+    isOpen: false,
+    imageUrl: "",
+    fieldType: null,
+  });
 
-  // Move fetchData outside useEffect so it can be referenced anywhere in the component
-  const fetchData = async () => {
+  // Wrap fetchData with useCallback
+  const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetchBusinessesByslug(params.id as string);
@@ -129,98 +145,115 @@ export default function EditBusinessPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params.id]); // Only depend on params.id
 
-  // Check authorization
+  // Update useEffect to depend on the stable fetchData function
   useEffect(() => {
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1];
-
-    if (!token) {
-      router.push(`/${params.id}`);
-    }
-  }, [params.id, router]);
-
-  // Initial data fetch
-  useEffect(() => {
-    if (params.id) {
+    if (params.id && isMounted) {
       fetchData();
     }
-  }, [params.id]);
+  }, [params.id, fetchData, isMounted]); // Include isMounted to prevent unnecessary fetches
 
-  const handleFieldSave = async (field: string, value: any) => {
-    try {
-      if (!businessData?.profile.id) return;
+  // Combine mounting and fetch effects
+  useEffect(() => {
+    setIsMounted(true);
+    return () => setIsMounted(false);
+  }, []);
 
+  const handleFieldChange = (field: string, value: any) => {
+    setPendingChanges(prev => {
       const fieldParts = field.split(".");
-      let updateData: Record<string, any> = {};
-
       if (fieldParts.length > 1 && fieldParts[0] === "socials") {
-        // Handle social media fields specifically
-        updateData.socials = {
-          ...(businessData.profile.socials || {}),
-          [fieldParts[1]]: value,
+        return {
+          ...prev,
+          socials: {
+            ...(prev.socials || {}),
+            [fieldParts[1]]: value,
+          },
         };
-      } else {
-        // Handle regular fields
-        updateData[field] = value;
       }
+      return {
+        ...prev,
+        [field]: value,
+      };
+    });
 
-      // Ensure updateData is not empty before making the API call
-      if (Object.keys(updateData).length === 0) {
-        console.warn("No values to update");
-        return;
-      }
-
-      // Log the updateData object
-      console.log("Updating business with data:", updateData);
-
-      await updateBusiness(businessData.profile.id, updateData);
-      toast.success(`${field} updated successfully`);
-
-      // Update local state
-      setBusinessData((prev) => {
-        if (!prev) return null;
+    // Update local state for immediate UI feedback
+    setBusinessData(prev => {
+      if (!prev) return null;
+      if (field.startsWith("socials.")) {
+        const socialField = field.split(".")[1];
         return {
           ...prev,
           profile: {
             ...prev.profile,
-            ...(fieldParts[0] === "socials"
-              ? {
-                  socials: {
-                    ...prev.profile.socials,
-                    [fieldParts[1]]: value,
-                  },
-                }
-              : updateData),
+            socials: {
+              ...prev.profile.socials,
+              [socialField]: value,
+            },
           },
         };
-      });
-    } catch (error) {
-      console.error("Error updating field:", error);
-      toast.error(`Failed to update ${field}`);
-    }
+      }
+      return {
+        ...prev,
+        profile: {
+          ...prev.profile,
+          [field]: value,
+        },
+      };
+    });
   };
 
-  const handleImageUpload = (assetpath: string, field: "avatar" | "banner") => {
-    console.log("Image uploaded:", assetpath);
-    // console.log('Field:', field);
-    handleFieldSave(field, assetpath);
+  const handleOperatingHoursUpdate = (newHours: { [key: string]: string }) => {
+    setPendingChanges(prev => ({
+      ...prev,
+      operating_hours: newHours,
+    }));
+
+    setBusinessData(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        profile: {
+          ...prev.profile,
+          operating_hours: newHours,
+        },
+      };
+    });
   };
 
-  // Replace handleChange with immediate save
-  const handleChange = async (field: string, value: string) => {
-    await handleFieldSave(field, value);
+  const handleImageUpload = (assetpath: string, field: 'avatar' | 'banner') => {
+    setPendingChanges(prev => ({
+      ...prev,
+      [field]: assetpath,
+    }));
+
+    setBusinessData(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        profile: {
+          ...prev.profile,
+          [field]: assetpath,
+        },
+      };
+    });
   };
 
   const handleSave = async () => {
     try {
-      // TODO: Implement API call to save all changes
+      if (!businessData?.profile.id || Object.keys(pendingChanges).length === 0) {
+        router.push(`/${params.id}`);
+        return;
+      }
+
+      await updateBusiness(businessData.profile.id, pendingChanges);
+      toast.success("All changes saved successfully");
+      setPendingChanges({});
       router.push(`/${params.id}`);
     } catch (error) {
       console.error("Error saving changes:", error);
+      toast.error("Failed to save changes");
     }
   };
 
@@ -228,44 +261,87 @@ export default function EditBusinessPage() {
     try {
       if (businessData?.profile.id) {
         await deletebusinessMedia(businessData.profile.id, mediaId);
+        // Update local state instead of fetching all data again
+        setBusinessData(prev => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            media: prev.media.filter(item => item.id !== mediaId)
+          };
+        });
+        toast.success('Media item deleted successfully');
       }
-      fetchData();
-      toast.success("Media item deleted successfully");
     } catch (error) {
-      console.error("Error deleting media:", error);
-      toast.error("Failed to delete media item");
+      console.error('Error deleting media:', error);
+      toast.error('Failed to delete media item');
     }
   };
 
-  const handleOperatingHoursUpdate = async (newHours: {
-    [key: string]: string;
-  }) => {
+  // Add this new function to handle media updates
+  const handleMediaUpdate = (newMedia: MediaItem) => {
+    setBusinessData(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        media: [...prev.media, {
+          id: newMedia.id,
+          url: newMedia.url,
+          type: newMedia.type || 'image/jpeg' // Provide a default type if none exists
+        }]
+      };
+    });
+  };
+
+  const handleImageSelect = async (file: File, fieldType: "avatar" | "banner") => {
+    const imageUrl = URL.createObjectURL(file);
+    setCropperState({
+      isOpen: true,
+      imageUrl,
+      fieldType,
+    });
+  };
+
+  const handleCroppedImage = async (croppedImageUrl: string) => {
     try {
-      if (!businessData?.profile.id) return;
+      if (!cropperState.fieldType || !businessData?.profile.id) return;
 
-      await updateBusiness(businessData.profile.id, {
-        operating_hours: newHours,
-      });
-      toast.success("Operating hours updated successfully");
+      // Convert base64/URL to blob
+      const response = await fetch(croppedImageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "cropped-image.jpg", { type: "image/jpeg" });
 
-      // Update local state
-      setBusinessData((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          profile: {
-            ...prev.profile,
-            operating_hours: newHours,
-          },
-        };
+      // Get presigned URL
+      const uploadResponse = await GetURL({
+        type: file.type,
+        category: cropperState.fieldType,
       });
+
+      if (!uploadResponse.presignedUrl) {
+        throw new Error("Failed to get presigned URL");
+      }
+
+      // Upload to storage
+      await uploadToPresignedUrl(uploadResponse.presignedUrl, file);
+
+      // Update business profile
+      await handleFieldChange(cropperState.fieldType, uploadResponse.assetpath);
+
+      // Close cropper
+      setCropperState({
+        isOpen: false,
+        imageUrl: "",
+        fieldType: null,
+      });
+
+      toast.success("Image updated successfully");
     } catch (error) {
-      console.error("Error updating operating hours:", error);
-      toast.error("Failed to update operating hours");
+      console.error("Error handling cropped image:", error);
+      toast.error("Failed to update image");
     }
   };
 
-  if (isLoading) {
+  // Loading and error states can now be checked after all hooks are declared
+  if (!isMounted || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         Loading...
@@ -293,9 +369,7 @@ export default function EditBusinessPage() {
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex md:flex-row flex-col justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold md:pb-0 pb-2">
-            Edit Business Profile
-          </h1>
+          <h1 className="text-2xl font-bold md:pb-0 pb-2">Edit Business Profile</h1>
           <div className="flex gap-4">
             <button
               onClick={() => router.push(`/${params.id}`)}
@@ -322,48 +396,79 @@ export default function EditBusinessPage() {
               {/* Profile Avatar */}
               <div>
                 <h3 className="text-sm font-medium mb-2">Profile Image</h3>
-                <ImageUploadButton
-                  businessId={businessData.profile.id} // Changed from _id to profile.id
-                  category="avatar"
-                  label="Upload Avatar"
-                  showPreview={true}
-                  currentImage={
-                    businessData.profile.avatar
-                      ? `${ASSET_BASE_URL}/${businessData.profile.avatar}`
-                      : undefined
-                  }
-                  multiple={false}
-                  onUploadComplete={(assetpath) => {
-                    if (assetpath) {
-                      handleImageUpload(assetpath, "avatar");
-                      businessData.profile.avatar = assetpath;
-                    }
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageSelect(file, "avatar");
                   }}
+                  className="hidden"
+                  id="avatar-input"
                 />
+                <div className="relative">
+                  <img
+                    src={
+                      businessData.profile.avatar
+                        ? `${ASSET_BASE_URL}/${businessData.profile.avatar}`
+                        : "/placeholder-avatar.png"
+                    }
+                    alt="Avatar"
+                    className="w-32 h-32 object-cover rounded-full"
+                  />
+                  <label
+                    htmlFor="avatar-input"
+                    className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow cursor-pointer"
+                  >
+                    <Pencil size={16} />
+                  </label>
+                </div>
               </div>
               {/* Banner Image */}
               <div>
                 <h3 className="text-sm font-medium mb-2">Banner Image</h3>
-                <ImageUploadButton
-                  businessId={businessData.profile.id} // Changed from _id to profile.id
-                  category="banner"
-                  label="Upload Banner"
-                  showPreview={true}
-                  currentImage={
-                    businessData.profile.banner
-                      ? `${ASSET_BASE_URL}/${businessData.profile.banner}`
-                      : undefined
-                  }
-                  multiple={false}
-                  onUploadComplete={(assetpath) => {
-                    if (assetpath) {
-                      handleImageUpload(assetpath, "banner");
-                      businessData.profile.banner = assetpath;
-                    }
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageSelect(file, "banner");
                   }}
+                  className="hidden"
+                  id="banner-input"
                 />
+                <div className="relative">
+                  <img
+                    src={
+                      businessData.profile.banner
+                        ? `${ASSET_BASE_URL}/${businessData.profile.banner}`
+                        : "/placeholder-banner.png"
+                    }
+                    alt="Banner"
+                    className="w-full h-32 object-cover rounded-lg"
+                  />
+                  <label
+                    htmlFor="banner-input"
+                    className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow cursor-pointer"
+                  >
+                    <Pencil size={16} />
+                  </label>
+                </div>
               </div>
+
+
             </div>
+            {/* Image Cropper Modal */}
+            {cropperState.isOpen && (
+              <ImageCropper
+                imageUrl={cropperState.imageUrl}
+                aspect={cropperState.fieldType === "avatar" ? 1 : 16 / 9}
+                onCropComplete={handleCroppedImage}
+                onCancel={() =>
+                  setCropperState({ isOpen: false, imageUrl: "", fieldType: null })
+                }
+              />
+            )}
           </section>
 
           {/* Basic Information */}
@@ -377,19 +482,57 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.profile.name}
-                  onBlur={(e) => handleFieldSave("name", e.target.value)}
+                  onChange={(e) => handleFieldChange("name", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
+                  Business Category
+                </label>
+                <input
+                  type="text"
+                  defaultValue={businessData.category}
+                  onChange={(e) => handleFieldChange("category", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Business Sub-Category
+                </label>
+                <input
+                  type="text"
+                  defaultValue={businessData.subCategory}
+                  onChange={(e) => handleFieldChange("subCategory", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Business Sub-Category options
+                </label>
+                <input
+                  type="text"
+                  defaultValue={businessData.subCategoryOption}
+                  onChange={(e) => handleFieldChange("subCategoryOption", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
                   Description
                 </label>
-                <textarea
-                  defaultValue={businessData.profile.description}
-                  onBlur={(e) => handleFieldSave("description", e.target.value)}
-                  className="w-full p-2 border rounded-lg min-h-[100px]"
-                />
+                <div className="border rounded-lg">
+                  <Editor
+                    value={businessData.profile.description || ''}
+                    onChange={(e) => handleFieldChange("description", e.target.value)}
+                    containerProps={{
+                      className: "min-h-[150px] p-2"
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </section>
@@ -403,16 +546,17 @@ export default function EditBusinessPage() {
                 <input
                   type="email"
                   defaultValue={businessData.profile.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
+                  onChange={(e) => handleFieldChange("email", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Phone</label>
                 <input
-                  type="number"
-                  defaultValue={businessData.user.phone}
-                  onChange={(e) => handleChange("phone", e.target.value)}
+                  type="tel"
+                  maxLength={10}
+                  defaultValue={businessData.profile.phone || ""}
+                  onChange={(e) => handleFieldChange("phone", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -423,7 +567,7 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.profile.address}
-                  onChange={(e) => handleChange("address", e.target.value)}
+                  onChange={(e) => handleFieldChange("address", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -462,7 +606,7 @@ export default function EditBusinessPage() {
                   type="text"
                   defaultValue={businessData.profile.additional_services}
                   onBlur={(e) =>
-                    handleFieldSave("additional_services", e.target.value)
+                    handleFieldChange("additional_services", e.target.value)
                   }
                   className="w-full p-2 border rounded-lg"
                   placeholder="e.g., customOrders, afterSalesSupport"
@@ -493,11 +637,11 @@ export default function EditBusinessPage() {
                         type="url"
                         defaultValue={
                           businessData.profile.socials?.[
-                            key as keyof typeof businessData.profile.socials
+                          key as keyof typeof businessData.profile.socials
                           ] || ""
                         }
                         onBlur={(e) =>
-                          handleFieldSave(`socials.${key}`, e.target.value)
+                          handleFieldChange(`socials.${key}`, e.target.value)
                         }
                         className="w-full p-2 border rounded-lg"
                         placeholder={`Enter ${label}`}
@@ -518,30 +662,13 @@ export default function EditBusinessPage() {
             />
           </section>
 
-          {/* Tags */}
-          {/* <section className="bg-white rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Business Tags</h2>
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Add tags (comma separated)"
-                defaultValue={businessData.tags?.join(', ')}
-                onChange={(e) => handleChange('tags', e.target.value)}
-                className="w-full p-2 border rounded-lg"
-              />
-              <p className="text-sm text-gray-500">
-                Enter tags separated by commas (e.g., web design, development, marketing)
-              </p>
-            </div>
-          </section> */}
-
           {/* Media Gallery */}
           <section className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Media Gallery</h2>
             <MediaGallery
               media={businessData.media}
               businessId={businessData.profile.id} // Changed from _id to profile.id
-              onUpdate={() => fetchData()}
+              onUpdate={handleMediaUpdate}
               onDelete={handleMediaDelete}
             />
           </section>
@@ -588,3 +715,4 @@ export default function EditBusinessPage() {
     </div>
   );
 }
+

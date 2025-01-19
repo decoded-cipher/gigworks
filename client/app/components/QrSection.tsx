@@ -4,7 +4,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { Share2 } from "lucide-react";
 import html2canvas from 'html2canvas';
 
-const DynamicQRCode = () => {
+interface DynamicQRCodeProps {
+  slug: string; // Required
+}
+
+
+
+const DynamicQRCode: React.FC<DynamicQRCodeProps> = ({ slug }) => {
   const [currentUrl, setCurrentUrl] = useState("");
   const [showUrl, setShowUrl] = useState("");
   const shareRef = useRef(null);
@@ -55,7 +61,7 @@ const DynamicQRCode = () => {
     <div>
       <div 
         ref={shareRef} 
-        className="w-80 mx-auto bg-white border rounded-lg shadow-lg p-6"
+        className="w-60 sm:w-80 mx-auto bg-white border rounded-lg shadow-lg p-6"
       >
         <div className="space-y-4">
           <h2 className="text-center font-medium mb-4">Scan Me</h2>
@@ -67,7 +73,7 @@ const DynamicQRCode = () => {
           />
 
           <p className="text-sm text-gray-500 text-center break-all">
-            {showUrl}
+            gigwork.co.in/{slug}
           </p>
         </div>
       </div>

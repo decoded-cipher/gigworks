@@ -87,6 +87,7 @@ interface BusinessProfile {
   type: string;
   additional_services: string;
   gstin: string;
+  slug: string; // Add slug property
 }
 
 interface BusinessData {
@@ -107,6 +108,7 @@ export const runtime = "edge";
 
 const DevMorphixWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [hoveredIcon, setHoveredIcon] = useState<{
     platform: string;
   } | null>(null);
@@ -116,8 +118,28 @@ const DevMorphixWebsite = () => {
   const [tokenData, setTokenData] = useState<JWTPayload | null>(null);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [userProfiles] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("userProfiles");
+      return stored ? JSON.parse(stored) : [];
+    }
+    return [];
+  });
+
   const params = useParams();
   const router = useRouter();
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const dropdown = document.getElementById("account-dropdown");
+      if (dropdown && !dropdown.contains(event.target as Node)) {
+        setIsAccountMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Add JWT token handler function
   const handleJWTToken = () => {
@@ -167,8 +189,6 @@ const DevMorphixWebsite = () => {
   useEffect(() => {
     const decoded = handleJWTToken();
     setTokenData(decoded);
-
-
   }, []);
 
   // Add this function to handle edit click
@@ -196,7 +216,6 @@ const DevMorphixWebsite = () => {
       } else {
         console.log("Error logging out:", res);
       }
-
     } catch (err) {
       console.error("Error logging out:", err);
     }
@@ -265,6 +284,8 @@ const DevMorphixWebsite = () => {
       fetchData();
     }
   }, [params.id, router]);
+
+  const slug = businessData?.profile.slug || "";
 
   // Add share handlers
   const handleShare = async () => {
@@ -393,13 +414,13 @@ const DevMorphixWebsite = () => {
 
   return (
     <div className="font-circular">
-      <nav className="bg-white border-gray-200 dark:bg-gray-900 fixed top-0 left-0 right-0 z-50 shadow-md px-4 sm:px-6 lg:px-52">
-        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <nav className="bg-white border-gray-200 dark:bg-gray-900 fixed top-0 left-0 right-0 z-50 shadow-md px-2 sm:px-4 lg:px-52">
+        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-2 sm:p-4">
           <a
             href=""
-            className="flex items-center space-x-3 rtl:space-x-reverse"
+            className="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse w-1/2 sm:w-auto"
           >
-            <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+            <span className="self-center text-sm sm:text-base lg:text-xl font-semibold whitespace-nowrap overflow-hidden text-ellipsis dark:text-white max-w-[150px] sm:max-w-[200px] lg:max-w-[300px]">
               {businessData?.profile.name || "Business Name"}
             </span>
           </a>
@@ -408,13 +429,13 @@ const DevMorphixWebsite = () => {
           <button
             onClick={toggleMenu}
             type="button"
-            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+            className="inline-flex items-center p-1.5 sm:p-2 w-8 h-8 sm:w-10 sm:h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
             aria-controls="navbar-default"
             aria-expanded={isMenuOpen}
           >
             <span className="sr-only">Open main menu</span>
             <svg
-              className="w-5 h-5"
+              className="w-4 h-4 sm:w-5 sm:h-5"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -432,17 +453,18 @@ const DevMorphixWebsite = () => {
 
           {/* Navigation menu */}
           <div
-            className={`w-full md:block md:w-auto ${isMenuOpen ? "block" : "hidden"
-              }`}
+            className={`w-full md:block md:w-auto ${
+              isMenuOpen ? "block" : "hidden"
+            }`}
             id="navbar-default"
           >
-            <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+            <ul className="font-medium flex flex-col p-2 sm:p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-4 lg:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
               {navItems.map((item, index) => (
                 <li key={index}>
                   <a
                     href={item.href}
                     onClick={handleNavItemClick}
-                    className="block py-2 px-3 rounded text-gray-900 hover:bg-gray-400 md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0 dark:text-white md:dark:hover:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                    className="block py-1.5 px-2 sm:py-2 sm:px-3 text-sm sm:text-base rounded text-gray-900 hover:bg-gray-400 md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0 dark:text-white md:dark:hover:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
                     aria-current={item.label === "Home" ? "page" : undefined}
                   >
                     {item.label}
@@ -454,11 +476,11 @@ const DevMorphixWebsite = () => {
         </div>
       </nav>
 
-      <div className="px-4 sm:px-6 lg:px-52">
+      <div className="px-4 mt-12 sm:px-6 lg:px-52">
         <main>
           <ScrollToTopButton isProfilePage={true} />
-          <section className="relative py-8 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
-            <div className="absolute top-0 left-0 right-0 h-72 overflow-hidden">
+          <section className="relative pb-8 flex flex-col items-center text-center border mb-2 -mt-2 rounded-3xl">
+            <div className="w-full relative ">
               <img
                 src={
                   businessData?.profile.banner
@@ -466,31 +488,128 @@ const DevMorphixWebsite = () => {
                     : "/assets/media/15879.png"
                 }
                 alt="Background"
-                className="w-full h-full object-cover"
+                className="bsolute top-0 left-0 w-full h-full object-cover"
               />
             </div>
-
             {isOwner && (
-              <button
-                onClick={handlelogout}
-                className="absolute top-24 left-4 p-2 px-4 text-white bg-red-500 hover:bg-red-400 rounded-lg transition-colors"
-                title="Edit Business Profile"
-              >
-                Logout
-              </button>
+              <div className="absolute top-12 left-4" id="account-dropdown">
+                <button
+                  onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+                  className="p-2 px-4 text-white bg-black hover:bg-gray-800 rounded-lg transition-colors flex items-center gap-2"
+                >
+                  Account
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className={`transform transition-transform ${
+                      isAccountMenuOpen ? "rotate-180" : ""
+                    }`}
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+
+                {isAccountMenuOpen && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50">
+                    {userProfiles.map((profile: any) => (
+                      <button
+                        key={profile.id}
+                        onClick={() => {
+                          router.push(`/${profile.slug}`);
+                          setIsAccountMenuOpen(false);
+                        }}
+                        className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        {profile.name}
+                      </button>
+                    ))}
+                    <div className="border-t border-gray-200 my-1" />
+                    <button
+                      onClick={() => {
+                        router.push("/signup");
+                        setIsAccountMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-2 text-left text-green-600 hover:bg-green-600 hover:text-white flex items-center gap-2"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="mr-2"
+                      >
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                      Add new business
+                    </button>
+                    <div className="border-t border-gray-200 my-1" />
+                    <button
+                      onClick={() => {
+                        handlelogout();
+                        setIsAccountMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-600 hover:text-white flex items-center gap-2"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
 
             {isOwner && (
               <button
                 onClick={handleEditClick}
-                className="absolute top-24 right-4 p-2 bg-white  hover:bg-gray-300 rounded-full transition-colors"
+                className="absolute top-12 right-4 p-2 bg-white  hover:bg-gray-300 rounded-full transition-colors"
                 title="Edit Business Profile"
               >
                 <Pencil className="w-4 h-4 text-gray-600" />
               </button>
             )}
 
-            <div className="relative z-0 w-60 md:w-80 h-60 md:h-80 border border-white border-8 bg-black rounded-full overflow-hidden border-8 border-white rounded-full flex items-center justify-center mb-8 mt-20">
+            <div className="absolute left-1/2 w-40 sm:w-60 h-auto transform -translate-x-1/2 bottom-[14rem] sm:bottom-[14rem] ">
               <img
                 src={
                   businessData?.profile.avatar
@@ -498,12 +617,12 @@ const DevMorphixWebsite = () => {
                     : "/444.png"
                 }
                 alt="Logo"
-                className="w-full h-full object-cover"
+                className="w-full h-full rounded-full border-4 border-white object-cover shadow-lg"
               />
             </div>
 
-            <div className="relative inline-flex items-center">
-              <h2 className="sm:text-6xl text-4xl font-bold mb-4">
+            <div className="relative inline-flex items-center mt-24 sm:mt-32">
+              <h2 className="sm:text-4xl text-3xl font-bold mb-4">
                 {businessData?.profile.name}
               </h2>
             </div>
@@ -638,7 +757,8 @@ const DevMorphixWebsite = () => {
                           </a>
                         </div>
                       </>
-                    ) : businessData?.profile.name.toLowerCase() === "anjaneya gym" ? (
+                    ) : businessData?.profile.name.toLowerCase() ===
+                      "anjaneya gym" ? (
                       <>
                         <iframe
                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3935.6791870223733!2d76.5665951!3d9.4495045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b062528d37a641d%3A0x66e967f68f9994bb!2sAnjaneya%20Gym!5e0!3m2!1sen!2sin!4v1736680465049!5m2!1sen!2sin"
@@ -659,6 +779,98 @@ const DevMorphixWebsite = () => {
                             View on Google Maps →
                           </a>
                         </div>
+                      </>
+                    ) : businessData?.profile.name.toLowerCase() ===
+                      "acme decor" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3935.722946930944!2d76.5714552!3d9.4456761!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625808d39e54d%3A0x2b8378272ddf82aa!2sacme%20DECOR!5e0!3m2!1sen!2sin!4v1737032116084!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                        <div className="mt-2">
+                          <a
+                            href="https://maps.app.goo.gl/wWFbsqCAxa5XUHpj9"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-blue-500 hover:text-blue-700"
+                          >
+                            View on Google Maps →
+                          </a>
+                        </div>
+                      </>
+                    ) : businessData?.profile.name.toLowerCase() ===
+                      "pathil electricals sanitary" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1967.9015774093411!2d76.5679237!3d9.438655!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625eb50756337%3A0xde34a5bb2a767a61!2sPATHIL%20ELECTRICAL%20%26%20SANITARY!5e0!3m2!1sen!2sin!4v1737035238332!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                        <div className="mt-2">
+                          <a
+                            href="https://maps.app.goo.gl/wWFbsqCAxa5XUHpj9"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-blue-500 hover:text-blue-700"
+                          >
+                            View on Google Maps →
+                          </a>
+                        </div>
+                      </>
+                    ) : businessData?.profile.name.toLowerCase() ===
+                      "adobe designs & digital printing" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3935.7607718648087!2d76.54132767502395!3d9.44236569063642!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOcKwMjYnMzIuNSJOIDc2wrAzMiczOC4xIkU!5e0!3m2!1sen!2sin!4v1737118006785!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                        {/* <div className="mt-2">
+                      <a
+                        href="https://maps.app.goo.gl/wWFbsqCAxa5XUHpj9"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-500 hover:text-blue-700"
+                      >
+                        View on Google Maps →
+                      </a>
+                    </div> */}
+                      </>
+                    ) : businessData?.profile.name.toLowerCase() ===
+                      "wedboat photography" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3929.0097795578995!2d76.27212147503143!3d10.016050290090138!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTDCsDAwJzU3LjgiTiA3NsKwMTYnMjguOSJF!5e0!3m2!1sen!2sin!4v1737118448906!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                        {/* <div className="mt-2">
+                    <a
+                      href="https://maps.app.goo.gl/wWFbsqCAxa5XUHpj9"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-500 hover:text-blue-700"
+                    >
+                      View on Google Maps →
+                    </a>
+                  </div> */}
                       </>
                     ) : (
                       <iframe
@@ -692,7 +904,10 @@ const DevMorphixWebsite = () => {
                         <Phone className="h-4 w-4 text-muted-foreground" />
                         <span className="font-light text-md text-black">
                           <span>
-                            +91 {businessData?.profile.phone || businessData?.user.phone || "Not available"}
+                            +91{" "}
+                            {businessData?.profile.phone ||
+                              businessData?.user.phone ||
+                              "Not available"}
                           </span>
                         </span>
                       </div>
@@ -748,7 +963,7 @@ const DevMorphixWebsite = () => {
             <hr className="my-4 mx-10 "></hr>
 
             <section
-              className="bg-white  rounded-lg p-6 mb-8 text-center"
+              className="bg-white  rounded-lg p-6 mb-8 px-5 text-center"
               id="about"
               style={{ scrollMarginTop: "100px" }}
             >
@@ -756,7 +971,10 @@ const DevMorphixWebsite = () => {
               <div className="hidden md:block flex flex-col items-center justify-center">
                 {/* <h2 className="text-xl font-medium mb-2">Contact us</h2> */}
                 <p className="text-4xl font-mediu mb-2">
-                  +91 {businessData?.profile.phone || businessData?.user.phone || "Not available"}
+                  +91{" "}
+                  {businessData?.profile.phone ||
+                    businessData?.user.phone ||
+                    "Not available"}
                 </p>
                 <div className="flex justify-center pb-11">
                   <svg
@@ -776,10 +994,14 @@ const DevMorphixWebsite = () => {
                 </div>
               </div>
               <div className="flex items-center justify-center">
-                <p className="text-[#111111] text-md text-justify text-center font-medium leading-relaxed">
-                  {businessData?.profile.description ||
-                    "No description available"}
-                </p>
+                <p
+                  className="text-[#111111] text-md text-justify text-center font-medium leading-relaxed"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      businessData?.profile.description ||
+                      "No description available",
+                  }}
+                />
               </div>
               {businessData?.profile.socials &&
                 Object.values(businessData.profile.socials).some(
@@ -864,7 +1086,7 @@ const DevMorphixWebsite = () => {
             id="qr"
             style={{ scrollMarginTop: "100px" }}
           >
-            <DynamicQRCode />
+            <DynamicQRCode slug={slug || ""} />
           </section>
         </main>
       </div>
