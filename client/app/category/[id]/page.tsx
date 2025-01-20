@@ -70,6 +70,9 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     setVisibleEmploys(prev => prev + 16)
   }
 
+  console.log(filteredEmploys);
+  
+
   return (
     <div>
       <Navbar />
@@ -128,7 +131,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                 >
                   <div className="w-16 h-16 mb-2">
                     <Image 
-                      src={s.src || "/assets/media/img/defaultbusiness.png"} 
+                     src={s.src && s.src.includes('/avatar') ? s.src :"../assets/media/defaultbusiness.png"} 
                       alt={s.title} 
                       width={64} 
                       height={64} 
