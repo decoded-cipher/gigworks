@@ -70,7 +70,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     setVisibleEmploys(prev => prev + 16)
   }
 
-  console.log(filteredEmploys);
+ 
   
 
   return (

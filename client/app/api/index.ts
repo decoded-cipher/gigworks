@@ -12,7 +12,7 @@ export const fetchBusinessData = async (params:any = {}) => {
       `${BASE_URL}/api/v1/category?hasBusiness=true`,
         ///api/v1/category?page=1&limit=3
     );
-        console.log('response',response.data);
+      
         
     return response.data;
   } catch (error) {
@@ -156,12 +156,12 @@ interface BusinessProfile {
 
 export const uploadToPresignedUrl = async (presignedUrl: string, file: File) => {
   try {
-    console.log('Uploading to:', presignedUrl);
-    console.log('File details:', {
-      name: file.name,
-      type: file.type,
-      size: file.size
-    });
+    // console.log('Uploading to:', presignedUrl);
+    // console.log('File details:', {
+    //   name: file.name,
+    //   type: file.type,
+    //   size: file.size
+    // });
 
     const response = await axios.put(presignedUrl, file, {
       headers: {
@@ -169,7 +169,7 @@ export const uploadToPresignedUrl = async (presignedUrl: string, file: File) => 
       },
     });
 
-    console.log('Upload response:', response.status);
+    
     return true;
   } catch (error) {
     console.error('Error uploading file:', {
@@ -410,7 +410,7 @@ export const fetchsubCategoryByCategory = async (categoryId: string) => {
     const response = await axios.get(
       `${BASE_URL}/api/v1/category/${categoryId}`
     );
-    // console.log('response',response.data);
+   
     
     return response.data;
   } catch (error) {
@@ -427,7 +427,7 @@ export const fetchDataBySubCategory = async (subCategoryId: string) => {
     const response = await axios.get(
       `${BASE_URL}/api/v1/sub_category/${subCategoryId}`
     );
-    console.log('response',response.data);
+   
     
     return response.data;
   } catch (error) {
@@ -471,8 +471,8 @@ export const createBusinessMedia = async (businessId: string, data: { url: strin
       .find(row => row.startsWith('token='))
       ?.split('=')[1];
 
-        console.log(typeof data);
-        console.log(data);
+        // console.log(typeof data);
+        // console.log(data);
         
         
     const response = await axios.post(
@@ -518,8 +518,8 @@ export const deletebusinessMedia = async (businessId: string, mediaId: string) =
 
 export const updateBusiness = async (businessId: string, updateData: Record<string, any>) => {
   try {
-    console.log("Sending update request for business:", businessId);
-    console.log("Update data:", updateData);
+    // console.log("Sending update request for business:", businessId);
+    // console.log("Update data:", updateData);
 
     const token = document.cookie
       .split('; ')
@@ -540,7 +540,7 @@ export const updateBusiness = async (businessId: string, updateData: Record<stri
       }
     );
 
-    console.log("Update response:", response.data);
+    // console.log("Update response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error updating business:", error);

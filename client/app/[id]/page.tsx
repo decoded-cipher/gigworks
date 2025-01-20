@@ -1089,7 +1089,11 @@ const DevMorphixWebsite = () => {
             id="qr"
             style={{ scrollMarginTop: "100px" }}
           >
-            <DynamicQRCode slug={slug || ""} />
+            <DynamicQRCode 
+              slug={slug || ""} 
+              currentUrl={window.location.href} 
+              // handleShare={handleShare} 
+            />
           </section>
         </main>
       </div>

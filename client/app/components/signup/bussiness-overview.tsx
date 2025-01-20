@@ -91,7 +91,7 @@ export default function BusinessOverview({
       setIsCheckingSlug(true);
       try {
         const response = await checkSlug(slug);
-        console.log("response slug", response);
+        // console.log("response slug", response);
 
         setSlugAvailable(response.data);
         setSlugError(response.data ? null : "This slug is already taken");
