@@ -84,7 +84,7 @@ const DevMorphixWebsite = () => {
         return null;
       }
       const res = await UserLogout(token);
-      console.log();
+     
 
       if (res.status === 200) {
         Cookies.remove("token");

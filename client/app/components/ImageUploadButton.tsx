@@ -105,7 +105,7 @@ const ImageUploadButton = ({
 
     try {
       for (const file of selectedFiles) {
-        console.log(`Starting upload for ${file.name}`);
+        // console.log(`Starting upload for ${file.name}`);
         
         // Get presigned URL
         const urlResponse = await GetURL({
@@ -113,7 +113,7 @@ const ImageUploadButton = ({
           category: category
         });
 
-        console.log('URL Response:', urlResponse);
+        // console.log('URL Response:', urlResponse);
 
         if (!urlResponse || !urlResponse.presignedUrl || !urlResponse.assetpath) {
           throw new Error('Invalid URL response from server');
@@ -121,10 +121,10 @@ const ImageUploadButton = ({
 
         // Upload to storage
         await uploadToPresignedUrl(urlResponse.presignedUrl, file);
-        console.log(`File ${file.name} uploaded successfully to storage`);
+        // console.log(`File ${file.name} uploaded successfully to storage`);
 
         if (category === 'avatar' || category === 'banner' || category === 'identity') {
-          console.log(`Completing ${category} upload with assetpath:`, urlResponse.assetpath);
+          // console.log(`Completing ${category} upload with assetpath:`, urlResponse.assetpath);
           onUploadComplete(urlResponse.assetpath);
         } else if (category === 'media') {
           const response = await createBusinessMedia(businessId, {

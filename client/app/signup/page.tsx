@@ -171,7 +171,7 @@ export default function SignupPage() {
       };
       const userDataString:any = localStorage.getItem("userData");
       const userData = JSON.parse(userDataString);
-      console.log(userDataString);
+      // console.log(userDataString);
       
       const profileData = {
         name: formData.businessName,

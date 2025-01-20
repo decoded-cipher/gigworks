@@ -24,14 +24,17 @@ function ExplorePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetchBusinessData()
+        const response = await fetchBusinessData({ hasBusiness: true })
         // Ensure categories are in the correct format
         const validCategories =
-          response.data.categories?.map((cat: any) => ({
-            id: cat.id || "",
-            title: cat.name || cat.title || "Untitled",
-            src: cat.src || "/icons/default.svg",
-          })) || []
+          // response.data.businessCount > 0 &&
+          response.data.categories?.map((cat: any) => 
+            cat.businessCount !== 0 ? {
+              id: cat.id || "",
+              title: cat.name || cat.title || "Untitled",
+              src: cat.src || "/icons/default.svg",
+            } : null
+          ).filter((cat: any) => cat !== null) || []
         setCategories(validCategories)
       } catch (error) {
         console.error("Error:", error)

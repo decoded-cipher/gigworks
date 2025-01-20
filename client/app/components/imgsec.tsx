@@ -147,7 +147,7 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
     };
   });
 
-  console.log('mediaImages:', mediaImages);
+  
   
   const getBentoSpan = (imageSize?: 'small' | 'medium' | 'large') => {
     switch(imageSize) {
