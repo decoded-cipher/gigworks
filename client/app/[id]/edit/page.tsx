@@ -22,8 +22,7 @@ import {
   Youtube,
   Globe,
 } from "lucide-react";
-import ImageGrid from "@/app/components/imgsec";
-import ImageUploadButton from "@/app/components/ImageUploadButton";
+
 import MediaGallery from "@/app/components/MediaGallery";
 import OperatingHours from "@/app/components/OperatingHours";
 import { deletebusinessMedia } from "@/app/api";
@@ -454,15 +453,15 @@ export default function EditBusinessPage() {
                     <Pencil size={16} />
                   </label>
                 </div>
+
+
               </div>
-
-
             </div>
             {/* Image Cropper Modal */}
             {cropperState.isOpen && (
               <ImageCropper
                 imageUrl={cropperState.imageUrl}
-                aspect={cropperState.fieldType === "avatar" ? 1 : 16 / 9}
+                aspect={cropperState.fieldType === "avatar" ? 1 : 3} // 600/200 simplified to 3
                 onCropComplete={handleCroppedImage}
                 onCancel={() =>
                   setCropperState({ isOpen: false, imageUrl: "", fieldType: null })

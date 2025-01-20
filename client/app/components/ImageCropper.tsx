@@ -10,13 +10,7 @@ interface ImageCropperProps {
 }
 
 export default function ImageCropper({ imageUrl, aspect, onCropComplete, onCancel }: ImageCropperProps) {
-  const [crop, setCrop] = useState<Crop>({
-    unit: '%',
-    width: 90,
-    height: 90,
-    x: 5,
-    y: 5
-  });
+  const [crop, setCrop] = useState<Crop>();  // Remove initial state
   const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
@@ -77,6 +71,7 @@ export default function ImageCropper({ imageUrl, aspect, onCropComplete, onCance
             onChange={(c) => setCrop(c)}
             onComplete={(c) => setCompletedCrop(c)}
             aspect={aspect}
+            circularCrop={aspect === 1}  // Add circular crop for avatars
           >
             <img
               ref={imgRef}
@@ -95,7 +90,8 @@ export default function ImageCropper({ imageUrl, aspect, onCropComplete, onCance
           </button>
           <button
             onClick={handleCropComplete}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+            disabled={!completedCrop?.width || !completedCrop?.height}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:bg-blue-300"
           >
             Apply
           </button>
