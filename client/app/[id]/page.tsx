@@ -827,6 +827,29 @@ const DevMorphixWebsite = () => {
                         </div>
                       </>
                     ) : businessData?.profile.name.toLowerCase() ===
+                    "al-tech aluminium house" ? (
+                    <>
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1210.7253498673488!2d76.5675167!3d9.437330400000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06255b1dcfebb3%3A0x3109daf53a6bf1ff!2sHrishikesh%20building!5e1!3m2!1sen!2sin!4v1737360641670!5m2!1sen!2sin"
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      ></iframe>
+                      <div className="mt-2">
+                        <a
+                          href="https://maps.app.goo.gl/wWFbsqCAxa5XUHpj9"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-500 hover:text-blue-700"
+                        >
+                          View on Google Maps →
+                        </a>
+                      </div>
+                    </>
+                  ) : businessData?.profile.name.toLowerCase() ===
                       "adobe designs & digital printing" ? (
                       <>
                         <iframe
