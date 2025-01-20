@@ -153,10 +153,10 @@ const DevMorphixWebsite = () => {
         return null;
       }
 
-      console.log("Raw JWT Token:", token);
+      // console.log("Raw JWT Token:", token);
 
       const decodedToken = jwtDecode<JWTPayload>(token);
-      console.log("Decoded JWT Payload:", decodedToken);
+      // console.log("Decoded JWT Payload:", decodedToken);
 
       if (decodedToken.exp) {
         const currentTime = Math.floor(Date.now() / 1000);
@@ -206,7 +206,7 @@ const DevMorphixWebsite = () => {
         return null;
       }
       const res = await UserLogout(token);
-      console.log();
+     
 
       if (res.status === 200) {
         Cookies.remove("token");
@@ -235,7 +235,7 @@ const DevMorphixWebsite = () => {
         const response = await fetchBusinessesByslug(params.id as string);
         if (response.message === "Business fetched successfully") {
           setBusinessData(response.data);
-          console.log("User Name:", response.data.user.name);
+          // console.log("User Name:", response.data.user.name);
 
           if (tokenInfo?.name === response.data.user.name) {
             setIsOwner(true);
@@ -244,26 +244,26 @@ const DevMorphixWebsite = () => {
             console.log("User not authenticated");
           }
 
-          console.log(
-            "Avatar URL:",
-            `${ASSET_BASE_URL}/${response.data.profile.avatar}`
-          );
-          console.log(
-            "Banner URL:",
-            `${ASSET_BASE_URL}/${response.data.profile.banner}`
-          );
-          console.log(
-            "License Documents:",
-            response.data.licenses?.map(
-              (license: License) => `${ASSET_BASE_URL}/${license.url}`
-            )
-          );
-          console.log(
-            "Media Files:",
-            response.data.media?.map(
-              (mediaItem: MediaItem) => `${ASSET_BASE_URL}/${mediaItem.url}`
-            )
-          );
+          // console.log(
+          //   "Avatar URL:",
+          //   `${ASSET_BASE_URL}/${response.data.profile.avatar}`
+          // );
+          // console.log(
+          //   "Banner URL:",
+          //   `${ASSET_BASE_URL}/${response.data.profile.banner}`
+          // );
+          // console.log(
+          //   "License Documents:",
+          //   response.data.licenses?.map(
+          //     (license: License) => `${ASSET_BASE_URL}/${license.url}`
+          //   )
+          // );
+          // console.log(
+          //   "Media Files:",
+          //   response.data.media?.map(
+          //     (mediaItem: MediaItem) => `${ASSET_BASE_URL}/${mediaItem.url}`
+          //   )
+          // );
         } else {
           setError("Failed to load business data");
         }
@@ -861,18 +861,21 @@ const DevMorphixWebsite = () => {
                           loading="lazy"
                           referrerPolicy="no-referrer-when-downgrade"
                         ></iframe>
-                        {/* <div className="mt-2">
-                    <a
-                      href="https://maps.app.goo.gl/wWFbsqCAxa5XUHpj9"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-500 hover:text-blue-700"
-                    >
-                      View on Google Maps →
-                    </a>
-                  </div> */}
                       </>
-                    ) : (
+                    ) : businessData?.profile.name.toLowerCase() ===
+                    "al-tech aluminium house" ? (
+                    <>
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1039.0457764470052!2d76.5675167!3d9.437330400000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06255b1dcfebb3%3A0x3109daf53a6bf1ff!2sHrishikesh%20building!5e1!3m2!1sen!2sin!4v1737356965310!5m2!1sen!2sin"
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      ></iframe>
+                    </>
+                  ) : (
                       <iframe
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d251482.44857791857!2d76.1643857954714!3d9.982669325611842!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d514abec6bf%3A0xbd582caa5844192!2sKochi%2C%20Kerala!5e0!3m2!1sen!2sin!4v1702359671799!5m2!1sen!2sin"
                         width="100%"
