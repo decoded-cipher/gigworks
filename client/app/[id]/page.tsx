@@ -609,7 +609,7 @@ const DevMorphixWebsite = () => {
               </button>
             )}
 
-            <div className="absolute left-1/2 w-32 sm:w-60 h-auto transform -translate-x-1/2 bottom-[12rem] sm:bottom-[14rem] ">
+            <div className="absolute left-1/2 w-32 sm:w-60 h-auto transform -translate-x-1/2 bottom-[13rem] sm:bottom-[14rem] ">
               <img
                 src={
                   businessData?.profile.avatar
