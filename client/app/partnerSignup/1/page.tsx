@@ -60,7 +60,7 @@ const ProfileForm = () => {
 
   // Debug log for form data changes
   React.useEffect(() => {
-    console.log('Current Form Data:', formData);
+    // console.log('Current Form Data:', formData);
   }, [formData]);
 
   const handleInputChange = async (
@@ -89,8 +89,8 @@ const ProfileForm = () => {
         };
 
         // ...rest of file upload logic...
-        console.log('GetURL Response:', uploadResult);
-        console.log('Asset Path:', uploadResult.assetpath);
+        // console.log('GetURL Response:', uploadResult);
+        // console.log('Asset Path:', uploadResult.assetpath);
 
         axios.put(uploadResult.presignedUrl, file, {
           headers: {
