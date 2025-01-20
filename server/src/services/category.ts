@@ -1,7 +1,7 @@
 
 import { count, eq, sql } from "drizzle-orm";
 import { db } from '../config/database/turso';
-import { category, subCategory } from '../config/database/schema';
+import { category, subCategory, profile } from '../config/database/schema';
 
 
 
@@ -25,27 +25,41 @@ export const createCategory = async (name: string) => {
 
 
 // Get all categories
-export const getCategories = async (page: number, limit: number, search: string) => {
+export const getCategories = async (page: number, limit: number, search: string, hasBusiness: boolean) => {
     return new Promise(async (resolve, reject) => {
         try {
 
             // SQL Query : SELECT id, name FROM category WHERE name LIKE '%search%' LIMIT limit OFFSET (page - 1) * limit
 
-            const result = await db
-                .select({
-                    id: category.id,
-                    name: category.name
-                })
-                .from(category)
-                .where(sql`${category.name} LIKE ${'%' + search + '%'} AND ${category.status} = 1`)
-                .limit(limit)
-                .offset((page - 1) * limit);
+            let result = [];
+
+            if (hasBusiness) {
+                result = await db
+                    .select({
+                        id: category.id,
+                        name: category.name,
+                        businessCount: count(profile.id)
+                    })
+                    .from(category)
+                    .leftJoin(profile, sql`${profile.category_id} = ${category.id}`)
+                    .where(sql`${category.name} LIKE ${'%' + search + '%'} AND ${category.status} = 1`)
+                    .groupBy(category.id);
+            } else {
+                result = await db
+                    .select({
+                        id: category.id,
+                        name: category.name
+                    })
+                    .from(category)
+                    .where(sql`${category.name} LIKE ${'%' + search + '%'} AND ${category.status} = 1`)
+                    .limit(limit)
+                    .offset((page - 1) * limit);
+            }
 
             resolve({
                 data: result,
                 count: await db.$count(category)
             });
-
         } catch (error) {
             reject(error);
         }
