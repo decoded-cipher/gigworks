@@ -6,11 +6,14 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export const ASSET_BASE_URL = process.env.NEXT_PUBLIC_ASSET_BASE_URL;
 // export const ASSET_BASE_URL = 'https://pub-3aaf2182691d4cb6b5270a8f14ad704a.r2.dev';
 
-export const fetchBusinessData = async () => {
+export const fetchBusinessData = async (params:any = {}) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/api/v1/category` ///api/v1/category?page=1&limit=3
+      `${BASE_URL}/api/v1/category?hasBusiness=true`,
+        ///api/v1/category?page=1&limit=3
     );
+        console.log('response',response.data);
+        
     return response.data;
   } catch (error) {
     console.error('Error fetching business data:', error);
