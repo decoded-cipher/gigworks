@@ -25,7 +25,7 @@ const QrSection: React.FC<QrSectionProps> = ({ slug}) => {
         width: 200,
         height: 200,
         data: currentUrl,
-        image: '../favicon-32x32.png',
+        image: '../assets/gigqr.svg',
         dotsOptions: {
           color: '#000000',
           type: 'rounded'
@@ -35,7 +35,7 @@ const QrSection: React.FC<QrSectionProps> = ({ slug}) => {
         },
         imageOptions: {
           crossOrigin: 'anonymous',
-          margin: 10
+          margin: 1
         }
       });
     } else {
