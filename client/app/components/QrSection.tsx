@@ -64,24 +64,39 @@ const QrSection: React.FC<QrSectionProps> = ({ slug}) => {
   const handleShareClick = async () => {
     if (navigator.share && qrCodeContainerRef.current) {
       try {
+        // Generate the canvas from the QR code container
         const canvas = await html2canvas(qrCodeContainerRef.current);
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const filesArray = [
-              new File([blob], 'qr-code.png', {
-                type: blob.type,
-              }),
-            ];
-
-            navigator.share({
+        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve));
+  
+        if (blob) {
+          // Create the file array
+          const filesArray = [
+            new File([blob], 'qr-code.png', { type: blob.type }),
+          ];
+  
+          // Prepare the sharing data
+          const shareData = {
+            title: 'Gigwork',
+            text: `Check out this business on Gigwork!\n${currentUrl}`,
+            files: filesArray,
+          };
+  
+          // Check if files can be shared
+          if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+            await navigator.share(shareData);
+            console.log('Successful share');
+          } else {
+            // Fallback for browsers that do not support file sharing
+            await navigator.share({
               title: 'Gigwork',
               text: `Check out this business on Gigwork!\n${currentUrl}`,
-              files: filesArray,
-            })
-            .then(() => console.log('Successful share'))
-            .catch((error) => console.log('Error sharing', error));
+              url: currentUrl,
+            });
+            console.log('Successful fallback share');
           }
-        });
+        } else {
+          console.error('Failed to create blob from canvas');
+        }
       } catch (error) {
         console.error('Error generating image for sharing:', error);
       }
@@ -90,7 +105,7 @@ const QrSection: React.FC<QrSectionProps> = ({ slug}) => {
       window.open(currentUrl, '_blank');
     }
   };
-
+  
   return (
     <div>
       <div ref={qrCodeContainerRef} className="w-60 sm:w-80 mx-auto bg-white border rounded-lg shadow-lg p-6">
