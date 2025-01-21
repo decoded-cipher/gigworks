@@ -1091,8 +1091,8 @@ const DevMorphixWebsite = () => {
           >
             <DynamicQRCode 
               slug={slug || ""} 
-              currentUrl={window.location.href} 
-              
+              // currentUrl={window.location.href} 
+              // handleShare={handleShare} 
             />
           </section>
         </main>

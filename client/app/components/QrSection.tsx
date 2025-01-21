@@ -4,13 +4,14 @@ import { Share2 } from 'lucide-react';
 
 interface QrSectionProps {
   slug: string;
-  currentUrl: string;
+  // currentUrl: string;
   // handleShare: () => void;
 }
 
-const QrSection: React.FC<QrSectionProps> = ({ slug, currentUrl }) => {
+const QrSection: React.FC<QrSectionProps> = ({ slug}) => {
   const qrCodeRef = useRef<HTMLDivElement>(null);
   const qrCode = useRef<QRCodeStyling | null>(null);
+  const currentUrl = `https://gigwork.co.in/${slug}`;
 
   useEffect(() => {
     // Clear the container first
@@ -55,14 +56,18 @@ const QrSection: React.FC<QrSectionProps> = ({ slug, currentUrl }) => {
       }
     };
   }, [currentUrl]);
-
-  const handleShare = () => {
+  const handleShareClick = () => {
     if (navigator.share) {
       navigator.share({
         title: 'Gigwork',
-        text: 'Check out my gig on Gigwork',
-        url: "https://gigwork.co.in/" + slug
-      });
+        text: 'Check out this business on Gigwork!',
+        url: currentUrl,
+      })
+      .then(() => console.log('Successful share'))
+      .catch((error) => console.log('Error sharing', error));
+    } else {
+      // Fallback for browsers that do not support the Web Share API
+      window.open(currentUrl, '_blank');
     }
   };
 
@@ -72,13 +77,13 @@ const QrSection: React.FC<QrSectionProps> = ({ slug, currentUrl }) => {
         <div className="space-y-4">
           <h2 className="text-center font-medium mb-4">Scan Me</h2>
           <div ref={qrCodeRef} className="w-full h-auto mx-auto flex justify-center" />
-        </div>
-      <p className="text-sm text-gray-500 text-center break-all mt-4"> 
+      <p className="text-sm text-gray-500 text-center break-all mt-4">
         gigwork.co.in/{slug}
       </p>
+        </div>
       </div>
       <button
-        onClick={handleShare}
+        onClick={handleShareClick}
         className="flex items-center justify-center w-full gap-2 p-2 mt-4 text-sm bg-transparent"
       >
         <Share2 className="w-4 h-4" />
