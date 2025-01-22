@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 
 import MediaGallery from "@/app/components/MediaGallery";
+import Cookies from 'js-cookie';
 import OperatingHours from "@/app/components/OperatingHours";
 import { deletebusinessMedia } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
@@ -158,6 +159,16 @@ export default function EditBusinessPage() {
     setIsMounted(true);
     return () => setIsMounted(false);
   }, []);
+
+
+  useEffect(() => {
+    const token = Cookies.get('token');
+    const slug = params.id;   
+    if (!token && slug) {
+      router.push(`/${slug}`); // Redirect to the page with the slug if no token
+    }
+  }, [router]);
+
 
   const handleFieldChange = (field: string, value: any) => {
     setPendingChanges(prev => {

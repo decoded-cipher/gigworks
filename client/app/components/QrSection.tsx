@@ -65,7 +65,7 @@ const currentUrl = `https://gigwork.co.in/${slug}`;
 
           <QRCode
             value={currentUrl}
-            logoImage="/assets/qr ref1.png"
+            logoImage="../assets/qr ref1.png"
             size={200}
             qrStyle="dots"
             eyeRadius={10}
