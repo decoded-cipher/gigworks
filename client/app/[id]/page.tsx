@@ -32,7 +32,7 @@ import {
   UserLogout,
 } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
-
+import PendingPage  from "../components/pending";
 // Add this interface with other interfaces
 interface ApiError {
   status: number;
@@ -270,7 +270,7 @@ const DevMorphixWebsite = () => {
       } catch (err) {
         const error = err as ApiError;
         if (error.status === 404) {
-          router.push("/pending");
+          setError('pending');
           return;
         }
         console.error("Error fetching business data:", error);
@@ -329,6 +329,10 @@ const DevMorphixWebsite = () => {
         </div>
       </div>
     );
+  }
+
+  if (error === 'pending') {
+    return <PendingPage />;
   }
 
   if (error) {
