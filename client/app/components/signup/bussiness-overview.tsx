@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Editor, { ContentEditableEvent } from "react-simple-wysiwyg";
-import { Textarea } from "@nextui-org/input";
+
 import type { FormData } from "../../signup/page";
 import ReactCrop, { Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
