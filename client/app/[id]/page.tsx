@@ -944,11 +944,11 @@ const DevMorphixWebsite = () => {
               referrerPolicy="no-referrer-when-downgrade"
             ></iframe>
           </>
-        ) : businessData?.profile.name.toLowerCase() ===
-        "kasthuri premium tissues" ? (
+        ) : businessData?.profile.slug.toLowerCase() ===
+        "kasthuritissue" ? (
         <>
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d2739726.6248972835!2d74.3780993!3d11.1953909!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625b7fd82ef3b%3A0x2f0376ec4bbc0c1!2sKasthuri%20premium%20tissues!5e1!3m2!1sen!2sin!4v1737616021347!5m2!1sen!2sin"
+            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d719.9638923314029!2d76.5666106241674!3d9.449273442096539!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625b7fd82ef3b%3A0x2f0376ec4bbc0c1!2sKasthuri%20premium%20tissues!5e0!3m2!1sen!2sin!4v1737634242110!5m2!1sen!2sin"
             width="100%"
             height="100%"
             style={{ border: 0 }}
