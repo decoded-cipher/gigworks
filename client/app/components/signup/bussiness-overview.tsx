@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Editor, { ContentEditableEvent } from "react-simple-wysiwyg";
-import { Textarea } from "@nextui-org/input";
+
 import type { FormData } from "../../signup/page";
 import ReactCrop, { Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -14,6 +14,7 @@ import {
   checkSlug,
   fetchDataBySubCategory,
 } from "../../api/index";
+import ImageCropper from "../ImageCropper";
 
 interface Category {
   id: string;
@@ -794,70 +795,16 @@ export default function BusinessOverview({
 
      {/* Crop Modal */}
       {isCropModalOpen && currentImage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg w-[95vw] max-w-[800px] max-h-[90vh] flex flex-col">
-            <h3 className="text-lg font-bold mb-4">Adjust Image</h3>
-
-            {/* Crop Area */}
-            <div className="flex-1 min-h-0 overflow-auto">
-              <ReactCrop
-                crop={cropConfig}
-                onChange={(c) => setCropConfig(c)}
-                onComplete={handleCropComplete}
-                aspect={currentImage.type === "profile" ? 1 : 16 / 9}
-                circularCrop={currentImage.type === "profile"}
-                className="max-h-[60vh] flex items-center justify-center"
-              >
-                <img
-                  ref={imgRef}
-                  src={currentImage.src}
-                  alt="Crop preview"
-                  className="max-w-full max-h-[60vh] object-contain"
-                  onLoad={(e) => {
-                    const img = e.currentTarget;
-                    const minSize = Math.min(img.width, img.height);
-                    setCropConfig({
-                      unit: "px",
-                      width:
-                        currentImage.type === "profile" ? minSize : img.width,
-                      height:
-                        currentImage.type === "profile"
-                          ? minSize
-                          : Math.round((img.width / 16) * 9),
-                      x: 0,
-                      y: 0,
-                    });
-                  }}
-                />
-              </ReactCrop>
-            </div>
-
-            {/* Action Buttons - Fixed at bottom */}
-            <div className="flex justify-end gap-4 mt-6 pt-4 border-t">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsCropModalOpen(false);
-                  setCurrentImage(null);
-                }}
-                className="px-6 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
-                disabled={isUploading}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleCropSave}
-                className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
-                disabled={
-                  isUploading || !completedCrop?.width || !completedCrop?.height
-                }
-              >
-                {isUploading ? "Saving..." : "Save Image"}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ImageCropper
+          imageUrl={currentImage.src}
+          aspect={currentImage.type === "profile" ? 1 : 3}
+          onCropComplete={handleCropSave}
+          onCancel={() => {
+            setIsCropModalOpen(false);
+            setCurrentImage(null);
+          }}
+          isCircular={currentImage.type === "profile"}
+        />
       )}
     </div>
   );
