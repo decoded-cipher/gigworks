@@ -17,8 +17,15 @@ export default function ImageCropper({
   onCancel,
   isCircular = false // Default to false
 }: ImageCropperProps) {
-  // Initialize crop as null
-  const [crop, setCrop] = useState<Crop | null>(null);
+  // Initialize crop with required properties
+  const [crop, setCrop] = useState<Crop>({
+    unit: '%',
+    width: 90,
+    height: isCircular ? 90 : 90 / aspect,
+    x: 5,
+    y: 5
+  });
+  
   const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -102,8 +109,8 @@ export default function ImageCropper({
     // Calculate initial crop after image loads
     setTimeout(() => {
       const minSize = Math.min(width, height);
-      const initialCrop = {
-        unit: 'px',
+      const initialCrop: Crop = {
+        unit: 'px', // Explicitly specify as 'px' or '%'
         width: isCircular ? minSize : width * 0.8,
         height: isCircular ? minSize : (width * 0.8) / aspect,
         x: (width - (isCircular ? minSize : width * 0.8)) / 2,
@@ -115,9 +122,8 @@ export default function ImageCropper({
     }, 100); // Small delay to ensure image is rendered
   };
 
-  const handleCropChange = (newCrop: Crop, percentCrop: Crop) => {
+  const handleCropChange = (newCrop: Crop) => {
     setCrop(newCrop);
-    setCompletedCrop(newCrop);
   };
 
   const cropStyle = isCircular ? {
