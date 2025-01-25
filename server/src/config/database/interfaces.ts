@@ -171,3 +171,8 @@ export interface PartnerIdProof {
     proof_url?: string;
     status?: string;
 }
+
+export interface Coordinates {
+    latitude: number;
+    longitude: number;
+};
