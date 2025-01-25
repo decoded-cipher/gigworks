@@ -54,6 +54,10 @@ export const createProfile = async (data: Profile) => {
                 data.socials = JSON.stringify(data.socials);
             }
 
+            if(data.additional_services) {
+                data.additional_services = JSON.stringify(data.additional_services);
+            }
+
             // SQL Query : INSERT INTO profile (name, slug, description, email, website, phone, gstin, category_id, sub_category_id, sub_category_option_id, address, city, state, zip, country, facebook, instagram, twitter, linkedin, youtube, logo, type, additional_services, referral_code, partner_id) VALUES (data.name, data.slug, data.description, data.email, data.website, data.phone, data.gstin, data.category_id, data.sub_category_id, data.sub_category_option_id, data.address, data.city, data.state, data.zip, data.country, data.facebook, data.instagram, data.twitter, data.linkedin, data.youtube, data.logo, data.type, data.additional_services, data.referral_code, partnerData[0].id)
             
             let result = await db
