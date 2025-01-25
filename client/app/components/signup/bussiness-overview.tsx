@@ -238,41 +238,47 @@ export default function BusinessOverview({
     });
   };
 
-  const handleCropSave = async (croppedImageUrl: string) => {
-    if (!currentImage) return;
+  const handleCropSave = async () => {
+    if (
+      !currentImage ||
+      !imgRef.current ||
+      !completedCrop?.width ||
+      !completedCrop?.height
+    ) {
+      alert("Please select an area to crop");
+      return;
+    }
 
     try {
       setIsUploading(true);
-      
-      // Convert base64 to blob
-      const response = await fetch(croppedImageUrl);
-      const blob = await response.blob();
-      const croppedFile = new File([blob], currentImage.file.name, {
+      const croppedImg = await getCroppedImg(imgRef.current, completedCrop);
+      const croppedFile = new File([croppedImg], currentImage.file.name, {
         type: "image/jpeg",
       });
 
       // Get upload URL
       const category = currentImage.type === "profile" ? "avatar" : "banner";
-      const uploadResponse = await GetURL({
+      const response = await GetURL({
         type: "image/jpeg",
         category: category as "avatar" | "identity",
       });
 
       // Upload the file
-      await uploadToPresignedUrl(uploadResponse.data.presignedUrl, croppedFile);
+      await uploadToPresignedUrl(response.data.presignedUrl, croppedFile);
 
       // Update preview and form data
+      const previewUrl = URL.createObjectURL(croppedImg);
       if (currentImage.type === "profile") {
-        setProfilePreview(croppedImageUrl);
+        setProfilePreview(previewUrl);
         updateFormData({
           profileImage: croppedFile,
-          avatar: uploadResponse.data.assetPath,
+          avatar: response.data.assetPath,
         });
       } else {
-        setCoverPreview(croppedImageUrl);
+        setCoverPreview(previewUrl);
         updateFormData({
           coverImage: croppedFile,
-          banner: uploadResponse.data.assetPath,
+          banner: response.data.assetPath,
         });
       }
 
