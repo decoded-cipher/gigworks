@@ -4,9 +4,9 @@ import { eachMonthOfInterval, format } from 'date-fns';
 import { count, eq, sql } from "drizzle-orm";
 import { db } from '../config/database/turso';
 
-import { user, profile, partner, partnerBank, partnerIdProof, partnerIdProofType } from '../config/database/schema';
-import { User, Partner, PartnerBank, PartnerIdProof, PartnerIdProofType, User } from '../config/database/interfaces';
-import { PgHalfVector } from "drizzle-orm/pg-core";
+import { user, profile, partner, partnerBank, partnerIdProof } from '../config/database/schema';
+import { User, Partner, PartnerBank, PartnerIdProof, partnerIdProofTypes, User } from '../config/database/interfaces';
+import { removeFields, secureText } from "../utils/helpers";
 
 
 
@@ -73,25 +73,66 @@ export const createPartner = async (data: Partner, user: User) => {
 
 
 // Get partner data ny partner_id
-export const getPartnerById = async (user: User) => {
+export const getPartnerById = async (userData: User) => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            // SQL Query : SELECT * FROM partner WHERE user_id = user.id
+            /*
+                SELECT
+                    user.name,
+                    user.phone,
+                    user.email,
+                    partner.referral_code,
+                    partnerBank.*,
+                    partnerIdProof.*
+                FROM
+                    partner
+                LEFT JOIN
+                    user ON user.id = partner.user_id
+                LEFT JOIN
+                    partnerBank ON partnerBank.partner_id = partner.id
+                LEFT JOIN
+                    partnerIdProof ON partnerIdProof.partner_id = partner.id
+                WHERE
+                    partner.user_id = userData.id
+            */
 
-            let partnerData = await db
-                .select()
+            const partnerData = await db
+                .select({
+                    user,
+                    partner,
+                    partnerBank,
+                    partnerIdProof,
+                })
                 .from(partner)
-                .where(sql`user_id = ${user.id}`);
+                .innerJoin(user, sql`${user.id} = ${partner.user_id}`)
+                .leftJoin(partnerBank, sql`${partnerBank.partner_id} = ${partner.id}`)
+                .leftJoin(partnerIdProof, sql`${partnerIdProof.partner_id} = ${partner.id}`)
+                .where(sql`${partner.user_id} = ${userData.id}`);
+        
+            if (!partnerData) {
+                return resolve(null);
+            }
+        
+            const secureBankDetails = (bank: any) => {
+                ['account_number', 'branch_name', 'ifsc', 'account_holder', 'upi_id'].forEach(field => {
+                    bank[field] = secureText(bank[field], 2);
+                });
+            };
             
-            partnerData = partnerData[0];
+            const mapProofType = (proof: any) => {
+                proof.proof_type = partnerIdProofTypes.find(p => p.id === proof.proof_type_id)?.name;
+            };
             
-            resolve({
-                name: user.name,
-                phone: user.phone,
-                avatar: partnerData.avatar,
-                referral_code: partnerData.referral_code,
+            const securedPartnerData = partnerData.map((data: any) => {
+                if (data.partnerBank) secureBankDetails(data.partnerBank);
+                if (data.partnerIdProof) mapProofType(data.partnerIdProof);
+                return data;
             });
+            
+            const result = removeFields(securedPartnerData, ['id', 'user_id', 'partner_id', 'updated_at', 'created_at', 'status', 'role', 'proof_type_id', 'proof_url']);
+            
+            resolve(result);
 
         } catch (error) {
             reject(error);

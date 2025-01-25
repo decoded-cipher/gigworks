@@ -15,6 +15,7 @@ import {
     subCategoryOption
 } from '../config/database/schema';
 import { User, Profile } from '../config/database/interfaces';
+import { removeFields } from "../utils/helpers";
 
 
 
@@ -441,21 +442,4 @@ export const getProfileBySlug = async (slug: string) => {
             reject(error);
         }
     });
-}
-
-
-
-// Remove fields from object
-const removeFields = (obj: any, fields: string[]) => {
-    if (Array.isArray(obj)) {
-        return obj.map(item => removeFields(item, fields));
-    } else if (obj && typeof obj === 'object') {
-        return Object.keys(obj).reduce((newObj, key) => {
-            if (!fields.includes(key)) {
-                newObj[key] = removeFields(obj[key], fields);
-            }
-            return newObj;
-        }, {} as any);
-    }
-    return obj;
 }

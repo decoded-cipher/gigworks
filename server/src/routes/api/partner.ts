@@ -49,13 +49,7 @@ router.post('/', async (c) => {
         }
     
         return c.json({
-            message: 'Partner created successfully',
-            data: {
-                user,
-                partner,
-                partnerBank,
-                partnerIdProof
-            }
+            message: 'Partner created successfully'
         });
     } catch (error) {
         return c.json({
