@@ -28,3 +28,23 @@ export const createPartnerIdProof = async (data: PartnerIdProof): Promise<Partne
         }
     });
 }
+
+
+
+// Delete partner ID proof
+export const deletePartnerIdProof = async (partner_id: number) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : DELETE FROM partner_id_proof WHERE partner_id = $1
+
+            const result = await db
+                .delete(partnerIdProof)
+                .where(sql`partner_id = ${partner_id}`);
+
+            resolve(result);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}

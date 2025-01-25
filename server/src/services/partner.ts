@@ -6,7 +6,7 @@ import { db } from '../config/database/turso';
 
 import { user, profile, partner, partnerBank, partnerIdProof } from '../config/database/schema';
 import { User, Partner, PartnerBank, PartnerIdProof, partnerIdProofTypes, User } from '../config/database/interfaces';
-import { removeFields, secureText } from "../utils/helpers";
+import { secureText } from "../utils/helpers";
 
 
 
@@ -72,7 +72,30 @@ export const createPartner = async (data: Partner, user: User) => {
 
 
 
-// Get partner data ny partner_id
+// Update partner data
+export const updatePartner = async (data: Partner) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : UPDATE partner SET name = $1, phone = $2, email = $3, updated_at = $4 WHERE id = $5 RETURNING *
+
+            const result = await db
+                .update(partner)
+                .set({ ...data })
+                .where(sql`id = ${data.id}`)
+                .returning();
+
+            resolve(result[0]);
+
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+
+
+// Get partner by user id
 export const getPartnerById = async (userData: User) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -113,15 +136,16 @@ export const getPartnerById = async (userData: User) => {
             if (!partnerData) {
                 return resolve(null);
             }
-        
+
             const secureBankDetails = (bank: any) => {
                 ['account_number', 'branch_name', 'ifsc', 'account_holder', 'upi_id'].forEach(field => {
-                    bank[field] = secureText(bank[field], 2);
+                    bank[field] = secureText(bank[field], 3);
                 });
             };
             
             const mapProofType = (proof: any) => {
                 proof.proof_type = partnerIdProofTypes.find(p => p.id === proof.proof_type_id)?.name;
+                proof.proof_number = secureText(proof.proof_number, 0);
             };
             
             const securedPartnerData = partnerData.map((data: any) => {
@@ -129,10 +153,8 @@ export const getPartnerById = async (userData: User) => {
                 if (data.partnerIdProof) mapProofType(data.partnerIdProof);
                 return data;
             });
-            
-            const result = removeFields(securedPartnerData, ['id', 'user_id', 'partner_id', 'updated_at', 'created_at', 'status', 'role', 'proof_type_id', 'proof_url']);
-            
-            resolve(result);
+                        
+            resolve(securedPartnerData);
 
         } catch (error) {
             reject(error);

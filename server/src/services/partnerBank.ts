@@ -23,3 +23,23 @@ export const createPartnerBank = async (data: PartnerBank) => {
         }
     });
 }
+
+
+
+// Delete partner bank details
+export const deletePartnerBank = async (partner_id: number) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : DELETE FROM partner_bank WHERE partner_id = $1
+
+            const result = await db
+                .delete(partnerBank)
+                .where(sql`partner_id = ${partner_id}`);
+
+            resolve(result);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
