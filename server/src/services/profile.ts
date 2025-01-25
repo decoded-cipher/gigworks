@@ -405,6 +405,7 @@ export const getProfileBySlug = async (slug: string) => {
                     
                     
                     db.select({
+                        _id: profileLicense.id,
                         name: licenseType.name,
                         number: profileLicense.license_number,
                         url: profileLicense.license_url,
