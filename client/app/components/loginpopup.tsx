@@ -244,7 +244,11 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
     toast.success('Login successful!');
   
     if (user?.partner) {
-      router.push('/partnerProfile');
+      if (user.partner.registered) {
+        router.push('/partnerProfile');
+      } else {
+        router.push('/partnerSignup/1'); // Redirect to a partner registration page
+      }
       handleClose();
       return;
     }
