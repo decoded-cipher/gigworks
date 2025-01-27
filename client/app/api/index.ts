@@ -272,6 +272,32 @@ export const BisunessMedia = async (data: any) => {
   }
 };
 
+export const updatePartner = async (data: any) => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+    console.log(data);
+    
+    const response = await axios.patch(
+      `${BASE_URL}/api/v1/partner`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    console.log(response.data);
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    throw error;
+  }
+}
+
 export const GetPartner = async () => {
   try {
     const token = document.cookie
