@@ -61,7 +61,10 @@ const DevMorphixWebsite = () => {
           GetPartnerAnalytics(dateRange.start, dateRange.end),
         ]);
         setPartnerData(partnerResponse.data[0]);
-        console.log("Partner Data:", partnerResponse.data[0]);
+        console.log("Partner Data:", partnerResponse.data[0]);  
+        if (!partnerResponse.data[0]) {
+          router.push("/partnerSignup/1");
+        }
         
         setAnalyticsData(analyticsResponse.data);
       } catch (error) {
