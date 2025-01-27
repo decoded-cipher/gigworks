@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 
 import MediaGallery from "@/app/components/MediaGallery";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import OperatingHours from "@/app/components/OperatingHours";
 import { deletebusinessMedia } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
@@ -160,18 +160,16 @@ export default function EditBusinessPage() {
     return () => setIsMounted(false);
   }, []);
 
-
   useEffect(() => {
-    const token = Cookies.get('token');
-    const slug = params.id;   
+    const token = Cookies.get("token");
+    const slug = params.id;
     if (!token && slug) {
       router.push(`/${slug}`); // Redirect to the page with the slug if no token
     }
   }, [router]);
 
-
   const handleFieldChange = (field: string, value: any) => {
-    setPendingChanges(prev => {
+    setPendingChanges((prev) => {
       const fieldParts = field.split(".");
       if (fieldParts.length > 1 && fieldParts[0] === "socials") {
         return {
@@ -189,7 +187,7 @@ export default function EditBusinessPage() {
     });
 
     // Update local state for immediate UI feedback
-    setBusinessData(prev => {
+    setBusinessData((prev) => {
       if (!prev) return null;
       if (field.startsWith("socials.")) {
         const socialField = field.split(".")[1];
@@ -215,12 +213,12 @@ export default function EditBusinessPage() {
   };
 
   const handleOperatingHoursUpdate = (newHours: { [key: string]: string }) => {
-    setPendingChanges(prev => ({
+    setPendingChanges((prev) => ({
       ...prev,
       operating_hours: newHours,
     }));
 
-    setBusinessData(prev => {
+    setBusinessData((prev) => {
       if (!prev) return null;
       return {
         ...prev,
@@ -232,13 +230,13 @@ export default function EditBusinessPage() {
     });
   };
 
-  const handleImageUpload = (assetpath: string, field: 'avatar' | 'banner') => {
-    setPendingChanges(prev => ({
+  const handleImageUpload = (assetpath: string, field: "avatar" | "banner") => {
+    setPendingChanges((prev) => ({
       ...prev,
       [field]: assetpath,
     }));
 
-    setBusinessData(prev => {
+    setBusinessData((prev) => {
       if (!prev) return null;
       return {
         ...prev,
@@ -252,7 +250,10 @@ export default function EditBusinessPage() {
 
   const handleSave = async () => {
     try {
-      if (!businessData?.profile.id || Object.keys(pendingChanges).length === 0) {
+      if (
+        !businessData?.profile.id ||
+        Object.keys(pendingChanges).length === 0
+      ) {
         router.push(`/${params.id}`);
         return;
       }
@@ -272,37 +273,43 @@ export default function EditBusinessPage() {
       if (businessData?.profile.id) {
         await deletebusinessMedia(businessData.profile.id, mediaId);
         // Update local state instead of fetching all data again
-        setBusinessData(prev => {
+        setBusinessData((prev) => {
           if (!prev) return null;
           return {
             ...prev,
-            media: prev.media.filter(item => item.id !== mediaId)
+            media: prev.media.filter((item) => item.id !== mediaId),
           };
         });
-        toast.success('Media item deleted successfully');
+        toast.success("Media item deleted successfully");
       }
     } catch (error) {
-      console.error('Error deleting media:', error);
-      toast.error('Failed to delete media item');
+      console.error("Error deleting media:", error);
+      toast.error("Failed to delete media item");
     }
   };
 
   // Add this new function to handle media updates
   const handleMediaUpdate = (newMedia: MediaItem) => {
-    setBusinessData(prev => {
+    setBusinessData((prev) => {
       if (!prev) return null;
       return {
         ...prev,
-        media: [...prev.media, {
-          id: newMedia.id,
-          url: newMedia.url,
-          type: newMedia.type || 'image/jpeg' // Provide a default type if none exists
-        }]
+        media: [
+          ...prev.media,
+          {
+            id: newMedia.id,
+            url: newMedia.url,
+            type: newMedia.type || "image/jpeg", // Provide a default type if none exists
+          },
+        ],
       };
     });
   };
 
-  const handleImageSelect = async (file: File, fieldType: "avatar" | "banner") => {
+  const handleImageSelect = async (
+    file: File,
+    fieldType: "avatar" | "banner"
+  ) => {
     const imageUrl = URL.createObjectURL(file);
     setCropperState({
       isOpen: true,
@@ -318,7 +325,9 @@ export default function EditBusinessPage() {
       // Convert base64/URL to blob
       const response = await fetch(croppedImageUrl);
       const blob = await response.blob();
-      const file = new File([blob], "cropped-image.jpg", { type: "image/jpeg" });
+      const file = new File([blob], "cropped-image.jpg", {
+        type: "image/jpeg",
+      });
 
       // Get presigned URL
       const uploadResponse = await GetURL({
@@ -379,7 +388,9 @@ export default function EditBusinessPage() {
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex md:flex-row flex-col justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold md:pb-0 pb-2">Edit Business Profile</h1>
+          <h1 className="text-2xl font-bold md:pb-0 pb-2">
+            Edit Business Profile
+          </h1>
           <div className="flex gap-4">
             <button
               onClick={() => router.push(`/${params.id}`)}
@@ -464,8 +475,6 @@ export default function EditBusinessPage() {
                     <Pencil size={16} />
                   </label>
                 </div>
-
-
               </div>
             </div>
             {/* Image Cropper Modal */}
@@ -475,7 +484,11 @@ export default function EditBusinessPage() {
                 aspect={cropperState.fieldType === "avatar" ? 1 : 3} // 600/200 simplified to 3
                 onCropComplete={handleCroppedImage}
                 onCancel={() =>
-                  setCropperState({ isOpen: false, imageUrl: "", fieldType: null })
+                  setCropperState({
+                    isOpen: false,
+                    imageUrl: "",
+                    fieldType: null,
+                  })
                 }
               />
             )}
@@ -503,7 +516,9 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.category}
-                  onChange={(e) => handleFieldChange("category", e.target.value)}
+                  onChange={(e) =>
+                    handleFieldChange("category", e.target.value)
+                  }
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -514,7 +529,9 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.subCategory}
-                  onChange={(e) => handleFieldChange("subCategory", e.target.value)}
+                  onChange={(e) =>
+                    handleFieldChange("subCategory", e.target.value)
+                  }
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -525,7 +542,9 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.subCategoryOption}
-                  onChange={(e) => handleFieldChange("subCategoryOption", e.target.value)}
+                  onChange={(e) =>
+                    handleFieldChange("subCategoryOption", e.target.value)
+                  }
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -536,10 +555,12 @@ export default function EditBusinessPage() {
                 </label>
                 <div className="border rounded-lg">
                   <Editor
-                    value={businessData.profile.description || ''}
-                    onChange={(e) => handleFieldChange("description", e.target.value)}
+                    value={businessData.profile.description || ""}
+                    onChange={(e) =>
+                      handleFieldChange("description", e.target.value)
+                    }
                     containerProps={{
-                      className: "min-h-[150px] p-2"
+                      className: "min-h-[150px] p-2",
                     }}
                   />
                 </div>
@@ -591,6 +612,7 @@ export default function EditBusinessPage() {
               <div className="flex flex-wrap gap-2">
                 {businessData.profile.additional_services
                   .split(",")
+                  .slice(0, 5)
                   .map((service, index) => {
                     const formattedService = service
                       .trim()
@@ -608,7 +630,11 @@ export default function EditBusinessPage() {
                     );
                   })}
               </div>
+              
               <div>
+              
+                
+             
                 <label className="block text-sm font-medium mb-1">
                   Edit Services (comma-separated)
                 </label>
@@ -621,6 +647,9 @@ export default function EditBusinessPage() {
                   className="w-full p-2 border rounded-lg"
                   placeholder="e.g., customOrders, afterSalesSupport"
                 />
+                <p className="text-sm text-red-500">
+                  Only the first 5 services are shown.
+                </p>
                 <p className="text-sm text-gray-500 mt-1">
                   Enter services separated by commas. Use camelCase for multiple
                   words (e.g., customOrders).
@@ -647,7 +676,7 @@ export default function EditBusinessPage() {
                         type="url"
                         defaultValue={
                           businessData.profile.socials?.[
-                          key as keyof typeof businessData.profile.socials
+                            key as keyof typeof businessData.profile.socials
                           ] || ""
                         }
                         onBlur={(e) =>
@@ -725,4 +754,3 @@ export default function EditBusinessPage() {
     </div>
   );
 }
-

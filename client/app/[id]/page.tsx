@@ -695,14 +695,16 @@ const DevMorphixWebsite = () => {
             id="service"
             style={{ scrollMarginTop: "100px" }}
           >
-            {/* <section className="bg-white rounded-full p-6 mb-8">
+
+            {businessData?.profile.additional_services && (
+            <section className="bg-white rounded-full p-6 mb-8">
               <h2 className="text-2xl font-bold text-center mb-6">
                 Services Provides
               </h2>
               <div className="max-w-4xl mx-auto">
                 <div className="flex flex-wrap gap-6 justify-center">
                   {(
-                    businessData?.profile.additional_services.split(",").map(service => {
+                    businessData?.profile.additional_services.split(",").slice(0, 5).map(service => {
                       // Convert camelCase to Title Case with spaces
                       return service.trim().replace(/([A-Z])/g, ' $1')
                                          .replace(/^./, str => str.toUpperCase())
@@ -726,9 +728,10 @@ const DevMorphixWebsite = () => {
                   ))}
                 </div>
               </div>
-            </section> */}
-
+            </section>
+          )}
             <hr className="my-4 mx-10 "></hr>
+
 
             <section
               className="flex flex-col md:flex-row gap-6 mb-8"
