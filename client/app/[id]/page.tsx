@@ -1083,7 +1083,7 @@ const DevMorphixWebsite = () => {
               </div>
               <div className="flex items-center justify-center">
                 <p
-                  className="text-[#111111] text-md text-justify text-center font-medium leading-relaxed"
+                  className="text-[#111111] text-md text-left font-medium leading-relaxed "
                   dangerouslySetInnerHTML={{
                     __html:
                       businessData?.profile.description ||
