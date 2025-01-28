@@ -9,6 +9,7 @@ import {
   GetURL,
   uploadToPresignedUrl,
   createBusinessMedia,
+  
 } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -26,9 +27,8 @@ import {
 import MediaGallery from "@/app/components/MediaGallery";
 import Cookies from "js-cookie";
 import OperatingHours from "@/app/components/OperatingHours";
-import { deletebusinessMedia } from "@/app/api";
+import { deletebusinessMedia, DeleteLicense } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
-import { s } from "framer-motion/client";
 import ImageCropper from "@/app/components/ImageCropper";
 
 // Define MediaItem interface locally if import fails
@@ -44,6 +44,7 @@ interface License {
   number: string;
   url: string;
   description: string;
+  _id: string; // Add this field
 }
 
 interface BusinessProfile {
@@ -167,6 +168,25 @@ export default function EditBusinessPage() {
       router.push(`/${slug}`); // Redirect to the page with the slug if no token
     }
   }, [router]);
+
+  const handleDeleteLicense = async (licenseId: string) => {
+    try {
+      if (!businessData) {
+        throw new Error("Business data is not available");
+      }
+      const profileId = businessData.profile.id;
+      await DeleteLicense(profileId, licenseId);
+      // Update the state to remove the deleted license
+      if (businessData) {
+        const updatedLicenses = businessData.licenses.filter(
+          (license) => license._id !== licenseId
+        );
+        setBusinessData({ ...businessData, licenses: updatedLicenses });
+      }
+    } catch (error) {
+      console.error("Failed to delete license", error);
+    }
+  };
 
   const handleFieldChange = (field: string, value: any) => {
     setPendingChanges((prev) => {
@@ -630,11 +650,8 @@ export default function EditBusinessPage() {
                     );
                   })}
               </div>
-              
+
               <div>
-              
-                
-             
                 <label className="block text-sm font-medium mb-1">
                   Edit Services (comma-separated)
                 </label>
@@ -744,9 +761,16 @@ export default function EditBusinessPage() {
                         />
                       </div>
                     )}
+                    <button
+                      className="text-red-500 hover:text-red-700"
+                      onClick={() => handleDeleteLicense(license._id)}
+                    >
+                      Delete License
+                    </button>
                   </div>
                 </div>
               ))}
+              
             </div>
           </section>
         </div>

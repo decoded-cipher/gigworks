@@ -308,55 +308,25 @@ export default function BusinessOperations({
                 </div>
 
                 <div className="w-full relative">
-                  <label className="block text-lg font-bold mb-2">
-                    Upload Certificate
-                  </label>
-                  <div className="relative border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-500 transition min-h-[120px] bg-gray-50">
-                    {!previews[index] ? (
-                      <>
-                        <input
-                          type="file"
-                          name="otherLicenses"
-                          data-index={index}
-                          data-field="certification"
-                          onChange={handleInputChange}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                          disabled={isUploading}
-                          accept="image/*,.pdf"
-                        />
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <Upload className="w-6 h-6 text-gray-400" />
-                          {isUploading ? (
-                            <p className="mt-2 text-sm text-gray-600">
-                              Uploading...
-                            </p>
-                          ) : (
-                            <p className="mt-2 text-sm text-gray-600">
-                              Click to upload certificate
-                            </p>
-                          )}
-                        </div>
-                      </>
-                    ) : (
-                      <div className="relative p-2">
-                        <div className="relative w-full h-[200px]">
-                          <Image
-                            src={previews[index]!}
-                            alt="License Certificate Preview"
-                            fill
-                            className="object-contain rounded-lg"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeFile(index)}
-                          className="absolute top-4 right-4 p-1 bg-red-100 rounded-full hover:bg-red-200 transition"
-                        >
-                          <X className="w-4 h-4 text-red-600" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                
+        <div key={index}>
+          <label className="block text-base font-semibold mb-2">
+            Upload Certificate {index + 1}
+          </label>
+          <input
+            type="file"
+            name="otherLicenses"
+            data-index={index}
+            data-field="certification"
+            onChange={handleInputChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+            disabled={isUploading}
+            accept="image/*,.pdf"
+          />
+          {/* {isUploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>} */}
+          {/* <FilePreview path={license.certification} label={`Certificate ${index + 1}`} /> */}
+        </div>
+     
 
                   {formData.otherLicenses.length > 1 && (
                     <button
