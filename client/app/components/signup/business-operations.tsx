@@ -308,25 +308,23 @@ export default function BusinessOperations({
                 </div>
 
                 <div className="w-full relative">
-                
-        <div key={index}>
-          <label className="block text-base font-semibold mb-2">
-            Upload Certificate {index + 1}
-          </label>
-          <input
-            type="file"
-            name="otherLicenses"
-            data-index={index}
-            data-field="certification"
-            onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-            disabled={isUploading}
-            accept="image/*,.pdf"
-          />
-          {/* {isUploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>} */}
-          {/* <FilePreview path={license.certification} label={`Certificate ${index + 1}`} /> */}
-        </div>
-     
+                  <div key={index}>
+                    <label className="block text-base font-semibold mb-2">
+                      Upload Certificate {index + 1}
+                    </label>
+                    <input
+                      type="file"
+                      name="otherLicenses"
+                      data-index={index}
+                      data-field="certification"
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                      disabled={isUploading}
+                      accept="image/*,.pdf"
+                    />
+                    {/* {isUploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>} */}
+                    {/* <FilePreview path={license.certification} label={`Certificate ${index + 1}`} /> */}
+                  </div>
 
                   {formData.otherLicenses.length > 1 && (
                     <button

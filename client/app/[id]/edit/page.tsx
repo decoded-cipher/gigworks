@@ -7,7 +7,7 @@ import {
   ASSET_BASE_URL,
   updateBusiness,
   GetURL,
-  uploadToPresignedUrl,
+  uploadToPresignedUrl, 
   createBusinessMedia,
   
 } from "@/app/api";
@@ -27,7 +27,7 @@ import {
 import MediaGallery from "@/app/components/MediaGallery";
 import Cookies from "js-cookie";
 import OperatingHours from "@/app/components/OperatingHours";
-import { deletebusinessMedia, DeleteLicense } from "@/app/api";
+import { deletebusinessMedia, DeleteLicense, fetchLicenseData } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
 import ImageCropper from "@/app/components/ImageCropper";
 
@@ -93,6 +93,10 @@ interface BusinessData {
   tags: string[];
 }
 
+interface LicenseType {
+  id: string;
+  name: string;
+}
 export const runtime = "edge";
 
 // Add this social media config object near the top of your component
@@ -116,6 +120,9 @@ export default function EditBusinessPage() {
   // Move all hooks to the top, before any conditional logic
   const [isMounted, setIsMounted] = useState(false);
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
+  
+
+  const [licenseTypes, setLicenseTypes] = useState<LicenseType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pendingChanges, setPendingChanges] = useState<Record<string, any>>({});
@@ -154,6 +161,27 @@ export default function EditBusinessPage() {
       fetchData();
     }
   }, [params.id, fetchData, isMounted]); // Include isMounted to prevent unnecessary fetches
+
+  useEffect(() => {
+    const fetchLicenses = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetchLicenseData();
+        if (response.data && Array.isArray(response.data)) {
+          setLicenseTypes(response.data);
+        } else {
+          setError("Invalid license data format");
+        }
+      } catch (error) {
+        console.error("Error fetching license types:", error);
+        setError("Failed to fetch license types");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchLicenses();
+  }, []);
 
   // Combine mounting and fetch effects
   useEffect(() => {
@@ -770,6 +798,11 @@ export default function EditBusinessPage() {
                   </div>
                 </div>
               ))}
+
+
+              <div>
+                
+              </div>
               
             </div>
           </section>
