@@ -882,8 +882,8 @@ const DevMorphixWebsite = () => {
                         referrerPolicy="no-referrer-when-downgrade"
                       ></iframe>
                     </>
-                  ) : businessData?.profile.name.toLowerCase() ===
-                  "fab tech" ? (
+                  ) : businessData?.profile.slug.toLowerCase() ===
+                  "fabtech" ? (
                   <>
                     <iframe
                       src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d2078.1127415475403!2d76.5664288!3d9.4338151!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06251eeb8d34ad%3A0xef156d4ab8447e21!2sFabtech%20interior%20and%20exterior%20gypsum!5e1!3m2!1sen!2sin!4v1737615318000!5m2!1sen!2sin"
