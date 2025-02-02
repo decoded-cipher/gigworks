@@ -85,7 +85,7 @@ export  function FooterSection() {
                 <ul className="text-white text-sm">
                   <li className="mb-4">
                     <a
-                      href="https://www.facebook.com/share/18SpvoPfKS/"
+                      href="https://www.facebook.com/profile.php?id=61572569857844"
                       className="hover:underline flex "
                     >
                       <svg
@@ -283,7 +283,7 @@ export  function FooterSection() {
                 <li className="rounded-full p-1">
                   {/* facebook */}
                   <a
-                    href="https://www.facebook.com/share/18SpvoPfKS/"
+                    href="https://www.facebook.com/profile.php?id=61572569857844"
                     className="hover:underline"
                   >
                     <svg
