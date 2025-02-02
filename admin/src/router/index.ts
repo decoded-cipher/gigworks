@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import HomeView from '../views/Home.vue'
+import BusinessView from '../views/Business.vue'
 import NotFoundView from '../views/404.vue'
 import LoginView from '../views/Login.vue'
 
@@ -14,6 +15,14 @@ const router = createRouter({
       component: HomeView,
       meta: {
         title: 'Home',
+      },
+    },
+    {
+      path: '/business',
+      name: 'business',
+      component: BusinessView,
+      meta: {
+        title: 'Business',
       },
     },
     {

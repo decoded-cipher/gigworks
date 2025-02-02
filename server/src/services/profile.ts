@@ -14,7 +14,7 @@ import {
     subCategory, 
     subCategoryOption
 } from '../config/database/schema';
-import { User, Profile } from '../config/database/interfaces';
+import { User, Profile, SubCategory } from '../config/database/interfaces';
 import { removeFields } from "../utils/helpers";
 
 
@@ -286,10 +286,16 @@ export const getRenewalProfiles = async (page: number, limit: number, days: numb
                 .select({
                     profileId: profile.id,
                     profileName: profile.name,
+                    
+                    category: category.name,
+                    subCategory: subCategory.name,
+                    subCategoryOption: subCategoryOption.name,
+
                     avatar: profile.avatar,
                     slug: profile.slug,
                     owner: user.name,
                     phone: user.phone,
+                    email: profile.email,
                     lastPaymentStatus: profilePayment.payment_status,
                     expiryDate: sql`DATETIME(${profilePayment.created_at}, '+1 YEAR')`,
                     daysLeft: sql`CAST((julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP)) AS INTEGER)`,
@@ -298,6 +304,9 @@ export const getRenewalProfiles = async (page: number, limit: number, days: numb
                 .from(profile)
                 .leftJoin(user, sql`${user.id} = ${profile.user_id}`)
                 .leftJoin(profilePayment, sql`${profilePayment.profile_id} = ${profile.id}`)
+                .leftJoin(category, sql`${category.id} = ${profile.category_id}`)
+                .leftJoin(subCategory, sql`${subCategory.id} = ${profile.sub_category_id}`)
+                .leftJoin(subCategoryOption, sql`${subCategoryOption.id} = ${profile.sub_category_option_id}`)
                 .where(sql`julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) < ${days}`)
                 .orderBy('statusOrder')
                 .orderBy(profilePayment.created_at)
