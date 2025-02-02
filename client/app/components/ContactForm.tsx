@@ -21,8 +21,7 @@ export function ContactForm() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
-    // Here you would typically send the form data to your server
+    
   }
 
   return (

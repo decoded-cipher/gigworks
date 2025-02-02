@@ -85,7 +85,7 @@ export  function FooterSection() {
                 <ul className="text-white text-sm">
                   <li className="mb-4">
                     <a
-                      href=""
+                      href="https://www.facebook.com/profile.php?id=61572569857844"
                       className="hover:underline flex "
                     >
                       <svg
@@ -106,7 +106,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href=""
+                      href="https://www.instagram.com/gigwork.co.in"
                       className="hover:underline  flex"
                     >
                       <svg
@@ -127,7 +127,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href=""
+                      href="https://x.com/Gigwork2025"
                       className="hover:underline flex"
                     >
                       <svg
@@ -148,7 +148,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href=""
+                      href="https://www.linkedin.com/in/gig-work-a9912b336"
                       className="hover:underline flex"
                     >
                       <svg
@@ -169,7 +169,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href=""
+                      href="https://youtube.com/@gigworkcoin"
                       className="hover:underline flex"
                     >
                       <svg
@@ -192,7 +192,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href=""
+                      href="https://www.threads.net/@gigwork.co.in"
                       className="hover:underline flex"
                     >
                       <svg
@@ -283,7 +283,7 @@ export  function FooterSection() {
                 <li className="rounded-full p-1">
                   {/* facebook */}
                   <a
-                    href=""
+                    href="https://www.facebook.com/profile.php?id=61572569857844"
                     className="hover:underline"
                   >
                     <svg
@@ -303,7 +303,7 @@ export  function FooterSection() {
                 {/* insta */}
                 <li className="rounded-full p-1">
                   <a
-                    href=""
+                    href="https://www.instagram.com/gigwork.co.in"
                     className="hover:underline  flex"
                   >
                     <svg
@@ -323,7 +323,7 @@ export  function FooterSection() {
                 {/* twitter */}
                 <li className="rounded-full p-1">
                   <a
-                    href=""
+                    href="https://x.com/Gigwork2025"
                     className="hover:underline"
                   >
                     <svg
@@ -343,7 +343,7 @@ export  function FooterSection() {
                 {/* linkedin */}
                 <li className="rounded-full p-1">
                   <a
-                    href=""
+                    href="https://www.linkedin.com/in/gig-work-a9912b336"
                     className="hover:underline flex"
                   >
                     <svg
@@ -363,7 +363,7 @@ export  function FooterSection() {
                 {/* youtube */}
                 <li className="rounded-full p-1">
                   <a
-                    href=""
+                    href="https://youtube.com/@gigworkcoin"
                     className="hover:underline flex"
                   >
                     <svg
@@ -385,7 +385,7 @@ export  function FooterSection() {
                 {/* thread */}
                 <li className="rounded-full p-1">
                   <a
-                    href=""
+                    href="https://www.threads.net/@gigwork.co.in"
                     className="hover:underline flex"
                   >
                     <svg

@@ -147,7 +147,7 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
     };
   });
 
-  console.log('mediaImages:', mediaImages);
+  
   
   const getBentoSpan = (imageSize?: 'small' | 'medium' | 'large') => {
     switch(imageSize) {
@@ -230,7 +230,7 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
                 e.stopPropagation();
                 setSelectedImage(null);
               }}
-              className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors p-2 rounded-full hover:bg-white/10"
+              className="absolute -top-15 right-0 text-white hover:text-gray-300 transition-colors p-2 rounded-full hover:bg-white/10"
             >
               <X size={24} />
             </button>

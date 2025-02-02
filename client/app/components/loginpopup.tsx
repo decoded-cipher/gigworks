@@ -244,7 +244,10 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
     toast.success('Login successful!');
   
     if (user?.partner) {
-      router.push('/partnerProfile');
+      console.log('User is a partner:', user);
+
+        router.push('/partnerProfile');
+    
       handleClose();
       return;
     }
@@ -476,52 +479,56 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
           </div>
         )}
         {/* Add the profile selector popup */}
-        {showProfileSelector && userData && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="bg-white rounded-xl w-full max-w-[400px] p-6 relative">
-              <button
-                onClick={() => setShowProfileSelector(false)}
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              >
-                <X size={24} />
-              </button>
+        {
+  showProfileSelector && userData && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+      <div className="bg-white rounded-xl w-full max-w-[400px] flex flex-col relative">
+        <button
+          onClick={() => setShowProfileSelector(false)}
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+        >
+          <X size={24} />
+        </button>
 
-              <div className="mb-6">
-                <h2 className="text-xl font-bold text-center">Select Profile</h2>
-                <div className="text-gray-600 text-center mt-2">
-                  {/* <p>{userData.name}</p> */}
-                  <h2 className="text-2xl text-black font-bold">Hi <span className='text-green-600'> {userData.name} </span> </h2>
-                  <h2 className="text-xl text-black font-bold"> choose your profile </h2>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                {userProfiles.map((profile) => (
-                  <button
-                    key={profile.slug}
-                    onClick={() => handleProfileSelect(profile.slug)}
-                    className="w-full p-4 border border-gray-200 rounded-lg hover:bg-green-500 transition-colors flex items-center space-x-4"
-                  >
-                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                      {profile.avatar ? (
-                        <img
-                          src={`${ASSET_BASE_URL}/${profile.avatar}`}
-                          alt={profile.name}
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-xl text-gray-600">
-                          {profile.name.charAt(0)}
-                        </span>
-                      )}
-                    </div>
-                    <span className="font-medium text-gray-800">{profile.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+        <div className="p-6 border-b">
+          <h2 className="text-xl font-bold text-center">Select Profile</h2>
+          <div className="text-gray-600 text-center mt-2">
+            <h2 className="text-2xl text-black font-bold">
+              Hi <span className="text-green-600">{userData.name}</span>
+            </h2>
+            <h2 className="text-xl text-black font-bold">choose your profile</h2>
           </div>
-        )}
+        </div>
+
+        <div className="p-6 overflow-y-auto max-h-[60vh]">
+          <div className="space-y-3">
+            {userProfiles.map((profile) => (
+              <button
+                key={profile.slug}
+                onClick={() => handleProfileSelect(profile.slug)}
+                className="w-full p-4 border border-gray-200 rounded-lg hover:bg-green-500 transition-colors flex items-center space-x-4"
+              >
+                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                  {profile.avatar ? (
+                    <img
+                      src={`${ASSET_BASE_URL}/${profile.avatar}`}
+                      alt={profile.name}
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-xl text-gray-600">{profile.name.charAt(0)}</span>
+                  )}
+                </div>
+                <span className="font-medium text-gray-800">{profile.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
       </div>
     </>
   );
