@@ -14,27 +14,26 @@ export const addProfileLicense = async (profile_id: string, data: any): Promise<
 
             // SQL Query : SELECT COUNT(*) FROM license_type WHERE id = data.type_id
 
-            if (data.some((item) => !item.type_id || !item.number || !item.url)) {
+            if (!data.type_id || !data.number || !data.url) {
                 return reject('Missing some license data');
             }
-
-            let licenseData: ProfileLicense[] = data.map((item) => {
-                return {
-                    profile_id: profile_id,
-                    license_type_id: item.type_id,
-                    license_number: item.number,
-                    license_url: item.url
-                }
-            });
-
+            
+            let licenseData: ProfileLicense = {
+                profile_id: profile_id,
+                license_type_id: data.type_id,
+                license_number: data.number,
+                license_url: data.url
+            };
+            
             // SQL Query : INSERT INTO profile_license (profile_id, license_type_id, license_number, license_url) VALUES (profile_id, license_type_id, license_number, license_url) RETURNING license_number, license_url
-
-            let result = await db.insert(profileLicense).values(licenseData).returning({
+            
+            let result = await db.insert(profileLicense).values([licenseData]).returning({
                 license_number: sql`license_number`,
                 license_url: sql`license_url`
             });
             
             resolve(result);
+
         } catch (error) {
             reject(error);
         }
@@ -52,9 +51,9 @@ export const removeProfileLicense = async (profile_id: string, license_id: strin
 
             let result = await db
                 .delete(profileLicense)
-                .where(sql`${eq("profile_id", profile_id)} AND ${eq("license_id", license_id)}`)
+                .where(sql`profile_id = ${profile_id} AND id = ${license_id}`)
                 .returning();
-            
+
             result = result[0];
 
             resolve(result);
