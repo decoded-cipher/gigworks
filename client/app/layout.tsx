@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     },
     other: {
         'theme-color': '#00A651',
-        'apple-mobile-web-app-capable': 'yes',
+        'mobile-web-app-capable': 'yes',
         'apple-mobile-web-app-title': 'Gigwork',
         'format-detection': 'telephone=no',
     }

@@ -1,6 +1,6 @@
 
 import { count, eq, sql } from "drizzle-orm";
-import { db } from '../config/database/connection';
+import { db } from '../config/database/turso';
 
 import { partnerIdProof } from '../config/database/schema';
 import { PartnerIdProof, partnerIdProofTypes } from '../config/database/interfaces';
@@ -21,6 +21,26 @@ export const createPartnerIdProof = async (data: PartnerIdProof): Promise<Partne
                 proof_url: data.proof_url
             }).returning();
             result = result[0];
+
+            resolve(result);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+
+
+// Delete partner ID proof
+export const deletePartnerIdProof = async (partner_id: number) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : DELETE FROM partner_id_proof WHERE partner_id = $1
+
+            const result = await db
+                .delete(partnerIdProof)
+                .where(sql`partner_id = ${partner_id}`);
 
             resolve(result);
         } catch (error) {

@@ -1,6 +1,6 @@
 
 import { count, eq, sql } from "drizzle-orm";
-import { db } from '../config/database/connection';
+import { db } from '../config/database/turso';
 import { 
     user, 
     profile, 
@@ -15,6 +15,7 @@ import {
     subCategoryOption
 } from '../config/database/schema';
 import { User, Profile } from '../config/database/interfaces';
+import { removeFields } from "../utils/helpers";
 
 
 
@@ -39,12 +40,22 @@ export const createProfile = async (data: Profile) => {
                 }
             }
 
+            // Check if profile slug exists
+            let slugExists = await checkProfileSlug(data.slug);
+            if (slugExists) {
+                reject(new Error('Profile slug already exists. Please choose another slug'));
+            }
+
             if(data.operating_hours) {
                 data.operating_hours = JSON.stringify(data.operating_hours);
             }
 
             if(data.socials) {
                 data.socials = JSON.stringify(data.socials);
+            }
+
+            if(data.additional_services) {
+                data.additional_services = JSON.stringify(data.additional_services);
             }
 
             // SQL Query : INSERT INTO profile (name, slug, description, email, website, phone, gstin, category_id, sub_category_id, sub_category_option_id, address, city, state, zip, country, facebook, instagram, twitter, linkedin, youtube, logo, type, additional_services, referral_code, partner_id) VALUES (data.name, data.slug, data.description, data.email, data.website, data.phone, data.gstin, data.category_id, data.sub_category_id, data.sub_category_option_id, data.address, data.city, data.state, data.zip, data.country, data.facebook, data.instagram, data.twitter, data.linkedin, data.youtube, data.logo, data.type, data.additional_services, data.referral_code, partnerData[0].id)
@@ -67,17 +78,45 @@ export const createProfile = async (data: Profile) => {
 
 
 
-// Update a profile (business) of a user by profile id
-export const updateProfile = async (id: string, profile: Profile) => {
+// Update a profile partially
+export const updateProfile = async (id: string, data: Profile) => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            // SQL Query : UPDATE profile SET name = name, description = description, email = email, website = website, phone = phone, gstin = gstin, category_id = category
+            const allowedFields = ['name', 'slug', 'description', 'email', 'phone', 'category_id', 'sub_category_id', 'sub_category_option_id', 'address', 'city', 'state', 'zip', 'country', 'operating_hours', 'socials', 'type', 'additional_services', 'gstin', 'avatar', 'banner'];
+            const dataKeys = Object.keys(data);
 
-            let result = await db.update(profile).set({ ...profile }).where(sql`${profile.id} = ${id}`).returning();
-            result = result[0];
+            for (let key of dataKeys) {
+                if (!allowedFields.includes(key)) {
+                    delete data[key];
+                }
+            }
 
-            return resolve(result);
+            if(data.operating_hours) {
+                data.operating_hours = JSON.stringify(data.operating_hours);
+            }
+
+            if(data.socials) {
+                data.socials = JSON.stringify(data.socials);
+            }
+
+            if(data.slug) {
+                let slugExists = await checkProfileSlug(data.slug);
+                if (slugExists) {
+                    reject(new Error('Profile slug already exists. Please choose another slug'));
+                }
+            }
+
+            // SQL Query : UPDATE profile SET profile = profile WHERE id = id
+
+            let result = await db
+                .update(profile)
+                .set(data)
+                .where(sql`${profile.id} = ${id}`)
+                .returning();
+
+            resolve(result);
+
         } catch (error) {
             reject(error);
         }
@@ -174,6 +213,28 @@ export const getProfilesByUser = async (user_id: string) => {
 
 
 
+// Check if profile exists
+export const getProfileById = async (id: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : SELECT * FROM profile WHERE id = id
+
+            let result = await db
+                .select()
+                .from(profile)
+                .where(sql`${profile.id} = ${id}`)
+                .get();
+
+            resolve(result);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+
+
 // Get total number of profiles (businesses)
 export const getProfileCount = async () => {
     return new Promise(async (resolve, reject) => {
@@ -225,18 +286,23 @@ export const getRenewalProfiles = async (page: number, limit: number, days: numb
                 .select({
                     profileId: profile.id,
                     profileName: profile.name,
+                    avatar: profile.avatar,
+                    slug: profile.slug,
                     owner: user.name,
                     phone: user.phone,
+                    lastPaymentStatus: profilePayment.payment_status,
                     expiryDate: sql`DATETIME(${profilePayment.created_at}, '+1 YEAR')`,
-                    daysLeft: sql`CAST((julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP)) AS INTEGER)`
+                    daysLeft: sql`CAST((julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP)) AS INTEGER)`,
+                    statusOrder: sql`CASE WHEN ${profilePayment.payment_status} = 'pending' THEN 1 ELSE 2 END`
                 })
                 .from(profile)
                 .leftJoin(user, sql`${user.id} = ${profile.user_id}`)
                 .leftJoin(profilePayment, sql`${profilePayment.profile_id} = ${profile.id}`)
                 .where(sql`julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) < ${days}`)
-                // .limit(limit)
-                // .offset((page - 1) * limit)
+                .orderBy('statusOrder')
                 .orderBy(profilePayment.created_at)
+                .limit(limit)
+                .offset((page - 1) * limit);
 
             resolve({
                 data: results,
@@ -293,16 +359,12 @@ export const getProfileBySlug = async (slug: string) => {
                     LEFT JOIN sub_category ON sub_category.id = profile.sub_category_id 
                 WHERE 
                     profile.slug = slug AND 
-                    julianday(DATETIME(profile_payment.created_at, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0 AND 
-                    profile_payment.payment_status = 'success'
+                    profile.status = 1
             */
 
                 let profileResult = await db
                     .select({
-                        profile: {
-                            _id: profile.id,
-                            ...profile
-                        },
+                        profile: profile,
                         user: {
                             name: user.name,
                             phone: user.phone
@@ -313,14 +375,11 @@ export const getProfileBySlug = async (slug: string) => {
                     })
                     .from(profile)
                     .innerJoin(user, sql`${user.id} = ${profile.user_id}`)
-                    .leftJoin(profilePayment, sql`${profilePayment.profile_id} = ${profile.id}`)
                     .leftJoin(category, sql`${category.id} = ${profile.category_id}`)
                     .leftJoin(subCategory, sql`${subCategory.id} = ${profile.sub_category_id}`)
                     .leftJoin(subCategoryOption, sql`${subCategoryOption.id} = ${profile.sub_category_option_id}`)
                     .where(sql`
-                        ${profile.slug} = ${slug} AND 
-                        julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) > 0 AND
-                        ${profilePayment.payment_status} = 'success'
+                        ${profile.slug} = ${slug} AND ${profile.status} = 1
                     `)
                     .get();
                 
@@ -346,6 +405,7 @@ export const getProfileBySlug = async (slug: string) => {
                     
                     
                     db.select({
+                        _id: profileLicense.id,
                         name: licenseType.name,
                         number: profileLicense.license_number,
                         url: profileLicense.license_url,
@@ -359,6 +419,7 @@ export const getProfileBySlug = async (slug: string) => {
                     
                     // SQL Query : SELECT * FROM profile_media WHERE profile_id = profileResult.profile.id
                     db.select({
+                        id: profileMedia.id,
                         url: profileMedia.url,
                         description: profileMedia.description,
                     })
@@ -377,7 +438,7 @@ export const getProfileBySlug = async (slug: string) => {
                 data.profile.socials = JSON.parse(data.profile.socials);
 
                 
-                const fieldsToRemove = ['id', 'user_id', 'category_id', 'sub_category_id', 'sub_category_option_id', 'partner_id', 'role', 'updated_at', 'created_at', 'status'];
+                const fieldsToRemove = ['user_id', 'category_id', 'sub_category_id', 'sub_category_option_id', 'partner_id', 'role', 'updated_at', 'created_at', 'status'];
                 const result = removeFields(data, fieldsToRemove);
                 
                 resolve(result);
@@ -386,21 +447,4 @@ export const getProfileBySlug = async (slug: string) => {
             reject(error);
         }
     });
-}
-
-
-
-// Remove fields from object
-const removeFields = (obj: any, fields: string[]) => {
-    if (Array.isArray(obj)) {
-        return obj.map(item => removeFields(item, fields));
-    } else if (obj && typeof obj === 'object') {
-        return Object.keys(obj).reduce((newObj, key) => {
-            if (!fields.includes(key)) {
-                newObj[key] = removeFields(obj[key], fields);
-            }
-            return newObj;
-        }, {} as any);
-    }
-    return obj;
 }

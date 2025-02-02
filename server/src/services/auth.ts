@@ -2,7 +2,7 @@
 import jwt from 'jsonwebtoken';
 
 import { count, eq, sql } from "drizzle-orm";
-import { db } from '../config/database/connection';
+import { db } from '../config/database/turso';
 import { tokenTable, user } from '../config/database/schema';
 import { User, TokenTable } from "../config/database/interfaces";
 

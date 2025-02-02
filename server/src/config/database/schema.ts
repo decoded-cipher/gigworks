@@ -266,7 +266,8 @@ export const profile = sqliteTable('profile', {
             { columns: ['country'] },
             { columns: ['partner_id'] },
             { columns: ['type'] },
-            { columns: ['category_id', 'sub_category_id'] }
+            { columns: ['category_id', 'sub_category_id'] },
+            { columns: ['additional_services'] }
         ]
     }
 });

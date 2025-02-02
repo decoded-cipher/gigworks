@@ -1,7 +1,7 @@
 
 import { createMiddleware } from 'hono/factory'
 
-import { db } from '../config/database/connection';
+import { db } from '../config/database/turso';
 import { activityLog } from '../config/database/schema';
 import { logActivity } from '../services/activityLog';
 
