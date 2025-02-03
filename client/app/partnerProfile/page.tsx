@@ -10,12 +10,18 @@ import { div } from "framer-motion/client";
 import ScrollToTopButton from "../components/ScrollToTop";
 import { GetPartner, GetPartnerAnalytics, ASSET_BASE_URL ,UserLogout} from "../api";
 import Cookies from "js-cookie";
+import {Pencil} from "lucide-react";
 
 interface PartnerData {
-  name: string;
-  phone: string;
-  avatar: string;
-  referral_code: string;
+  user: {
+    name: string;
+    phone: string;
+  };
+  partner: {
+    address: string
+    avatar: string;
+    referral_code: string;
+  };
 }
 
 interface AnalyticsData {
@@ -54,7 +60,12 @@ const DevMorphixWebsite = () => {
           GetPartner(),
           GetPartnerAnalytics(dateRange.start, dateRange.end),
         ]);
-        setPartnerData(partnerResponse.data);
+        setPartnerData(partnerResponse.data[0]);
+        // console.log("Partner Data:", partnerResponse.data[0]);  
+        if (!partnerResponse.data[0]) {
+          router.push("/partnerSignup/1");
+        }
+        
         setAnalyticsData(analyticsResponse.data);
       } catch (error) {
         const axiosError = error as AxiosError<{ error: string }>;
@@ -72,7 +83,9 @@ const DevMorphixWebsite = () => {
     fetchPartnerData();
   }, [dateRange, router]); // Re-fetch when date range changes
 
-
+  const handleEditClick = () => {
+    router.push(`/partnerProfile/edit`);
+  };
 
   const handlelogout = async () => {
     try {
@@ -106,7 +119,7 @@ const DevMorphixWebsite = () => {
     setIsMenuOpen(false);
   };
 
-  const textToCopy = partnerData?.referral_code || "";
+  const textToCopy = partnerData?.partner.referral_code || "";
 
   const copyToClipboard = async () => {
     try {
@@ -238,11 +251,18 @@ const DevMorphixWebsite = () => {
                 Logout
                 {/* <Pencil className="w-4 h-4 text-gray-600" /> */}
               </button>
+              <button
+                onClick={handleEditClick}
+                className="absolute top-5 sm:top-12 right-4 p-2 bg-white  hover:bg-gray-300 rounded-full transition-colors"
+                title="Edit Business Profile"
+              >
+                <Pencil className="w-4 h-4 text-gray-600" />
+              </button>
 
             <div className="relative z-10 w-80 h-80 border border-white border-8 bg-black rounded-full flex items-center justify-center mb-8 mt-20">
-              {partnerData?.avatar ? (
+              {partnerData?.partner.avatar ? (
                 <img
-                  src={`${ASSET_BASE_URL}/${partnerData.avatar}`}
+                  src={`${ASSET_BASE_URL}/${partnerData.partner.avatar}`}
                   alt="Profile"
                   className="w-full h-full rounded-full object-cover"
                 />
@@ -252,7 +272,7 @@ const DevMorphixWebsite = () => {
             </div>
 
             <h2 className="sm:text-6xl text-4xl font-bold mb-4">
-              {partnerData?.name || "Loading..."}
+              {partnerData?.user.name || "Loading..."}
             </h2>
             <p className="text-xl font-light text-gray-600 mb-2">
               Reference Code
@@ -260,7 +280,7 @@ const DevMorphixWebsite = () => {
             <div className="flex justify-center items-center w-full">
               <div className="inline-flex items-center gap-2">
                 <p className="text-xl font-medium ">
-                  {partnerData?.referral_code || "Loading..."}
+                  {partnerData?.partner.referral_code || "Loading..."}
                 </p>
                 <button
                   onClick={copyToClipboard}

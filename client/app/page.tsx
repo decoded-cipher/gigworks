@@ -200,7 +200,7 @@ export default function GigWorkLandingPage() {
                     Partner
                   </Link>
                   <Link
-                    href="https://www.gigwork.co.in/"
+                    href="https://blog.gigwork.co.in/"
                     className="text-white hover:text-green-500 transition"
                   >
                     Blog
@@ -269,7 +269,7 @@ export default function GigWorkLandingPage() {
                   About Us
                 </Link>
                 <Link
-                  href="https://www.gigwork.co.in/"
+                  href="https://blog.gigwork.co.in/"
                   className="text-white hover:text-green-500 transition"
                 >
                   Blog

@@ -272,6 +272,85 @@ export const BisunessMedia = async (data: any) => {
   }
 };
 
+export const DeleteLicense = async (profileId: string, licenseId: string) => {
+  try {
+      const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    console.log('Deleting license:', profileId, licenseId);
+    
+
+    const response = await axios.delete(`${BASE_URL}/api/v1/business/${profileId}/license/${licenseId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+      });
+      console.log(response.data);
+      
+      return response.data;
+    } catch (error) { 
+      console.error('Error in deleting license:', error);
+      throw error;
+    }
+};
+
+export const AddLicense = async (profileId: string, licenseData: { url: string, number: string, type_id: string }) => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    if (!token) {
+      throw new Error('Authorization token not found');
+    }
+
+    const response = await axios.post(`${BASE_URL}/api/v1/business/${profileId}/license`, licenseData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    console.log('Add response:', response.data);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Error in adding license:', error.response ? error.response.data : error.message);
+    } else {
+      console.error('Error in adding license:', error);
+    }
+    throw error;
+  }
+};
+
+export const updatePartner = async (data: any) => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+    console.log(data);
+    
+    const response = await axios.patch(
+      `${BASE_URL}/api/v1/partner`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    console.log(response.data);
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    throw error;
+  }
+}
+
 export const GetPartner = async () => {
   try {
     const token = document.cookie
@@ -544,6 +623,38 @@ export const updateBusiness = async (businessId: string, updateData: Record<stri
     return response.data;
   } catch (error) {
     console.error("Error updating business:", error);
+    throw error;
+  }
+};
+
+export const createLicense = async (businessId: string, licenseData: {
+  url: string;
+  number: string;
+  type_id: string;
+}) => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    if (!token) {
+      throw new Error('No token provided');
+    }
+
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/business/${businessId}/license`,
+      licenseData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error creating license:", error);
     throw error;
   }
 };

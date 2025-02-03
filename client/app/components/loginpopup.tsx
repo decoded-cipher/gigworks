@@ -244,7 +244,10 @@ const LoginPopup: React.FC<LoginPopupProps> = ({
     toast.success('Login successful!');
   
     if (user?.partner) {
-      router.push('/partnerProfile');
+      console.log('User is a partner:', user);
+
+        router.push('/partnerProfile');
+    
       handleClose();
       return;
     }

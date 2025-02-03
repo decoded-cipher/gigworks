@@ -7,8 +7,9 @@ import {
   ASSET_BASE_URL,
   updateBusiness,
   GetURL,
-  uploadToPresignedUrl,
+  uploadToPresignedUrl, 
   createBusinessMedia,
+  createLicense, // Add this import
 } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -24,11 +25,10 @@ import {
 } from "lucide-react";
 
 import MediaGallery from "@/app/components/MediaGallery";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import OperatingHours from "@/app/components/OperatingHours";
-import { deletebusinessMedia } from "@/app/api";
+import { deletebusinessMedia, DeleteLicense, fetchLicenseData } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
-import { s } from "framer-motion/client";
 import ImageCropper from "@/app/components/ImageCropper";
 
 // Define MediaItem interface locally if import fails
@@ -44,6 +44,7 @@ interface License {
   number: string;
   url: string;
   description: string;
+  _id: string; // Add this field
 }
 
 interface BusinessProfile {
@@ -92,6 +93,10 @@ interface BusinessData {
   tags: string[];
 }
 
+interface LicenseType {
+  id: string;
+  name: string;
+}
 export const runtime = "edge";
 
 // Add this social media config object near the top of your component
@@ -112,112 +117,15 @@ const socialMediaConfig = {
   medium: { label: "Medium Profile", icon: "/icon/medium.svg" },
 };
 
-interface LocationData {
-  embedUrl: string;
-  mapsUrl: string | null;
-}
 
-type BusinessLocations = {
-  [key: string]: LocationData;
-};
-
-const BUSINESS_LOCATIONS: BusinessLocations = {
-  "emilia": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3934.8730957553427!2d76.56412737495825!3d9.463395593246565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b062f23a403b63b%3A0xfed9fd50695f7df8!2sEMILIA%20BEAUTY%20HUB%20CHANGANACHERRY!5e0!3m2!1sen!2sin!4v1702359671799!5m2!1sen!2sin",
-    mapsUrl: "https://maps.app.goo.gl/VTsPuqgduDUwk2du8"
-  },
-  "anjaneya gym": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3935.6791870223733!2d76.5665951!3d9.4495045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b062528d37a641d%3A0x66e967f68f9994bb!2sAnjaneya%20Gym!5e0!3m2!1sen!2sin!4v1736680465049!5m2!1sen!2sin",
-    mapsUrl: "https://maps.app.goo.gl/wWFbsqCAxa5XUHpj9"
-  },
-  "acme decor": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3935.722946930944!2d76.5714552!3d9.4456761!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625808d39e54d%3A0x2b8378272ddf82aa!2sacme%20DECOR!5e0!3m2!1sen!2sin!4v1737032116084!5m2!1sen!2sin",
-    mapsUrl: "https://maps.app.goo.gl/wWFbsqCAxa5XUHpj9"
-  },
-  "pathil electricals sanitary": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1967.9015774093411!2d76.5679237!3d9.438655!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625eb50756337%3A0xde34a5bb2a767a61!2sPATHIL%20ELECTRICAL%20%26%20SANITARY!5e0!3m2!1sen!2sin!4v1737035238332!5m2!1sen!2sin",
-    mapsUrl: "https://maps.app.goo.gl/wWFbsqCAxa5XUHpj9"
-  },
-  "adobe designs & digital printing": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3935.7607718648087!2d76.54132767502395!3d9.44236569063642!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOcKwMjYnMzIuNSJOIDc2wrAzMiczOC4xIkU!5e0!3m2!1sen!2sin!4v1737118006785!5m2!1sen!2sin",
-    mapsUrl: null  // No maps URL provided
-  },
-  "wedboat photography": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3929.0097795578995!2d76.27212147503143!3d10.016050290090138!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTDCsDAwJzU3LjgiTiA3NsKwMTYnMjguOSJF!5e0!3m2!1sen!2sin!4v1737118448906!5m2!1sen!2sin",
-    mapsUrl: null  // No maps URL provided
-  },
-  "al-tech aluminium house": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1039.0457764470052!2d76.5675167!3d9.437330400000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06255b1dcfebb3%3A0x3109daf53a6bf1ff!2sHrishikesh%20building!5e1!3m2!1sen!2sin!4v1737356965310!5m2!1sen!2sin",
-    mapsUrl: null  // No maps URL provided
-  },
-  "fab tech": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d2078.1127415475403!2d76.5664288!3d9.4338151!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06251eeb8d34ad%3A0xef156d4ab8447e21!2sFabtech%20interior%20and%20exterior%20gypsum!5e1!3m2!1sen!2sin!4v1737615318000!5m2!1sen!2sin",
-    mapsUrl: null  // No maps URL provided
-  },
-  "drona": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1039.0456727537864!2d76.5674698!3d9.4373648!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625701baac7ab%3A0xa786339129ca58de!2sDrona%20fitness%20centre!5e1!3m2!1sen!2sin!4v1737615500571!5m2!1sen!2sin",
-    mapsUrl: null  // No maps URL provided
-  },
-  "mk tech": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d4156.036580982765!2d76.567734!3d9.449475000000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOcKwMjYnNTguMSJOIDc2wrAzNCcwMy44IkU!5e1!3m2!1sen!2sin!4v1737615571336!5m2!1sen!2sin",
-    mapsUrl: null  // No maps URL provided
-  },
-  "a&d digital vision": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d43046.333304051135!2d76.58383945!3d9.4507664!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625913e4243d7%3A0xf6c0ab6d281939a6!2sThrikkodithanam%2C%20Kerala!5e1!3m2!1sen!2sin!4v1737615756685!5m2!1sen!2sin",
-    mapsUrl: null  // No maps URL provided
-  },
-  "sri ambika decor": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d5380.799053926908!2d76.5624093!3d9.4502936!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625bd70eb9cfb%3A0xdbee1de18b9c2bd8!2sSri%20Ambika%20Decoration!5e1!3m2!1sen!2sin!4v1737615901900!5m2!1sen!2sin",
-    mapsUrl: null  // No maps URL provided
-  },
-  "kasthuritissue": {
-    embedUrl: "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d719.9638923314029!2d76.5666106241674!3d9.449273442096539!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625b7fd82ef3b%3A0x2f0376ec4bbc0c1!2sKasthuri%20premium%20tissues!5e0!3m2!1sen!2sin!4v1737634242110!5m2!1sen!2sin",
-    mapsUrl: null  // No maps URL provided
-  }
-} as const;
-
-// Default location for fallback
-const DEFAULT_LOCATION: LocationData = {
-  embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d251482.44857791857!2d76.1643857954714!3d9.982669325611842!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d514abec6bf%3A0xbd582caa5844192!2sKochi%2C%20Kerala!5e0!3m2!1sen!2sin!4v1702359671799!5m2!1sen!2sin",
-  mapsUrl: null
-};
-
-const MapSection = ({ businessName, slug }: { businessName: string, slug: string }) => {
-  const location = BUSINESS_LOCATIONS[businessName.toLowerCase()] || 
-                  BUSINESS_LOCATIONS[slug.toLowerCase()] || 
-                  DEFAULT_LOCATION;
-
-  return (
-    <>
-      <iframe
-        src={location.embedUrl}
-        width="100%"
-        height="100%"
-        style={{ border: 0 }}
-        allowFullScreen
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-      />
-      {location.mapsUrl && (
-        <div className="mt-2">
-          <a
-            href={location.mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-blue-500 hover:text-blue-700"
-          >
-            View on Google Maps →
-          </a>
-        </div>
-      )}
-    </>
-  );
-};
 
 export default function EditBusinessPage() {
   // Move all hooks to the top, before any conditional logic
   const [isMounted, setIsMounted] = useState(false);
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
+  
+
+  const [licenseTypes, setLicenseTypes] = useState<LicenseType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pendingChanges, setPendingChanges] = useState<Record<string, any>>({});
@@ -232,6 +140,13 @@ export default function EditBusinessPage() {
     imageUrl: "",
     fieldType: null,
   });
+
+  const [newLicense, setNewLicense] = useState({
+    name: "",
+    number: "",
+    file: null as File | null,
+  });
+  const [isAddingLicense, setIsAddingLicense] = useState(false);
 
   // Wrap fetchData with useCallback
   const fetchData = useCallback(async () => {
@@ -257,24 +172,62 @@ export default function EditBusinessPage() {
     }
   }, [params.id, fetchData, isMounted]); // Include isMounted to prevent unnecessary fetches
 
+  useEffect(() => {
+    const fetchLicenses = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetchLicenseData();
+        if (response.data && Array.isArray(response.data)) {
+          setLicenseTypes(response.data);
+        } else {
+          setError("Invalid license data format");
+        }
+      } catch (error) {
+        console.error("Error fetching license types:", error);
+        setError("Failed to fetch license types");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchLicenses();
+  }, []);
+
   // Combine mounting and fetch effects
   useEffect(() => {
     setIsMounted(true);
     return () => setIsMounted(false);
   }, []);
 
-
   useEffect(() => {
-    const token = Cookies.get('token');
-    const slug = params.id;   
+    const token = Cookies.get("token");
+    const slug = params.id;
     if (!token && slug) {
       router.push(`/${slug}`); // Redirect to the page with the slug if no token
     }
   }, [router]);
 
+  const handleDeleteLicense = async (licenseId: string) => {
+    try {
+      if (!businessData) {
+        throw new Error("Business data is not available");
+      }
+      const profileId = businessData.profile.id;
+      await DeleteLicense(profileId, licenseId);
+      // Update the state to remove the deleted license
+      if (businessData) {
+        const updatedLicenses = businessData.licenses.filter(
+          (license) => license._id !== licenseId
+        );
+        setBusinessData({ ...businessData, licenses: updatedLicenses });
+      }
+    } catch (error) {
+      console.error("Failed to delete license", error);
+    }
+  };
 
   const handleFieldChange = (field: string, value: any) => {
-    setPendingChanges(prev => {
+    setPendingChanges((prev) => {
       const fieldParts = field.split(".");
       if (fieldParts.length > 1 && fieldParts[0] === "socials") {
         return {
@@ -292,7 +245,7 @@ export default function EditBusinessPage() {
     });
 
     // Update local state for immediate UI feedback
-    setBusinessData(prev => {
+    setBusinessData((prev) => {
       if (!prev) return null;
       if (field.startsWith("socials.")) {
         const socialField = field.split(".")[1];
@@ -318,12 +271,12 @@ export default function EditBusinessPage() {
   };
 
   const handleOperatingHoursUpdate = (newHours: { [key: string]: string }) => {
-    setPendingChanges(prev => ({
+    setPendingChanges((prev) => ({
       ...prev,
       operating_hours: newHours,
     }));
 
-    setBusinessData(prev => {
+    setBusinessData((prev) => {
       if (!prev) return null;
       return {
         ...prev,
@@ -335,13 +288,13 @@ export default function EditBusinessPage() {
     });
   };
 
-  const handleImageUpload = (assetpath: string, field: 'avatar' | 'banner') => {
-    setPendingChanges(prev => ({
+  const handleImageUpload = (assetpath: string, field: "avatar" | "banner") => {
+    setPendingChanges((prev) => ({
       ...prev,
       [field]: assetpath,
     }));
 
-    setBusinessData(prev => {
+    setBusinessData((prev) => {
       if (!prev) return null;
       return {
         ...prev,
@@ -355,7 +308,10 @@ export default function EditBusinessPage() {
 
   const handleSave = async () => {
     try {
-      if (!businessData?.profile.id || Object.keys(pendingChanges).length === 0) {
+      if (
+        !businessData?.profile.id ||
+        Object.keys(pendingChanges).length === 0
+      ) {
         router.push(`/${params.id}`);
         return;
       }
@@ -375,37 +331,43 @@ export default function EditBusinessPage() {
       if (businessData?.profile.id) {
         await deletebusinessMedia(businessData.profile.id, mediaId);
         // Update local state instead of fetching all data again
-        setBusinessData(prev => {
+        setBusinessData((prev) => {
           if (!prev) return null;
           return {
             ...prev,
-            media: prev.media.filter(item => item.id !== mediaId)
+            media: prev.media.filter((item) => item.id !== mediaId),
           };
         });
-        toast.success('Media item deleted successfully');
+        toast.success("Media item deleted successfully");
       }
     } catch (error) {
-      console.error('Error deleting media:', error);
-      toast.error('Failed to delete media item');
+      console.error("Error deleting media:", error);
+      toast.error("Failed to delete media item");
     }
   };
 
   // Add this new function to handle media updates
   const handleMediaUpdate = (newMedia: MediaItem) => {
-    setBusinessData(prev => {
+    setBusinessData((prev) => {
       if (!prev) return null;
       return {
         ...prev,
-        media: [...prev.media, {
-          id: newMedia.id,
-          url: newMedia.url,
-          type: newMedia.type || 'image/jpeg' // Provide a default type if none exists
-        }]
+        media: [
+          ...prev.media,
+          {
+            id: newMedia.id,
+            url: newMedia.url,
+            type: newMedia.type || "image/jpeg", // Provide a default type if none exists
+          },
+        ],
       };
     });
   };
 
-  const handleImageSelect = async (file: File, fieldType: "avatar" | "banner") => {
+  const handleImageSelect = async (
+    file: File,
+    fieldType: "avatar" | "banner"
+  ) => {
     const imageUrl = URL.createObjectURL(file);
     setCropperState({
       isOpen: true,
@@ -421,7 +383,9 @@ export default function EditBusinessPage() {
       // Convert base64/URL to blob
       const response = await fetch(croppedImageUrl);
       const blob = await response.blob();
-      const file = new File([blob], "cropped-image.jpg", { type: "image/jpeg" });
+      const file = new File([blob], "cropped-image.jpg", {
+        type: "image/jpeg",
+      });
 
       // Get presigned URL
       const uploadResponse = await GetURL({
@@ -450,6 +414,52 @@ export default function EditBusinessPage() {
     } catch (error) {
       console.error("Error handling cropped image:", error);
       toast.error("Failed to update image");
+    }
+  };
+
+  const handleAddLicense = async () => {
+    try {
+      if (!businessData?.profile.id || !newLicense.file) {
+        toast.error("Please fill all license details");
+        return;
+      }
+
+      // Get presigned URL for file upload
+      const uploadResponse = await GetURL({
+        type: newLicense.file.type,
+        category: 'license',
+      });
+
+      if (!uploadResponse.presignedUrl) {
+        throw new Error("Failed to get presigned URL");
+      }
+
+      // Upload file to storage
+      await uploadToPresignedUrl(uploadResponse.presignedUrl, newLicense.file);
+
+      // Create license with the correct structure
+      const licenseData = {
+        url: uploadResponse.assetpath,
+        number: newLicense.number,
+        type_id: newLicense.name, // Assuming name field contains the type_id
+      };
+
+      await createLicense(businessData.profile.id, licenseData);
+
+      // Refresh business data
+      await fetchData();
+
+      // Reset form
+      setNewLicense({
+        name: "",
+        number: "",
+        file: null,
+      });
+      setIsAddingLicense(false);
+      toast.success("License added successfully");
+    } catch (error) {
+      console.error("Error adding license:", error);
+      toast.error("Failed to add license");
     }
   };
 
@@ -482,7 +492,9 @@ export default function EditBusinessPage() {
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex md:flex-row flex-col justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold md:pb-0 pb-2">Edit Business Profile</h1>
+          <h1 className="text-2xl font-bold md:pb-0 pb-2">
+            Edit Business Profile
+          </h1>
           <div className="flex gap-4">
             <button
               onClick={() => router.push(`/${params.id}`)}
@@ -567,8 +579,6 @@ export default function EditBusinessPage() {
                     <Pencil size={16} />
                   </label>
                 </div>
-
-
               </div>
             </div>
             {/* Image Cropper Modal */}
@@ -578,7 +588,11 @@ export default function EditBusinessPage() {
                 aspect={cropperState.fieldType === "avatar" ? 1 : 3} // 600/200 simplified to 3
                 onCropComplete={handleCroppedImage}
                 onCancel={() =>
-                  setCropperState({ isOpen: false, imageUrl: "", fieldType: null })
+                  setCropperState({
+                    isOpen: false,
+                    imageUrl: "",
+                    fieldType: null,
+                  })
                 }
               />
             )}
@@ -606,7 +620,9 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.category}
-                  onChange={(e) => handleFieldChange("category", e.target.value)}
+                  onChange={(e) =>
+                    handleFieldChange("category", e.target.value)
+                  }
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -617,7 +633,9 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.subCategory}
-                  onChange={(e) => handleFieldChange("subCategory", e.target.value)}
+                  onChange={(e) =>
+                    handleFieldChange("subCategory", e.target.value)
+                  }
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -628,7 +646,9 @@ export default function EditBusinessPage() {
                 <input
                   type="text"
                   defaultValue={businessData.subCategoryOption}
-                  onChange={(e) => handleFieldChange("subCategoryOption", e.target.value)}
+                  onChange={(e) =>
+                    handleFieldChange("subCategoryOption", e.target.value)
+                  }
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
@@ -639,10 +659,12 @@ export default function EditBusinessPage() {
                 </label>
                 <div className="border rounded-lg">
                   <Editor
-                    value={businessData.profile.description || ''}
-                    onChange={(e) => handleFieldChange("description", e.target.value)}
+                    value={businessData.profile.description || ""}
+                    onChange={(e) =>
+                      handleFieldChange("description", e.target.value)
+                    }
                     containerProps={{
-                      className: "min-h-[150px] p-2"
+                      className: "min-h-[150px] p-2",
                     }}
                   />
                 </div>
@@ -694,6 +716,7 @@ export default function EditBusinessPage() {
               <div className="flex flex-wrap gap-2">
                 {businessData.profile.additional_services
                   .split(",")
+                  .slice(0, 5)
                   .map((service, index) => {
                     const formattedService = service
                       .trim()
@@ -711,6 +734,7 @@ export default function EditBusinessPage() {
                     );
                   })}
               </div>
+
               <div>
                 <label className="block text-sm font-medium mb-1">
                   Edit Services (comma-separated)
@@ -724,6 +748,9 @@ export default function EditBusinessPage() {
                   className="w-full p-2 border rounded-lg"
                   placeholder="e.g., customOrders, afterSalesSupport"
                 />
+                <p className="text-sm text-red-500">
+                  Only the first 5 services are shown.
+                </p>
                 <p className="text-sm text-gray-500 mt-1">
                   Enter services separated by commas. Use camelCase for multiple
                   words (e.g., customOrders).
@@ -750,7 +777,7 @@ export default function EditBusinessPage() {
                         type="url"
                         defaultValue={
                           businessData.profile.socials?.[
-                          key as keyof typeof businessData.profile.socials
+                            key as keyof typeof businessData.profile.socials
                           ] || ""
                         }
                         onBlur={(e) =>
@@ -818,25 +845,72 @@ export default function EditBusinessPage() {
                         />
                       </div>
                     )}
+                    <button
+                      className="text-red-500 hover:text-red-700"
+                      onClick={() => handleDeleteLicense(license._id)}
+                    >
+                      Delete License
+                    </button>
                   </div>
                 </div>
               ))}
+
+              {/* Add License Button */}
+              <button
+                onClick={() => setIsAddingLicense(true)}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                Add New License
+              </button>
+
+              {/* Add License Form */}
+              {isAddingLicense && (
+                <div className="mt-4 p-4 border rounded-lg space-y-4">
+                  <h3 className="font-medium">Add New License</h3>
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      placeholder="License Name"
+                      value={newLicense.name}
+                      onChange={(e) => setNewLicense(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full p-2 border rounded-lg"
+                    />
+                    <input
+                      type="text"
+                      placeholder="License Number"
+                      value={newLicense.number}
+                      onChange={(e) => setNewLicense(prev => ({ ...prev, number: e.target.value }))}
+                      className="w-full p-2 border rounded-lg"
+                    />
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={(e) => setNewLicense(prev => ({ ...prev, file: e.target.files?.[0] || null }))}
+                      className="w-full p-2 border rounded-lg"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleAddLicense}
+                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                      >
+                        Save License
+                      </button>
+                      <button
+                        onClick={() => setIsAddingLicense(false)}
+                        className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
-          {/* Map Section */}
-          <section className="bg-white rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Location</h2>
-            <div className="w-full h-64">
-              <MapSection 
-                businessName={businessData.profile.name} 
-                slug={businessData.profile.slug} 
-              />
-            </div>
-          </section>
+
         </div>
       </div>
     </div>
   );
 }
-
