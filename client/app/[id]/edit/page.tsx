@@ -845,12 +845,12 @@ export default function EditBusinessPage() {
                         />
                       </div>
                     )}
-                    <button
+                    {/* <button
                       className="text-red-500 hover:text-red-700"
                       onClick={() => handleDeleteLicense(license._id)}
                     >
                       Delete License
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               ))}

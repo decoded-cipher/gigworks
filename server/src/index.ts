@@ -17,6 +17,8 @@ import { trimTrailingSlash } from 'hono/trailing-slash'
 import apiRouter from './routes/api';
 import authRouter from './routes/auth';
 
+import { handleCron } from './cron';
+
 
 
 type Bindings = {
@@ -70,4 +72,10 @@ app.use((c) => c.json({
 
 
 
-export default app;
+export default {
+    fetch: app.fetch,
+    async scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
+        console.log(`Cron triggered: ${event.cron}`);
+        ctx.waitUntil(handleCron(event.cron));
+    },
+};

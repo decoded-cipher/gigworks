@@ -5,11 +5,12 @@ const router = new Hono();
 import { verifyToken } from '../../middleware/authentication';
 
 import { createUser, getUserByPhone } from '../../services/user';
-import { createPartner, getPartnerById, getPartnerAnalytics } from '../../services/partner';
-import { createPartnerBank } from '../../services/partnerBank';
-import { createPartnerIdProof } from '../../services/partnerProof';
+import { createPartner, updatePartner, getPartnerById, getPartnerAnalytics } from '../../services/partner';
+import { createPartnerBank, deletePartnerBank } from '../../services/partnerBank';
+import { createPartnerIdProof, deletePartnerIdProof } from '../../services/partnerProof';
 
 import { User, Partner, PartnerBank, PartnerIdProof } from '../../config/database/interfaces';
+import { removeFields } from '../../utils/helpers';
 
 
 /**
@@ -49,13 +50,59 @@ router.post('/', async (c) => {
         }
     
         return c.json({
-            message: 'Partner created successfully',
-            data: {
-                user,
-                partner,
-                partnerBank,
-                partnerIdProof
-            }
+            message: 'Partner created successfully'
+        });
+    } catch (error) {
+        return c.json({
+            message: 'Internal Server Error',
+            error: error.message
+        }, 500);
+    }
+});
+
+
+
+/**
+ * @route   PATCH /api/v1/partner
+ * @desc    Update partner data
+ * @access  Authenticated
+ * @params  token, avatar
+ * @return  message, data
+ * @error   400, { error }
+ * @status  200, 400
+ * 
+ * @example /api/v1/partner
+ **/
+
+router.patch('/', verifyToken, async (c) => {
+    try {
+        const data = await c.req.json();
+        const user: User = c.req._user;
+        
+        let partnerData: Partner = await getPartnerById(user);
+        partnerData = partnerData[0];
+
+        if (!partnerData) {
+            return c.json({
+                message: 'Partner not found'
+            }, 400);
+        }
+
+        if(data.partnerBank) {
+            await deletePartnerBank(partnerData.partner.id);
+            await createPartnerBank({ ...data.partnerBank, partner_id: partnerData.partner.id });
+        }
+
+        if(data.identityProof) {
+            await deletePartnerIdProof(partnerData.partner.id);
+            await createPartnerIdProof({ ...data.identityProof, partner_id: partnerData.partner.id });
+        }
+
+        const partner: Partner = await updatePartner({ ...data.partner, id: partnerData.partner.id });
+
+        return c.json({
+            message: 'Partner data updated successfully',
+            data: partner
         });
     } catch (error) {
         return c.json({
@@ -84,9 +131,11 @@ router.get('/', verifyToken, async (c) => {
         const user: User = c.req._user;
         const partner: Partner = await getPartnerById(user);
 
+        const result = removeFields(partner, ['id', 'user_id', 'partner_id', 'updated_at', 'created_at', 'status', 'role', 'proof_type_id', 'proof_url']);
+
         return c.json({
             message: 'Partner data fetched successfully',
-            data: partner
+            data: result
         });
     } catch (error) {
         return c.json({

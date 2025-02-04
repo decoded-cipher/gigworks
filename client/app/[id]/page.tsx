@@ -616,7 +616,7 @@ const DevMorphixWebsite = () => {
                 src={
                   businessData?.profile.avatar
                     ? `${ASSET_BASE_URL}/${businessData.profile.avatar}`
-                    : "/444.png"
+                    : "/assets/media/defaultbusiness.png"
                 }
                 alt="Logo"
                 className="w-full h-full rounded-full border-4 border-white object-cover shadow-lg"
@@ -740,7 +740,7 @@ const DevMorphixWebsite = () => {
               <div className="md:w-1/2">
                 <div className="bg-white rounded-lg p-6 h-full">
                   <div className="h-[500px] rounded-lg overflow-hidden">
-                    {businessData?.profile.name.toLowerCase() === "emilia" ? (
+                    {businessData?.profile.slug.toLowerCase() === "emilia" ? (
                       <>
                         <iframe
                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3934.8730957553427!2d76.56412737495825!3d9.463395593246565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b062f23a403b63b%3A0xfed9fd50695f7df8!2sEMILIA%20BEAUTY%20HUB%20CHANGANACHERRY!5e0!3m2!1sen!2sin!4v1702359671799!5m2!1sen!2sin"
@@ -762,8 +762,8 @@ const DevMorphixWebsite = () => {
                           </a>
                         </div>
                       </>
-                    ) : businessData?.profile.name.toLowerCase() ===
-                      "anjaneya gym" ? (
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                      "anjaneya" ? (
                       <>
                         <iframe
                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3935.6791870223733!2d76.5665951!3d9.4495045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b062528d37a641d%3A0x66e967f68f9994bb!2sAnjaneya%20Gym!5e0!3m2!1sen!2sin!4v1736680465049!5m2!1sen!2sin"
@@ -785,8 +785,8 @@ const DevMorphixWebsite = () => {
                           </a>
                         </div>
                       </>
-                    ) : businessData?.profile.name.toLowerCase() ===
-                      "acme decor" ? (
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                      "acmedecor" ? (
                       <>
                         <iframe
                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3935.722946930944!2d76.5714552!3d9.4456761!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625808d39e54d%3A0x2b8378272ddf82aa!2sacme%20DECOR!5e0!3m2!1sen!2sin!4v1737032116084!5m2!1sen!2sin"
@@ -808,8 +808,8 @@ const DevMorphixWebsite = () => {
                           </a>
                         </div>
                       </>
-                    ) : businessData?.profile.name.toLowerCase() ===
-                      "pathil electricals sanitary" ? (
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                      "pathilelectricals" ? (
                       <>
                         <iframe
                           src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1967.9015774093411!2d76.5679237!3d9.438655!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625eb50756337%3A0xde34a5bb2a767a61!2sPATHIL%20ELECTRICAL%20%26%20SANITARY!5e0!3m2!1sen!2sin!4v1737035238332!5m2!1sen!2sin"
@@ -831,8 +831,8 @@ const DevMorphixWebsite = () => {
                           </a>
                         </div>
                       </>
-                    ) : businessData?.profile.name.toLowerCase() ===
-                      "adobe designs & digital printing" ? (
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                      "adobedesigns" ? (
                       <>
                         <iframe
                           src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3935.7607718648087!2d76.54132767502395!3d9.44236569063642!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOcKwMjYnMzIuNSJOIDc2wrAzMiczOC4xIkU!5e0!3m2!1sen!2sin!4v1737118006785!5m2!1sen!2sin"
@@ -854,8 +854,8 @@ const DevMorphixWebsite = () => {
                       </a>
                     </div> */}
                       </>
-                    ) : businessData?.profile.name.toLowerCase() ===
-                      "wedboat photography" ? (
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                      "wedboatphotography" ? (
                       <>
                         <iframe
                           src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3929.0097795578995!2d76.27212147503143!3d10.016050290090138!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTDCsDAwJzU3LjgiTiA3NsKwMTYnMjguOSJF!5e0!3m2!1sen!2sin!4v1737118448906!5m2!1sen!2sin"
@@ -867,6 +867,7 @@ const DevMorphixWebsite = () => {
                           referrerPolicy="no-referrer-when-downgrade"
                         ></iframe>
                       </>
+
                     ) : businessData?.profile.name.toLowerCase() ===
                       "al-tech aluminium house" ? (
                       <>
@@ -959,6 +960,113 @@ const DevMorphixWebsite = () => {
                         ></iframe>
                       </>
                     ) : (
+
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                    "altech" ? (
+                    <>
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1039.0457764470052!2d76.5675167!3d9.437330400000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06255b1dcfebb3%3A0x3109daf53a6bf1ff!2sHrishikesh%20building!5e1!3m2!1sen!2sin!4v1737356965310!5m2!1sen!2sin"
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      ></iframe>
+                    </>
+                  ) : businessData?.profile.slug.toLowerCase() ===
+                  "fabtech" ? (
+                  <>
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d2078.1127415475403!2d76.5664288!3d9.4338151!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06251eeb8d34ad%3A0xef156d4ab8447e21!2sFabtech%20interior%20and%20exterior%20gypsum!5e1!3m2!1sen!2sin!4v1737615318000!5m2!1sen!2sin"
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                  </>
+                ) : businessData?.profile.slug.toLowerCase() ===
+                "drona" ? (
+                <>
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1039.0456727537864!2d76.5674698!3d9.4373648!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625701baac7ab%3A0xa786339129ca58de!2sDrona%20fitness%20centre!5e1!3m2!1sen!2sin!4v1737615500571!5m2!1sen!2sin"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                </>
+              ) : businessData?.profile.slug.toLowerCase() ===
+              "mktech" ? (
+              <>
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d4156.036580982765!2d76.567734!3d9.449475000000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOcKwMjYnNTguMSJOIDc2wrAzNCcwMy44IkU!5e1!3m2!1sen!2sin!4v1737615571336!5m2!1sen!2sin"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </>
+            ) : businessData?.profile.slug.toLowerCase() ===
+            "abdigitalvision" ? (
+            <>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d43046.333304051135!2d76.58383945!3d9.4507664!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625913e4243d7%3A0xf6c0ab6d281939a6!2sThrikkodithanam%2C%20Kerala!5e1!3m2!1sen!2sin!4v1737615756685!5m2!1sen!2sin"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </>
+          ) : businessData?.profile.slug.toLowerCase() ===
+          "sriambikadecor" ? (
+          <>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d5380.799053926908!2d76.5624093!3d9.4502936!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625bd70eb9cfb%3A0xdbee1de18b9c2bd8!2sSri%20Ambika%20Decoration!5e1!3m2!1sen!2sin!4v1737615901900!5m2!1sen!2sin"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </>
+        ) : businessData?.profile.slug.toLowerCase() ===
+        "kasthuritissue" ? (
+        <>
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d719.9638923314029!2d76.5666106241674!3d9.449273442096539!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625b7fd82ef3b%3A0x2f0376ec4bbc0c1!2sKasthuri%20premium%20tissues!5e0!3m2!1sen!2sin!4v1737634242110!5m2!1sen!2sin"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </>
+      ) : businessData?.profile.slug.toLowerCase() ===
+      "highlights" ? (
+      <>
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3561.6865699278346!2d76.560034!3d9.439651199999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625000deeaf6d%3A0xccd860b6c0f7451f!2sHighlights%20unisex%20salon%20and%20makeup%20studio%20mukkattupadi%20changanacherry!5e1!3m2!1sen!2sin!4v1738653509591!5m2!1sen!2sin"
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </>
+    ) : (
+
                       <iframe
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d251482.44857791857!2d76.1643857954714!3d9.982669325611842!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d514abec6bf%3A0xbd582caa5844192!2sKochi%2C%20Kerala!5e0!3m2!1sen!2sin!4v1702359671799!5m2!1sen!2sin"
                         width="100%"

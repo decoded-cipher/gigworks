@@ -68,10 +68,11 @@ router.get('/', async (c) => {
     const page = Number(c.req.query('page')) || 1;
     const limit = Number(c.req.query('limit'));
     const search = c.req.query('search') || '';
+    const hasBusiness = Boolean(c.req.query('hasBusiness')) || false;
 
     try {
 
-        const result = await getCategories(page, limit, search);
+        const result = await getCategories(page, limit, search, hasBusiness);
 
         if (result.data.length > 0) {
             return c.json({
@@ -82,7 +83,8 @@ router.get('/', async (c) => {
                         params: {
                             page: page,
                             limit: limit,
-                            search: search
+                            search: search,
+                            hasBusiness: hasBusiness
                         },
                         total_count: result.count,
                         total_pages: Math.ceil(result.count / limit),

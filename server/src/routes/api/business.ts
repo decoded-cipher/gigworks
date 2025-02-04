@@ -4,10 +4,15 @@ const router = new Hono();
 
 import { createUser, getUserByPhone } from '../../services/user';
 import { createPayment } from '../../services/payment';
-import { saveProfileLicense } from '../../services/profileLicense';
+
+import { addProfileLicense, removeProfileLicense } from '../../services/profileLicense';
+import { addProfileMedia, removeProfileMedia } from '../../services/profileMedia';
+import { addProfileTag, removeProfileTag } from '../../services/profileTag';
 
 import { 
-    createProfile, 
+    createProfile,
+    getProfileById,
+    updateProfile,
     getProfileCount, 
     getRenewalProfiles, 
     getProfileBySlug, 
@@ -16,6 +21,7 @@ import {
 } from '../../services/profile';
 
 import { User, Profile, ProfilePayment, ProfileMedia, ProfileLicense, ProfileTag } from '../../config/database/interfaces';
+import { verifyToken } from '../../middleware/authentication';
 
 
 
@@ -47,14 +53,14 @@ router.post('/', async (c) => {
             }, 400);
         }
         
+        let license: License | null = null;
+        if (data.license && data.license.length > 0) {
+            license = await addProfileLicense(profile.id, data.license);
+        }
+        
         let payment: ProfilePayment | null = null;
         if (data.payment) {
             payment = await createPayment({ ...data.payment, profile_id: profile.id });
-        }
-
-        let license: License | null = null;
-        if (data.license) {
-            license = await saveProfileLicense(profile.id, data.license);
         }
     
         return c.json({
@@ -62,8 +68,8 @@ router.post('/', async (c) => {
             data: {
                 user,
                 profile,
-                payment,
-                license
+                license,
+                payment
             }
         }, 201);
     } catch (error) {
@@ -284,6 +290,314 @@ router.get('/', async (c) => {
                     next: result.data.length === limit ? `/api/v1/sub_category?page=${page + 1}&limit=${limit}` : null
                 }
             }
+        }, 200);
+
+    } catch (error) {
+        return c.json({
+            message: 'Internal Server Error',
+            error: error.message
+        }, 500);
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * @route   PATCH /api/v1/business/:id
+ * @desc    Update a business by id
+ * @access  Authenticated
+ * @params  id
+ * @return  message, data
+ * @error   400, { error }
+ * @status  200, 400
+ * 
+ * @example /api/v1/business/:id
+ **/
+
+router.patch('/:id', verifyToken, async (c) => {
+    try {
+        
+        const { id } = c.req.param();
+        const data = await c.req.json();
+
+        let checkProfile = await getProfileById(id);
+        if (!checkProfile) {
+            return c.json({
+                message: 'Business does not exist',
+            }, 404);
+        }
+
+        let profile = await updateProfile(id, data);
+        if (!profile) {
+            return c.json({
+                message: 'Business update failed',
+            }, 400);
+        }
+
+        return c.json({
+            message: 'Business updated successfully',
+            data: profile
+        }, 200);
+
+    } catch (error) {
+        return c.json({
+            message: 'Internal Server Error',
+            error: error.message
+        }, 500);
+    }
+});
+
+
+
+/**
+ * @route   POST /api/v1/business/:id/media
+ * @desc    Add media to a business by id
+ * @access  Authenticated
+ * @params  id
+ * @return  message, data
+ * @error   400, { error }
+ * @status  201, 400
+ * 
+ * @example /api/v1/business/:id/media
+ **/
+
+router.post('/:id/media', verifyToken, async (c) => {
+    try {
+        const { id } = c.req.param();
+        const { url, description } = await c.req.json();
+
+        let media = await addProfileMedia({ profile_id: id, url, description });
+
+        if (!media) {
+            return c.json({
+                message: 'Media addition failed',
+            }, 400);
+        }
+
+        return c.json({
+            message: 'Media added successfully',
+            data: media
+        }, 201);
+    } catch (error) {
+        return c.json({
+            message: 'Internal Server Error',
+            error: error.message
+        }, 500);
+    }
+});
+
+
+
+/**
+ * @route   DELETE /api/v1/business/:id/media/:media_id
+ * @desc    Remove media from a business by id
+ * @access  Authenticated
+ * @params  id, media_id
+ * @return  message, data
+ * @error   400, { error }
+ * @status  200, 400
+ * 
+ * @example /api/v1/business/:id/media/:media_id
+ **/
+
+router.delete('/:id/media/:media_id', verifyToken, async (c) => {
+    try {
+        const { id, media_id } = c.req.param();
+
+        let profile = await removeProfileMedia(id, media_id);
+        if (!profile) {
+            return c.json({
+                message: 'Media removal failed',
+            }, 400);
+        }
+
+        return c.json({
+            message: 'Media removed successfully',
+            data: profile
+        }, 200);
+
+    } catch (error) {
+        return c.json({
+            message: 'Internal Server Error',
+            error: error.message
+        }, 500);
+    }
+});
+
+
+
+/**
+ * @route   POST /api/v1/business/:id/tag
+ * @desc    Add tag to a business by id
+ * @access  Authenticated
+ * @params  id
+ * @return  message, data
+ * @error   400, { error }
+ * @status  201, 400
+ * 
+ * @example /api/v1/business/:id/tag
+ **/
+
+router.post('/:id/tag', verifyToken, async (c) => {
+    try {
+        const { id } = c.req.param();
+        const data = await c.req.json();
+
+        let profile = await addProfileTag(id, data);
+        if (!profile) {
+            return c.json({
+                message: 'Tag addition failed',
+            }, 400);
+        }
+
+        return c.json({
+            message: 'Tag added successfully',
+            data: profile
+        }, 201);
+
+    } catch (error) {
+        return c.json({
+            message: 'Internal Server Error',
+            error: error.message
+        }, 500);
+    }
+});
+
+
+
+/**
+ * @route   DELETE /api/v1/business/:id/tag/:tag_id
+ * @desc    Remove tag from a business by id
+ * @access  Authenticated
+ * @params  id, tag_id
+ * @return  message, data
+ * @error   400, { error }
+ * @status  200, 400
+ * 
+ * @example /api/v1/business/:id/tag/:tag_id
+ **/
+
+router.delete('/:id/tag/:tag_id', verifyToken, async (c) => {
+    try {
+        const { id, tag_id } = c.req.param();
+
+        let profile = await removeProfileTag(id, tag_id);
+        if (!profile) {
+            return c.json({
+                message: 'Tag removal failed',
+            }, 400);
+        }
+
+        return c.json({
+            message: 'Tag removed successfully',
+            data: profile
+        }, 200);
+
+    } catch (error) {
+        return c.json({
+            message: 'Internal Server Error',
+            error: error.message
+        }, 500);
+    }
+});
+
+
+
+/**
+ * @route   POST /api/v1/business/:id/license
+ * @desc    Add license to a business by id
+ * @access  Authenticated
+ * @params  id
+ * @return  message, data
+ * @error   400, { error }
+ * @status  201, 400
+ * 
+ * @example /api/v1/business/:id/license
+ **/
+
+router.post('/:id/license', verifyToken, async (c) => {
+    try {
+        const { id } = c.req.param();
+        const data = await c.req.json();
+
+        let license = await addProfileLicense(id, data);
+        if (!license) {
+            return c.json({
+                message: 'License addition failed',
+            }, 400);
+        }
+
+        return c.json({
+            message: 'License added successfully',
+            data: license
+        }, 201);
+
+    } catch (error) {
+        return c.json({
+            message: 'Internal Server Error',
+            error: error.message
+        }, 500);
+    }
+});
+
+
+
+/**
+ * @route   DELETE /api/v1/business/:id/license/:license_id
+ * @desc    Remove license from a business by id
+ * @access  Authenticated
+ * @params  id, license_id
+ * @return  message, data
+ * @error   400, { error }
+ * @status  200, 400
+ * 
+ * @example /api/v1/business/:id/license/:license_id
+ **/
+
+router.delete('/:id/license/:license_id', verifyToken, async (c) => {
+    try {
+        const { id, license_id } = c.req.param();
+
+        let license = await removeProfileLicense(id, license_id);
+        if (!license) {
+            return c.json({
+                message: 'License removal failed',
+            }, 400);
+        }
+
+        return c.json({
+            message: 'License removed successfully',
+            data: license
         }, 200);
 
     } catch (error) {
