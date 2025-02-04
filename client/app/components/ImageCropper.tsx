@@ -17,20 +17,17 @@ export default function ImageCropper({
   onCancel,
   isCircular = false // Default to false
 }: ImageCropperProps) {
-  // Initialize crop with required properties
   const [crop, setCrop] = useState<Crop>({
-    unit: '%',
-    width: 90,
-    height: isCircular ? 90 : 90 / aspect,
-    x: 5,
-    y: 5
+    unit: 'px',
+    width: 300,
+    height: 300,
+    x: 0,
+    y: 0,
   });
-  
   const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isCropReady, setIsCropReady] = useState(false);
 
   const getCroppedImg = async (image: HTMLImageElement, crop: Crop): Promise<string> => {
     const canvas = document.createElement('canvas');
@@ -59,13 +56,11 @@ export default function ImageCropper({
     return canvas.toDataURL('image/jpeg');
   };
 
-  const handleCropComplete = async () => {
-    if (!imgRef.current || !completedCrop?.width || !completedCrop?.height) {
-      return;
-    }
+  const handleCropComplete = async (crop: Crop) => {
+    if (!crop || !crop.width || !crop.height) return;
     
     try {
-      const croppedImageUrl = await getCroppedImg(imgRef.current, completedCrop);
+      const croppedImageUrl = await getCroppedImg(imgRef.current!, crop);
       onCropComplete(croppedImageUrl);
     } catch (e) {
       console.error('Error creating crop:', e);
@@ -106,24 +101,15 @@ export default function ImageCropper({
     const { width, height } = calculateOptimalDimensions(img.naturalWidth, img.naturalHeight);
     setDimensions({ width, height });
 
-    // Calculate initial crop after image loads
-    setTimeout(() => {
-      const minSize = Math.min(width, height);
-      const initialCrop: Crop = {
-        unit: 'px', // Explicitly specify as 'px' or '%'
-        width: isCircular ? minSize : width * 0.8,
-        height: isCircular ? minSize : (width * 0.8) / aspect,
-        x: (width - (isCircular ? minSize : width * 0.8)) / 2,
-        y: (height - (isCircular ? minSize : (width * 0.8) / aspect)) / 2,
-      };
-      setCrop(initialCrop);
-      setCompletedCrop(initialCrop);
-      setIsCropReady(true);
-    }, 100); // Small delay to ensure image is rendered
-  };
-
-  const handleCropChange = (newCrop: Crop) => {
-    setCrop(newCrop);
+    // Set initial crop
+    const minSize = Math.min(width, height);
+    setCrop({
+      unit: 'px',
+      width: aspect ? minSize : width * 0.8,
+      height: aspect ? minSize / aspect : height * 0.8,
+      x: (width - (aspect ? minSize : width * 0.8)) / 2,
+      y: (height - (aspect ? minSize / aspect : height * 0.8)) / 2
+    });
   };
 
   const cropStyle = isCircular ? {
@@ -138,19 +124,16 @@ export default function ImageCropper({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div 
-          ref={containerRef}
+        ref={containerRef}
         className="bg-white p-6 rounded-lg w-[95vw] max-w-[1200px] max-h-[90vh] flex flex-col" 
-        style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none' }}
+        style={{ userSelect: 'none' }}
       >
-        <h3 className="text-lg font-bold mb-4">
-          {!isCropReady ? 'Loading Image...' : 'Adjust Image'}
-        </h3>
+        <h3 className="text-lg font-bold mb-4">Adjust Image</h3>
         
         <div className="flex-1 min-h-0 overflow-auto flex justify-center items-center">
           <ReactCrop
             crop={crop}
-            onChange={handleCropChange}
-            onComplete={(c) => setCompletedCrop(c)}
+            onChange={(c) => setCrop(c)}
             aspect={aspect}
             className="max-w-full max-h-full select-none"
             circularCrop={isCircular}
@@ -166,9 +149,7 @@ export default function ImageCropper({
                 width: dimensions.width || 'auto',
                 height: dimensions.height || 'auto',
                 maxHeight: '70vh',
-                userSelect: 'none',
-                WebkitUserSelect: 'none',
-                msUserSelect: 'none'
+                userSelect: 'none'
               }}
               draggable="false"
             />
@@ -185,11 +166,11 @@ export default function ImageCropper({
           </button>
           <button
             type="button"
-            onClick={handleCropComplete}
-            className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
-            disabled={!isCropReady || !completedCrop?.width || !completedCrop?.height}
+            onClick={() => handleCropComplete(crop)}
+            className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+            disabled={!crop?.width || !crop?.height}
           >
-            {!isCropReady ? 'Loading...' : 'Save Image'}
+            Save Image
           </button>
         </div>
       </div>
