@@ -64,15 +64,29 @@ const EditPartner = () => {
           [field]: value,
         },
       });
-      setChangedFields((prev) => ({ ...prev, [field]: value }));
+      // Update changedFields with the correct nested structure
+      setChangedFields((prev) => ({
+        ...prev,
+        partner: {
+          ...(prev.partner || {}),
+          [field]: value,
+        },
+      }));
     }
   };
 
   const handleSaveChanges = async () => {
     if (Object.keys(changedFields).length > 0) {
       try {
-        await updatePartner(changedFields);
+        // Create the proper structure for the API call
+        const updateData = {
+          ...partner,
+          ...changedFields,
+        };
+        await updatePartner(updateData);
         console.log("Partner updated successfully");
+        // Reset changed fields after successful update
+        setChangedFields({});
       } catch (error) {
         console.error("Failed to update partner data:", error);
       }
@@ -85,7 +99,10 @@ const EditPartner = () => {
         ...partner,
         partnerBank: null,
       });
-      setChangedFields((prev) => ({ ...prev, partnerBank: null }));
+      setChangedFields((prev) => ({
+        ...prev,
+        partnerBank: null,
+      }));
     }
   };
 
@@ -98,6 +115,7 @@ const EditPartner = () => {
       try {
         await updatePartner(updatedPartner);
         setPartner(updatedPartner);
+        setChangedFields({});  // Reset changed fields after successful update
         setNewBankAccount({
           account_holder: "",
           account_number: "",
