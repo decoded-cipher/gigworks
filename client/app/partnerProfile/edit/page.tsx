@@ -1,6 +1,17 @@
 "use client";
-import { GetPartner, updatePartner } from "@/app/api";
+import {
+  GetPartner,
+  updatePartner,
+  ASSET_BASE_URL,
+  GetURL,
+  uploadToPresignedUrl,
+} from "@/app/api";
 import React, { useEffect, useState } from "react";
+import { Pencil } from "lucide-react";
+import ImageCropper from "../../components/ImageCropper";
+import { toast } from "react-hot-toast"; // Add toast for notifications
+import { useParams, useRouter } from "next/navigation";
+
 
 interface Partner {
   user: {
@@ -25,6 +36,16 @@ interface Partner {
 
 const EditPartner = () => {
   const [partner, setPartner] = useState<Partner | null>(null);
+  const router = useRouter();
+  const [cropperState, setCropperState] = useState<{
+    isOpen: boolean;
+    imageUrl: string;
+    fieldType: "avatar" | "banner" | null;
+  }>({
+    isOpen: false,
+    imageUrl: "",
+    fieldType: null,
+  });
   const [newBankAccount, setNewBankAccount] = useState<{
     account_holder: string;
     account_number: string;
@@ -40,7 +61,9 @@ const EditPartner = () => {
     ifsc: "",
     upi_id: "",
   });
-  const [changedFields, setChangedFields] = useState<{ [key: string]: string | null }>({});
+  const [changedFields, setChangedFields] = useState<{
+    [key: string]: any;
+  }>({});
 
   useEffect(() => {
     const fetchPartner = async () => {
@@ -68,7 +91,7 @@ const EditPartner = () => {
       setChangedFields((prev) => ({
         ...prev,
         partner: {
-          ...(prev.partner || {}),
+          ...(typeof prev.partner === "object" ? prev.partner : {}),
           [field]: value,
         },
       }));
@@ -76,6 +99,7 @@ const EditPartner = () => {
   };
 
   const handleSaveChanges = async () => {
+    
     if (Object.keys(changedFields).length > 0) {
       try {
         // Create the proper structure for the API call
@@ -85,11 +109,68 @@ const EditPartner = () => {
         };
         await updatePartner(updateData);
         console.log("Partner updated successfully");
+        router.push("/partnerProfile"); 
         // Reset changed fields after successful update
         setChangedFields({});
       } catch (error) {
         console.error("Failed to update partner data:", error);
       }
+    }else{
+      console.log("No changes to save");
+      alert("No changes to save");
+    }
+  };
+
+  const handleImageSelect = async (
+    file: File,
+    fieldType: "avatar" | "banner"
+  ) => {
+    const imageUrl = URL.createObjectURL(file);
+    setCropperState({
+      isOpen: true,
+      imageUrl,
+      fieldType,
+    });
+  };
+
+  const handleCroppedImage = async (croppedImageUrl: string) => {
+    try {
+      if (!cropperState.fieldType || !partner?.partner.referral_code) return;
+
+      // Convert base64/URL to blob
+      const response = await fetch(croppedImageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "cropped-image.jpg", {
+        type: "image/jpeg",
+      });
+
+      // Get presigned URL
+      const uploadResponse = await GetURL({
+        type: file.type,
+        category: cropperState.fieldType,
+      });
+
+      if (!uploadResponse.presignedUrl) {
+        throw new Error("Failed to get presigned URL");
+      }
+
+      // Upload to storage
+      await uploadToPresignedUrl(uploadResponse.presignedUrl, file);
+
+      // Update business profile
+      await handleFieldChange(cropperState.fieldType, uploadResponse.assetpath);
+
+      // Close cropper
+      setCropperState({
+        isOpen: false,
+        imageUrl: "",
+        fieldType: null,
+      });
+
+      toast.success("Image updated successfully");
+    } catch (error) {
+      console.error("Error handling cropped image:", error);
+      toast.error("Failed to update image");
     }
   };
 
@@ -107,7 +188,15 @@ const EditPartner = () => {
   };
 
   const handleAddBankAccount = async () => {
-    if (partner && newBankAccount.account_holder && newBankAccount.account_number && newBankAccount.bank_name && newBankAccount.branch_name && newBankAccount.ifsc && newBankAccount.upi_id) {
+    if (
+      partner &&
+      newBankAccount.account_holder &&
+      newBankAccount.account_number &&
+      newBankAccount.bank_name &&
+      newBankAccount.branch_name &&
+      newBankAccount.ifsc &&
+      newBankAccount.upi_id
+    ) {
       const updatedPartner = {
         ...partner,
         partnerBank: newBankAccount,
@@ -115,7 +204,7 @@ const EditPartner = () => {
       try {
         await updatePartner(updatedPartner);
         setPartner(updatedPartner);
-        setChangedFields({});  // Reset changed fields after successful update
+        setChangedFields({}); // Reset changed fields after successful update
         setNewBankAccount({
           account_holder: "",
           account_number: "",
@@ -139,6 +228,52 @@ const EditPartner = () => {
         <section className="bg-white rounded-lg p-6 shadow-sm">
           <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
           <div className="space-y-4">
+              <h3 className="text-sm font-medium mb-2 flex items-center justify-center" >Profile Image</h3>
+            <div className="flex items-center justify-center">
+              <>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleImageSelect(file, "avatar");
+                }}
+                className="hidden"
+                id="avatar-input"
+              />
+              <div className="relative">
+                <img
+                  src={
+                    partner.partner.avatar
+                      ? `${ASSET_BASE_URL}/${partner.partner.avatar}`
+                      : "/placeholder-avatar.png"
+                  }
+                  alt="Avatar"
+                  className="w-32 h-32 object-cover rounded-full"
+                />
+                <label
+                  htmlFor="avatar-input"
+                  className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow cursor-pointer"
+                >
+                  <Pencil size={16} />
+                </label>
+              </div>
+              </>
+            </div>
+            {cropperState.isOpen && (
+              <ImageCropper
+                imageUrl={cropperState.imageUrl}
+                aspect={cropperState.fieldType === "avatar" ? 1 : 3} // 600/200 simplified to 3
+                onCropComplete={handleCroppedImage}
+                onCancel={() =>
+                  setCropperState({
+                    isOpen: false,
+                    imageUrl: "",
+                    fieldType: null,
+                  })
+                }
+              />
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -173,8 +308,8 @@ const EditPartner = () => {
                 className="w-full p-2 border rounded-lg"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">
+            <div className="bg-green-200/20 p-4 rounded-lg">
+              <label className="block text-sm font-medium mb-1 ">
                 Bank Account
               </label>
               {partner.partnerBank ? (
