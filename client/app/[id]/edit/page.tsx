@@ -30,6 +30,8 @@ import OperatingHours from "@/app/components/OperatingHours";
 import { deletebusinessMedia, DeleteLicense, fetchLicenseData } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
 import ImageCropper from "@/app/components/ImageCropper";
+import { text } from "stream/consumers";
+import Swal from 'sweetalert2'
 
 // Define MediaItem interface locally if import fails
 interface MediaItem {
@@ -207,7 +209,22 @@ export default function EditBusinessPage() {
     }
   }, [router]);
 
+  const handledeletelicenses = async (licenseId: string) => {
+    Swal.fire({
+      text: "Are you sure you want to delete this license?",
+      icon: "warning",
+      showDenyButton: true,
+      confirmButtonText: "Yes",
+      denyButtonText: "No",
+    }).then(async (result) => {
+      if(result.isConfirmed){
+        await handleDeleteLicense(licenseId);
+      }
+    });
+  };
+
   const handleDeleteLicense = async (licenseId: string) => {
+    
     try {
       if (!businessData) {
         throw new Error("Business data is not available");
@@ -221,6 +238,7 @@ export default function EditBusinessPage() {
         );
         setBusinessData({ ...businessData, licenses: updatedLicenses });
       }
+      Swal.fire("License deleted successfully", "", "success");
     } catch (error) {
       console.error("Failed to delete license", error);
     }
@@ -845,12 +863,12 @@ export default function EditBusinessPage() {
                         />
                       </div>
                     )}
-                    {/* <button
+                    <button
                       className="text-red-500 hover:text-red-700"
-                      onClick={() => handleDeleteLicense(license._id)}
+                      onClick={() => handledeletelicenses(license._id)}
                     >
                       Delete License
-                    </button> */}
+                    </button>
                   </div>
                 </div>
               ))}
@@ -868,13 +886,27 @@ export default function EditBusinessPage() {
                 <div className="mt-4 p-4 border rounded-lg space-y-4">
                   <h3 className="font-medium">Add New License</h3>
                   <div className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="License Name"
-                      value={newLicense.name}
-                      onChange={(e) => setNewLicense(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full p-2 border rounded-lg"
-                    />
+                  <select
+                    name="otherLicenses"
+                    // data-index={index}
+                    data-field="type"
+                    // value={licenseTypes.name}
+                    onChange={(e) => setNewLicense(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                  >
+                    <option value="">Select License Type</option>
+                    {isLoading && <option disabled>Loading...</option>}
+                    {error && <option disabled>{error}</option>}
+                    {licenseTypes.map((type) => (
+                      <option
+                        key={type.id}
+                        value={type.id}
+                        // title={type.description}
+                      >
+                        {type.name}
+                      </option>
+                    ))}
+                  </select>
                     <input
                       type="text"
                       placeholder="License Number"

@@ -251,13 +251,13 @@ const DevMorphixWebsite = () => {
                 Logout
                 {/* <Pencil className="w-4 h-4 text-gray-600" /> */}
               </button>
-              {/* <button
+              <button
                 onClick={handleEditClick}
                 className="absolute top-5 sm:top-12 right-4 p-2 bg-white  hover:bg-gray-300 rounded-full transition-colors"
                 title="Edit Business Profile"
               >
                 <Pencil className="w-4 h-4 text-gray-600" />
-              </button> */}
+              </button>
 
             <div className="relative z-10 w-80 h-80 border border-white border-8 bg-black rounded-full flex items-center justify-center mb-8 mt-20">
               {partnerData?.partner.avatar ? (
