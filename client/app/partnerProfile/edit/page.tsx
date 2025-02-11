@@ -9,8 +9,9 @@ import {
 import React, { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
 import ImageCropper from "../../components/ImageCropper";
-import { toast } from "react-hot-toast"; // Add toast for notifications
 import { useParams, useRouter } from "next/navigation";
+import Swal from 'sweetalert2'
+
 
 
 interface Partner {
@@ -117,7 +118,15 @@ const EditPartner = () => {
       }
     }else{
       console.log("No changes to save");
-      alert("No changes to save");
+      Swal.fire({
+        title: 'Alert!',
+        text: 'No changes to save',
+        confirmButtonColor   : '#3085d6',
+        confirmButtonText: 'ok'
+      }).then(()=>{
+
+        router.push("/partnerProfile");
+      })
     }
   };
 
@@ -167,10 +176,9 @@ const EditPartner = () => {
         fieldType: null,
       });
 
-      toast.success("Image updated successfully");
+      
     } catch (error) {
       console.error("Error handling cropped image:", error);
-      toast.error("Failed to update image");
     }
   };
 
@@ -226,6 +234,7 @@ const EditPartner = () => {
     <div>
       {partner ? (
         <section className="bg-white rounded-lg p-6 shadow-sm">
+      
           <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
           <div className="space-y-4">
               <h3 className="text-sm font-medium mb-2 flex items-center justify-center" >Profile Image</h3>
@@ -489,7 +498,12 @@ const EditPartner = () => {
           </div>
         </section>
       ) : (
-        <p>Loading...</p>
+        <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
+          <p className="mt-4 text-gray-600">Loading business profile...</p>
+        </div>
+      </div>
       )}
     </div>
   );
