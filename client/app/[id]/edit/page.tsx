@@ -9,7 +9,7 @@ import {
   GetURL,
   uploadToPresignedUrl, 
   createBusinessMedia,
-  
+  createLicense, // Add this import
 } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -30,6 +30,8 @@ import OperatingHours from "@/app/components/OperatingHours";
 import { deletebusinessMedia, DeleteLicense, fetchLicenseData } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
 import ImageCropper from "@/app/components/ImageCropper";
+import { text } from "stream/consumers";
+import Swal from 'sweetalert2'
 
 // Define MediaItem interface locally if import fails
 interface MediaItem {
@@ -116,6 +118,9 @@ const socialMediaConfig = {
   github: { label: "GitHub Profile", icon: "/icon/github.svg" },
   medium: { label: "Medium Profile", icon: "/icon/medium.svg" },
 };
+
+
+
 export default function EditBusinessPage() {
   // Move all hooks to the top, before any conditional logic
   const [isMounted, setIsMounted] = useState(false);
@@ -137,6 +142,13 @@ export default function EditBusinessPage() {
     imageUrl: "",
     fieldType: null,
   });
+
+  const [newLicense, setNewLicense] = useState({
+    name: "",
+    number: "",
+    file: null as File | null,
+  });
+  const [isAddingLicense, setIsAddingLicense] = useState(false);
 
   // Wrap fetchData with useCallback
   const fetchData = useCallback(async () => {
@@ -197,7 +209,22 @@ export default function EditBusinessPage() {
     }
   }, [router]);
 
+  const handledeletelicenses = async (licenseId: string) => {
+    Swal.fire({
+      text: "Are you sure you want to delete this license?",
+      icon: "warning",
+      showDenyButton: true,
+      confirmButtonText: "Yes",
+      denyButtonText: "No",
+    }).then(async (result) => {
+      if(result.isConfirmed){
+        await handleDeleteLicense(licenseId);
+      }
+    });
+  };
+
   const handleDeleteLicense = async (licenseId: string) => {
+    
     try {
       if (!businessData) {
         throw new Error("Business data is not available");
@@ -211,6 +238,7 @@ export default function EditBusinessPage() {
         );
         setBusinessData({ ...businessData, licenses: updatedLicenses });
       }
+      Swal.fire("License deleted successfully", "", "success");
     } catch (error) {
       console.error("Failed to delete license", error);
     }
@@ -404,6 +432,52 @@ export default function EditBusinessPage() {
     } catch (error) {
       console.error("Error handling cropped image:", error);
       toast.error("Failed to update image");
+    }
+  };
+
+  const handleAddLicense = async () => {
+    try {
+      if (!businessData?.profile.id || !newLicense.file) {
+        toast.error("Please fill all license details");
+        return;
+      }
+
+      // Get presigned URL for file upload
+      const uploadResponse = await GetURL({
+        type: newLicense.file.type,
+        category: 'license',
+      });
+
+      if (!uploadResponse.presignedUrl) {
+        throw new Error("Failed to get presigned URL");
+      }
+
+      // Upload file to storage
+      await uploadToPresignedUrl(uploadResponse.presignedUrl, newLicense.file);
+
+      // Create license with the correct structure
+      const licenseData = {
+        url: uploadResponse.assetpath,
+        number: newLicense.number,
+        type_id: newLicense.name, // Assuming name field contains the type_id
+      };
+
+      await createLicense(businessData.profile.id, licenseData);
+
+      // Refresh business data
+      await fetchData();
+
+      // Reset form
+      setNewLicense({
+        name: "",
+        number: "",
+        file: null,
+      });
+      setIsAddingLicense(false);
+      toast.success("License added successfully");
+    } catch (error) {
+      console.error("Error adding license:", error);
+      toast.error("Failed to add license");
     }
   };
 
@@ -789,23 +863,84 @@ export default function EditBusinessPage() {
                         />
                       </div>
                     )}
-                    {/* <button
+                    <button
                       className="text-red-500 hover:text-red-700"
-                      onClick={() => handleDeleteLicense(license._id)}
+                      onClick={() => handledeletelicenses(license._id)}
                     >
                       Delete License
-                    </button> */}
+                    </button>
                   </div>
                 </div>
               ))}
 
+              {/* Add License Button */}
+              <button
+                onClick={() => setIsAddingLicense(true)}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                Add New License
+              </button>
 
-              <div>
-                
-              </div>
-              
+              {/* Add License Form */}
+              {isAddingLicense && (
+                <div className="mt-4 p-4 border rounded-lg space-y-4">
+                  <h3 className="font-medium">Add New License</h3>
+                  <div className="space-y-4">
+                  <select
+                    name="otherLicenses"
+                    // data-index={index}
+                    data-field="type"
+                    // value={licenseTypes.name}
+                    onChange={(e) => setNewLicense(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                  >
+                    <option value="">Select License Type</option>
+                    {isLoading && <option disabled>Loading...</option>}
+                    {error && <option disabled>{error}</option>}
+                    {licenseTypes.map((type) => (
+                      <option
+                        key={type.id}
+                        value={type.id}
+                        // title={type.description}
+                      >
+                        {type.name}
+                      </option>
+                    ))}
+                  </select>
+                    <input
+                      type="text"
+                      placeholder="License Number"
+                      value={newLicense.number}
+                      onChange={(e) => setNewLicense(prev => ({ ...prev, number: e.target.value }))}
+                      className="w-full p-2 border rounded-lg"
+                    />
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={(e) => setNewLicense(prev => ({ ...prev, file: e.target.files?.[0] || null }))}
+                      className="w-full p-2 border rounded-lg"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleAddLicense}
+                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                      >
+                        Save License
+                      </button>
+                      <button
+                        onClick={() => setIsAddingLicense(false)}
+                        className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
+
+
         </div>
       </div>
     </div>

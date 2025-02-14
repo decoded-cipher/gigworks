@@ -325,11 +325,6 @@ export const AddLicense = async (profileId: string, licenseData: { url: string, 
   }
 };
 
-
-
-
-
-
 export const updatePartner = async (data: any) => {
   try {
     const token = document.cookie
@@ -628,6 +623,38 @@ export const updateBusiness = async (businessId: string, updateData: Record<stri
     return response.data;
   } catch (error) {
     console.error("Error updating business:", error);
+    throw error;
+  }
+};
+
+export const createLicense = async (businessId: string, licenseData: {
+  url: string;
+  number: string;
+  type_id: string;
+}) => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    if (!token) {
+      throw new Error('No token provided');
+    }
+
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/business/${businessId}/license`,
+      licenseData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error creating license:", error);
     throw error;
   }
 };
