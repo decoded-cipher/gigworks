@@ -4,9 +4,9 @@
         <div class="flex flex-wrap justify-between items-center">
             <div class="flex justify-start items-center h-10">
 
-                <!-- <a href="/" class="flex items-center">
+                <a href="/" class="flex items-center">
                     <img src="/assets/logo.svg" class="lg:h-10 h-10 py-1.5" alt="Gigwork" />
-                </a> -->
+                </a>
 
             </div>
         </div>
