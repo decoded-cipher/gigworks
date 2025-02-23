@@ -4,6 +4,10 @@ import HomeView from '../views/Home.vue'
 import BusinessView from '../views/Business.vue'
 import NotFoundView from '../views/404.vue'
 import LoginView from '../views/Login.vue'
+import category from '../views/Category.vue'
+import SubCategory from '../views/SubCategory.vue'
+import SubCategoryOptions from '../views/SubCategoryOptions.vue'
+import licenseTypes from '@/views/licenseTypes.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +27,38 @@ const router = createRouter({
       component: BusinessView,
       meta: {
         title: 'Business',
+      },
+    },
+    {
+      path: '/category',
+      name: 'category',
+      component: category,
+      meta: {
+        title: 'category',
+      },
+    },
+    {
+      path: '/SubCategory/:id',
+      name: 'SubCategory',
+      component:  SubCategory,
+      meta: {
+        title: 'SubCategory',
+      },
+    },
+    {
+      path: '/SubCategoryOptions/:id',
+      name: 'SubCategoryOptions',
+      component:  SubCategoryOptions,
+      meta: {
+        title: 'SubCategoryOptions',
+      },
+    },
+    {
+      path: '/license-types',
+      name: 'licenseTypes',
+      component:  licenseTypes,
+      meta: {
+        title: 'licenseTypes',
       },
     },
     {
