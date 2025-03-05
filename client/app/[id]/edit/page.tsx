@@ -9,19 +9,13 @@ import {
   GetURL,
   uploadToPresignedUrl, 
   createBusinessMedia,
-  createLicense, // Add this import
+  createLicense, 
 } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
 import {
   Pencil,
   Save,
   X,
-  Facebook,
-  Instagram,
-  Twitter,
-  Linkedin,
-  Youtube,
-  Globe,
 } from "lucide-react";
 
 import MediaGallery from "@/app/components/MediaGallery";
