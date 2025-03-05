@@ -276,12 +276,12 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
               </button>
             </div>
             
-            <div onClick={(e: React.MouseEvent) => e.stopPropagation()} className="h-full w-full">
+            <div onClick={(e: React.MouseEvent) => e.stopPropagation()} className="h-full w-full flex items-center justify-center">
               <Swiper
                 initialSlide={selectedImageIndex}
                 modules={[Navigation, Pagination]}
                 pagination={{ clickable: true }}
-                className="h-full w-full"
+                className="h-full w-full flex items-center"
                 onSwiper={(swiper) => {
                   swiperRef.current = swiper;
                 }}
@@ -292,7 +292,7 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
                 }}
               >
                 {mediaImages.map((image, index) => (
-                  <SwiperSlide key={`slide-${image.id}`} className="flex flex-col items-center justify-center">
+                  <SwiperSlide key={`slide-${image.id}`} className="flex flex-col items-center justify-center h-full">
                     {image.isVideo ? (
                       <video 
                         className="w-full max-h-[80vh] object-contain rounded-lg" 
@@ -302,12 +302,14 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
                         <source src={image.src} type="video/mp4" />
                       </video>
                     ) : (
-                      <div className="flex flex-col items-center w-full h-full">
-                        <img 
-                          src={image.src} 
-                          alt={image.alt}
-                          className="w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
-                        />
+                      <div className="flex flex-col items-center justify-center h-full w-full">
+                        <div className="flex items-center justify-center flex-1">
+                          <img 
+                            src={image.src} 
+                            alt={image.alt}
+                            className="max-h-[70vh] w-auto object-contain rounded-lg shadow-2xl"
+                          />
+                        </div>
                         {image.description && (
                           <div className="bg-black/60 p-4 mt-4 rounded-lg max-w-2xl">
                             <p className="text-white text-center">{image.description}</p>
