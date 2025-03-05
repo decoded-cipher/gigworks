@@ -543,7 +543,7 @@ export const fetchLicenseData = async () => {
   }
 }
 
-export const createBusinessMedia = async (businessId: string, data: { url: string, type: string }) => {
+export const createBusinessMedia = async (businessId: string, data: { url: string, type: string, description: string }) => {
   try {
     const token = document.cookie
       .split('; ')

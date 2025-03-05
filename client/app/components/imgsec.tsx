@@ -1,7 +1,15 @@
-import React, { useState } from "react";
-import { X, ZoomIn } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { X, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ASSET_BASE_URL } from "@/app/api";
+// Import Swiper components
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
+import { Swiper as SwiperType } from 'swiper';
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 interface ImageSectionProps {
   images?: Array<{
@@ -10,12 +18,15 @@ interface ImageSectionProps {
     isVideo?: boolean;
     className?: string;
     size?: 'small' | 'medium' | 'large';
+    description?: string | null;
   }>;
   media?: Array<{
-    _id: string;
+    _id?: string;
+    id?: string;
     url: string;
     type?: string;
     size?: 'small' | 'medium' | 'large';
+    description?: string | null;
   }>;
   className?: string;
 }
@@ -117,20 +128,11 @@ const defaultImages: ImageSectionProps['images'] = [
     alt: "Lab Entrance",
     size: "small",
   },
-// {
-//   src: "/workspace.mp4",
-//   alt: "Workspace Video",
-//   isVideo: true,
-//   size: 'large'
-// },
-// Add more images as needed
 ] as const;
+
 const ImageSection = ({ images = defaultImages, media = [], className }: ImageSectionProps) => {
-  const [selectedImage, setSelectedImage] = useState<null | {
-    src: string;
-    alt: string;
-    isVideo: boolean;
-  }>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const swiperRef = useRef<SwiperType | null>(null);
 
   if (media.length === 0) {
     return null;
@@ -144,11 +146,11 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
       alt: `Business Image ${index + 1}`,
       size: item.size || 'medium' as const,
       isVideo,
+      description: item.description || null,
+      id: item.id || item._id || `img-${index}`,
     };
   });
 
-  
-  
   const getBentoSpan = (imageSize?: 'small' | 'medium' | 'large') => {
     switch(imageSize) {
       case 'large':
@@ -157,6 +159,20 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
         return 'md:col-span-1 md:row-span-1';//'md:col-span-2 md:row-span-1'; 
       default:
         return 'md:col-span-1 md:row-span-1';
+    }
+  };
+
+  const handlePrevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (swiperRef.current) {
+      swiperRef.current.slidePrev();
+    }
+  };
+
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (swiperRef.current) {
+      swiperRef.current.slideNext();
     }
   };
 
@@ -177,12 +193,12 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
         <div className="h-[calc(600px-64px)] overflow-y-auto px-6 py-4 
           [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[minmax(160px,auto)]">
-            {mediaImages.map((image:any, index) => {
+            {mediaImages.map((image, index) => {
               const bentoSpan = getBentoSpan(image.size);
               
               return (
                 <div 
-                  key={index} 
+                  key={image.id} 
                   className={cn(
                     "relative rounded-xl overflow-hidden group",
                     bentoSpan,
@@ -191,7 +207,7 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
                     "border border-gray-200",
                     "hover:-translate-y-1"
                   )}
-                  onClick={() => setSelectedImage(image)}
+                  onClick={() => setSelectedImageIndex(index)}
                 >
                   {image.isVideo ? (
                     <video className="w-full h-full object-cover" controls>
@@ -209,6 +225,13 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
                         <ZoomIn className="text-white w-8 h-8 opacity-0 group-hover:opacity-100 transform scale-50 group-hover:scale-100 transition-all duration-300" />
                       </div>
+                      
+                      {/* Description Overlay - Show if available */}
+                      {image.description && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-2 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                          <p className="text-white text-sm truncate">{image.description}</p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -218,38 +241,84 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
         </div>
       </section>
 
-      {/* Modal with Animation */}
-      {selectedImage && (
+      {/* Modal with Swiper for Images */}
+      {selectedImageIndex !== null && (
         <div 
           className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedImage(null)}
+          onClick={() => setSelectedImageIndex(null)}
         >
-          <div className="relative max-w-7xl w-full mx-auto transform transition-all duration-300">
+          <div className="relative max-w-7xl w-full h-full mx-auto transform transition-all duration-300">
             <button 
               onClick={(e) => {
                 e.stopPropagation();
-                setSelectedImage(null);
+                setSelectedImageIndex(null);
               }}
-              className="absolute -top-15 right-0 text-white hover:text-gray-300 transition-colors p-2 rounded-full hover:bg-white/10"
+              className="absolute top-4 right-4 z-50 text-white hover:text-black/40 bg-black/10 hover:text-gray-300 transition-colors p-2 rounded-full hover:bg-white/10"
             >
               <X size={24} />
             </button>
-            
-            {selectedImage.isVideo ? (
-              <video 
-                className="w-full max-h-[90vh] object-contain rounded-lg" 
-                controls 
-                autoPlay
+
+            <div className="absolute top-1/2 -translate-y-1/2 left-4 z-40">
+              <button
+                onClick={handlePrevImage}
+                className="bg-black/20 hover:bg-white/20 p-2 rounded-full text-white"
               >
-                <source src={selectedImage.src} type="video/mp4" />
-              </video>
-            ) : (
-              <img 
-                src={selectedImage.src} 
-                alt={selectedImage.alt}
-                className="w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
-              />
-            )}
+                <ChevronLeft size={24} />
+              </button>
+            </div>
+
+            <div className="absolute top-1/2 -translate-y-1/2 right-4 z-40">
+              <button
+                onClick={handleNextImage}
+                className="bg-black/20 hover:bg-white/20 p-2 rounded-full text-white"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
+            
+            <div onClick={(e: React.MouseEvent) => e.stopPropagation()} className="h-full w-full">
+              <Swiper
+                initialSlide={selectedImageIndex}
+                modules={[Navigation, Pagination]}
+                pagination={{ clickable: true }}
+                className="h-full w-full"
+                onSwiper={(swiper) => {
+                  swiperRef.current = swiper;
+                }}
+                onSlideChange={(swiper) => setSelectedImageIndex(swiper.activeIndex)}
+                navigation={{
+                  prevEl: '.swiper-button-prev',
+                  nextEl: '.swiper-button-next',
+                }}
+              >
+                {mediaImages.map((image, index) => (
+                  <SwiperSlide key={`slide-${image.id}`} className="flex flex-col items-center justify-center">
+                    {image.isVideo ? (
+                      <video 
+                        className="w-full max-h-[80vh] object-contain rounded-lg" 
+                        controls 
+                        autoPlay
+                      >
+                        <source src={image.src} type="video/mp4" />
+                      </video>
+                    ) : (
+                      <div className="flex flex-col items-center w-full h-full">
+                        <img 
+                          src={image.src} 
+                          alt={image.alt}
+                          className="w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
+                        />
+                        {image.description && (
+                          <div className="bg-black/60 p-4 mt-4 rounded-lg max-w-2xl">
+                            <p className="text-white text-center">{image.description}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
           </div>
         </div>
       )}
