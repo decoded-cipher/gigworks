@@ -59,8 +59,8 @@
         name: 'Sidebar',
         data() {
             return {
-                openedItem: null,
-                currentRoute: null,
+                openedItem: null as any,
+                currentRoute: '',
                 navItems: [
                     {
                         name: 'Overview',
@@ -90,26 +90,26 @@
                                 link: '/category',
                                 active: true,
                             },
-                            {
-                                name: 'Sub-category',
-                                link: '/sub-category',
-                                active: true,
-                            },
-                            {
-                                name: 'Sub-category Options',
-                                link: '/sub-category-options',
-                                active: true,
-                            },
+                            // {
+                            //     name: 'Sub-category',
+                            //     link: '/sub-category',
+                            //     active: true,
+                            // },
+                            // {
+                            //     name: 'Sub-category Options',
+                            //     link: '/sub-category-options',
+                            //     active: true,
+                            // },
                             {
                                 name: 'License Types',
                                 link: '/license-types',
                                 active: true,
                             },
-                            {
-                                name: 'Tags',
-                                link: '/tags',
-                                active: true,
-                            }
+                            // {
+                            //     name: 'Tags',
+                            //     link: '/tags',
+                            //     active: true,
+                            // }
                         ]
                     },
                     {
@@ -129,7 +129,7 @@
         },
 
         methods: {
-            openNav(item) {
+            openNav(item: any) {
                 if (this.openedItem && this.openedItem !== item) {
                     this.openedItem.open = false;
                 }

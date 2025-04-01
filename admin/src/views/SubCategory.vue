@@ -1,9 +1,16 @@
 <template>
     <DashboardLayout>
+
+        <div class="flex items-center mb-4">
+            <button @click="goBack"
+                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 mr-4">Back</button>
+        </div>
+
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Sub-Categories</h2>
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white">{{ category.name }}</h2>
-            <button @click="openAddModal" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Add Category</button>
+            <button @click="openAddModal" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Add
+                Category</button>
 
         </div>
 
@@ -17,29 +24,43 @@
                         <th scope="col" class="px-6 py-3">
                             Action
                         </th>
+                        <th scope="col" class="px-6 py-3">
+                            Status
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <template v-for="subCategory in subCategories" :key="subCategory.id">
+                    <template v-for="subCategory in paginatedSubCategories" :key="subCategory.id">
 
                         <tr
                             class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200">
-                            <th scope="row" 
+                            <th scope="row"
                                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                <a  @click="redirectToSubcategory(subCategory.id)" class="cursor-pointer hover:underline">{{ subCategory.name }}</a>
+                                <a @click="redirectToSubcategory(subCategory.id)"
+                                    class="cursor-pointer hover:underline">{{ subCategory.name }}</a>
 
                             </th>
 
-                            <td class="px-6 py-4 flex gap-2">
-                                <button  @click="openEditModal(subCategory)"
+                            <td class="px-6 py-4  gap-2">
+                                <button @click="openEditModal(subCategory)"
                                     class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                                <a href="#"
-                                    class="font-medium text-red-600 dark:text-red-500 hover:underline">Disable</a>
+                            </td>
+                            <td class="px-6 py-4 flex gap-2">
+                                <button href="#"
+                                    class="font-medium text-red-600 dark:text-red-500 hover:underline">Disable</button>
                             </td>
                         </tr>
                     </template>
                 </tbody>
             </table>
+        </div>
+
+        <div class="flex justify-between items-center mt-4">
+            <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1"
+                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Previous</button>
+            <span class="text-white">Page {{ currentPage }} of {{ totalPages }}</span>
+            <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages"
+                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Next</button>
         </div>
 
         <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center z-40 justify-center">
@@ -50,10 +71,12 @@
                 </div>
                 <form @submit.prevent="submitForm">
                     <label for="category">Category</label>
-                    <input type="text" id="category" v-model="subCategoryForm.name" class="w-full border border-gray-300 rounded-md p-2 mt-2 mb-4" placeholder="Enter the category">
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Save</button>
+                    <input type="text" id="category" v-model="subCategoryForm.name"
+                        class="w-full border border-gray-300 rounded-md p-2 mt-2 mb-4" placeholder="Enter the category">
+                    <button type="submit"
+                        class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Save</button>
                 </form>
-            </div>    
+            </div>
         </div>
 
     </DashboardLayout>
@@ -79,6 +102,18 @@ export default {
             subCategoryForm: {
                 name: ''
             },
+            currentPage: 1,
+            itemsPerPage: 10,
+        }
+    },
+    computed: {
+        paginatedSubCategories() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            return this.subCategories.slice(start, end);
+        },
+        totalPages() {
+            return Math.ceil(this.subCategories.length / this.itemsPerPage);
         }
     },
     mounted() {
@@ -101,7 +136,7 @@ export default {
             this.isAdd = true;
             this.isEdit = false;
             console.log('Add Modal');
-            
+
         },
         openEditModal(subCategory) {
             this.showModal = true;
@@ -110,7 +145,7 @@ export default {
             this.subCategoryForm.name = subCategory.name;
             this.editSubCategoryId = subCategory.id;
         },
-        closeModal() {  
+        closeModal() {
             this.showModal = false;
         },
         submitForm() {
@@ -138,7 +173,7 @@ export default {
         async updateSubCategory() {
             const data = {
                 name: this.subCategoryForm.name,
-                category_id: this.editSubCategoryId    
+                category_id: this.editSubCategoryId
             }
             try {
                 await updateSubCategories(data);
@@ -150,6 +185,14 @@ export default {
         },
         redirectToSubcategory(id) {
             this.$router.push(`/subcategoryoptions/${id}`);
+        },
+        changePage(page) {
+            if (page > 0 && page <= this.totalPages) {
+                this.currentPage = page;
+            }
+        },
+        goBack() {
+            this.$router.go(-1);
         }
 
     }

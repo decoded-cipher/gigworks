@@ -12,36 +12,51 @@
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
-                        <th scope="col" class="px-6 py-3">
+                        <th  class="px-6 py-3">
                             Category
                         </th>
-                        <th scope="col" class="px-6 py-3">
+                        <th  class="px-6 py-3">
                             Action
+                        </th>
+                        <th  class="px-6 py-3">
+                            Status
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <template v-for="category in categories" :key="category.id">
+                    <template v-for="category in paginatedCategories" :key="category.id">
 
                         <tr
                             class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200">
-                            <th scope="row" 
+                            <td 
                                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 <a @click="redirectToSubcategory(category.id)" class="cursor-pointer hover:underline">{{ category.name }}</a>
 
-                            </th>
-
-                            <td class="px-6 py-4 flex gap-2">
-                                <button @click="openEditModal(category)"
-                                    class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                                <a href="#"
-                                    class="font-medium text-red-600 dark:text-red-500 hover:underline">Disable</a>
                             </td>
+
+                            <td class="px-6 py-4  gap-2">
+                                <button @click="openEditModal(category)"
+                                    class="font-medium text-white bg-blue-700 py-2 px-5 rounded-lg hover:underline">Edit</button>
+                            </td>
+                            
+                            <td class="px-6 py-4  gap-2">
+                                <button href="#"
+                                    class="font-medium text-white bg-red-700 py-2 px-5 rounded-lg hover:underline">Disable</button>
+                            </td>
+                            
                         </tr>
                     </template>
                 </tbody>
             </table>
         </div>
+
+
+        <div class="flex justify-between items-center mt-4">
+            <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Previous</button>
+            <span class="text-white">Page {{ currentPage }} of {{ totalPages }}</span>
+            <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Next</button>
+        </div>
+
 
 
         <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center z-40 justify-center">
@@ -82,7 +97,19 @@ export default {
                 name: '',
             },
             editCategoryId: null,
+            currentPage: 1,
+            itemsPerPage: 10,
         };
+    },
+    computed: {
+        paginatedCategories() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            return this.categories.slice(start, end);
+        },
+        totalPages() {
+            return Math.ceil(this.categories.length / this.itemsPerPage);
+        }
     },
     mounted() {
         this.fetchCategories();
@@ -146,6 +173,11 @@ export default {
         },
         redirectToSubcategory(id) {
             this.$router.push(`/subcategory/${id}`);
+        },
+        changePage(page) {
+            if (page > 0 && page <= this.totalPages) {
+                this.currentPage = page;
+            }
         }
     },
 }
