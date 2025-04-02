@@ -1,5 +1,9 @@
 <template>
     <DashboardLayout>
+        <div class="flex items-center mb-4">
+                <button @click="goBack" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 mr-4">Back</button>                
+            </div>
+
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Sub-Categories options</h2>
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white">{{ subCategory.name }}</h2>
@@ -20,7 +24,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <template v-for="subCategoryOption in subCategoriesOptions" :key="subCategoryOption.id">
+                    <template v-for="subCategoryOption in paginatedSubCategoriesOptions" :key="subCategoryOption.id">
 
                         <tr
                             class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200">
@@ -41,6 +45,15 @@
             </table>
         </div>
 
+        <!-- pagination -->
+        <div class="flex justify-between items-center mt-4">
+            <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1"
+                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Previous</button>
+            <span class="text-white">Page {{ currentPage }} of {{ totalPages }}</span>
+            <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages"
+                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Next</button>
+        </div>
+                
         <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center z-40 justify-center">
             <div class="bg-white p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
@@ -78,6 +91,18 @@ export default {
             subCategoryOptionForm: {
                 name: ''
             },
+            currentPage: 1,
+            itemsPerPage: 10,
+        }
+    },
+    computed: {
+        paginatedSubCategoriesOptions() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            return this.subCategoriesOptions.slice(start, end);
+        },
+        totalPages() {
+            return Math.ceil(this.subCategoriesOptions.length / this.itemsPerPage);
         }
     },
     mounted() {
@@ -134,6 +159,14 @@ export default {
                 console.error(error);
             }
         },
+        changePage(page) {
+            if (page > 0 && page <= this.totalPages) {
+                this.currentPage = page;
+            }
+        },        
+        goBack() {
+            this.$router.go(-1);
+        }
         // async updateSubCategory() {
         //     const data = {
         //         name: this.subCategoryForm.name,
