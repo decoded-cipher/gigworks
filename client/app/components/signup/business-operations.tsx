@@ -365,7 +365,7 @@ export default function BusinessOperations({
           </div>
 
           {/* Additional Services */}
-          <h2 className="text-xl font-semibold text-start py-4">
+          {/* <h2 className="text-xl font-semibold text-start py-4">
             Additional Services
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -386,7 +386,7 @@ export default function BusinessOperations({
                 </div>
               )
             )}
-          </div>
+          </div> */}
 
           {/* Referrals */}
           <h2 className="text-xl font-semibold text-start py-4">
