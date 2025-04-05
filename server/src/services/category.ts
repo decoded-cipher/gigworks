@@ -97,6 +97,10 @@ export const getCategoryById = async (id: string) => {
           categoryName: category.name,
           subCategoryId: subCategory.id,
           subCategoryName: subCategory.name,
+          subCategoryStatus:
+            sql`CASE WHEN ${subCategory.status} = 1 THEN true ELSE false END`.mapWith(
+              Boolean
+            ),
         })
         .from(category)
         .leftJoin(subCategory, sql`${subCategory.category_id} = ${category.id}`)
@@ -115,6 +119,7 @@ export const getCategoryById = async (id: string) => {
       const subCategoryResults = results.map((result) => ({
         id: result.subCategoryId,
         name: result.subCategoryName,
+        status: result.subCategoryStatus,
       }));
 
       resolve({
