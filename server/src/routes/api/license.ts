@@ -5,7 +5,6 @@ import {
   createLicenseType,
   getLicenseTypes,
   updatedLicenseType,
-  updateLicense,
 } from "../../services/license";
 import { license } from "../../config/database/schema";
 

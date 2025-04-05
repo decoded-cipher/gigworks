@@ -33,6 +33,10 @@ export const getLicenseTypes = async () => {
           id: licenseType.id,
           name: licenseType.name,
           description: licenseType.description,
+          status:
+            sql`CASE WHEN ${licenseType.status} = 1 THEN true ELSE false END`.mapWith(
+              Boolean
+            ),
         })
         .from(licenseType);
       return resolve(result);
