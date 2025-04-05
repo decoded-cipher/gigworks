@@ -133,6 +133,26 @@ export const updateSubCategory = async (id: string, name: string) => {
   });
 };
 
+export const updateSubCategoryStatus = async (id: string, status: number) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // SQL Query : UPDATE sub_category SET name = name, updated_at = NOW() WHERE id = id RETURNING *
+
+      let result = await db
+        .update(subCategory)
+        .set({ status, updated_at: sql`(CURRENT_TIMESTAMP)` })
+        .where(eq(subCategory.id, id))
+        .returning();
+
+      result = result[0];
+
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 // Delete a sub-category
 export const deleteSubCategory = async (id: string) => {
   return new Promise(async (resolve, reject) => {

@@ -148,7 +148,7 @@ router.patch("/:id", async (c) => {
 });
 
 /**
- * @route   PUT /api/v1/license/:id
+ * @route   PUT /api/v1/license/update-status
  * @desc    Update an existing license type by ID
  * @access  Public
  * @params  id (path parameter)

@@ -7,6 +7,7 @@ import {
   getSubCategoryById,
   updateSubCategory,
   deleteSubCategory,
+  updateSubCategoryStatus,
 } from "../../services/subCategory";
 
 /**
@@ -255,4 +256,61 @@ router.delete("/:id", async (c) => {
   }
 });
 
+/**
+ * @route   PUT /api/v1/update-status
+ * @desc    Update an existing sub category type by ID
+ * @access  Public
+ * @params  id (path parameter)
+ * @body    { "status": "0", "category_id": "category_id" }
+ * @return  message, data
+ * @error   400, { error }
+ * @error   404, { error }
+ * @status  200, 400, 404
+ *
+ * @example /api/v1/sub_category/update-status
+ **/
+
+router.put("/update-status", async (c) => {
+  const { status, sub_category_id } = await c.req.json();
+  console.log(status, sub_category_id);
+
+  // Validate required fields
+  if (!status && !sub_category_id) {
+    return c.json(
+      {
+        message: "status, category_id is required",
+      },
+      400
+    );
+  }
+
+  try {
+    const sub_category = await updateSubCategoryStatus(sub_category_id, status);
+
+    if (!sub_category) {
+      return c.json(
+        {
+          message: "Sub category not found",
+        },
+        404
+      );
+    }
+
+    return c.json(
+      {
+        message: "Sub category staus updated successfully",
+        data: sub_category,
+      },
+      200
+    );
+  } catch (error) {
+    return c.json(
+      {
+        message: "Internal Server Error",
+        error: error.message,
+      },
+      500
+    );
+  }
+});
 export default router;
