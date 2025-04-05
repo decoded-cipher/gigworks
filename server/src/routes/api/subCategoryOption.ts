@@ -54,6 +54,18 @@ router.post("/", async (c) => {
   }
 });
 
+/**
+ * @route   PATCH /update-status
+ * @desc    Update the status of a sub_category_option
+ * @access  Public
+ * @params  sub_category_option_id, status
+ * @return  message, data
+ * @error   400, { message }
+ * @error   500, { message, error }
+ * @status  200, 400, 500
+ *
+ * @example  /api/v1/sub_category_option/update-status
+ **/
 router.patch("/update-status", async (c) => {
   const { sub_category_option_id, status } = await c.req.json();
 
@@ -89,6 +101,19 @@ router.patch("/update-status", async (c) => {
   }
 });
 
+/**
+ * @route   PATCH /:id
+ * @desc    Update a sub_category_option by ID
+ * @access  Public
+ * @params  id (path parameter), name (request body)
+ * @return  message, data
+ * @error   400, { message }
+ * @error   404, { message }
+ * @error   500, { message, error }
+ * @status  200, 400, 404, 500
+ *
+ * @example  /api/v1/sub_category_option/:sub_category_option_id
+ **/
 router.patch("/:id", async (c) => {
   const sub_category_option_id = c.req.param("id") || "";
   const { name } = await c.req.json();

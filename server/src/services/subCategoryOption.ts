@@ -24,6 +24,7 @@ export const createSubCategoryOption = async (
   });
 };
 
+// Update Sub-Category Option Status
 export const updateSubCategoryOptionStatus = async (
   sub_category_option_id: string,
   status: number
@@ -45,6 +46,7 @@ export const updateSubCategoryOptionStatus = async (
   });
 };
 
+// Update Sub-Category Option
 export const updateSubCategoryOption = async (
   sub_category_option_id: string,
   name: string
