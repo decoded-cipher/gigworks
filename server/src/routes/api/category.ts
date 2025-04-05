@@ -144,9 +144,10 @@ router.get("/", async (c) => {
 
 router.get("/:id", async (c) => {
   const { id } = c.req.param();
+  const status = c.req.query("status");
 
   try {
-    const category = await getCategoryById(id);
+    const category = await getCategoryById(id, status);
 
     if (category) {
       return c.json(

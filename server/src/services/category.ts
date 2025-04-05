@@ -86,7 +86,7 @@ export const getCategories = async (
 };
 
 // Get a category by id
-export const getCategoryById = async (id: string) => {
+export const getCategoryById = async (id: string, status?: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       // SQL Query : SELECT id, name FROM category WHERE id = id AND status = 1 LEFT JOIN sub_category ON sub_category.category_id = category id
@@ -105,7 +105,9 @@ export const getCategoryById = async (id: string) => {
         .from(category)
         .leftJoin(subCategory, sql`${subCategory.category_id} = ${category.id}`)
         .where(
-          sql`${category.id} = ${id} AND ${category.status} = 1 AND ${subCategory.status} = 1`
+          status === "all"
+            ? sql`${category.id} = ${id}`
+            : sql`${category.id} = ${id} AND ${category.status} = 1 AND ${subCategory.status} = 1`
         );
 
       const categoryResult =
