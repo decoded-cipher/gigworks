@@ -3,6 +3,7 @@ const router = new Hono();
 
 import {
   createSubCategoryOption,
+  updateSubCategoryOption,
   updateSubCategoryOptionStatus,
 } from "../../services/subCategoryOption";
 
@@ -74,6 +75,51 @@ router.patch("/update-status", async (c) => {
       {
         message: "Sub category option status updated successfully",
         data: updatedOption,
+      },
+      200
+    );
+  } catch (error) {
+    return c.json(
+      {
+        message: "Internal Server Error",
+        error: error.message,
+      },
+      500
+    );
+  }
+});
+
+router.patch("/:id", async (c) => {
+  const sub_category_option_id = c.req.param("id") || "";
+  const { name } = await c.req.json();
+
+  if (!name) {
+    return c.json(
+      {
+        message: "Name is required",
+      },
+      400
+    );
+  }
+
+  try {
+    const updatedSubCategoryOption = await updateSubCategoryOption(
+      sub_category_option_id,
+      name
+    );
+    if (!updatedSubCategoryOption) {
+      return c.json(
+        {
+          message: "Sub category option not found",
+        },
+        404
+      );
+    }
+
+    return c.json(
+      {
+        message: "Sub category option updated successfully",
+        data: updatedSubCategoryOption,
       },
       200
     );

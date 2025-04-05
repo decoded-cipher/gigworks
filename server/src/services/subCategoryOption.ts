@@ -44,3 +44,26 @@ export const updateSubCategoryOptionStatus = async (
     }
   });
 };
+
+export const updateSubCategoryOption = async (
+  sub_category_option_id: string,
+  name: string
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // SQL Query: UPDATE sub_category SET name = name WHERE id = id RETURNING *
+
+      let result = await db
+        .update(subCategoryOption)
+        .set({ name: name, updated_at: sql`(CURRENT_TIMESTAMP)` })
+        .where(eq(subCategoryOption.id, sub_category_option_id))
+        .returning();
+
+      result = result[0];
+
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
