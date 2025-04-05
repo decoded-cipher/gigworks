@@ -68,3 +68,24 @@ export const updatedLicenseType = async (
     }
   });
 };
+
+export const updatedLicenseTypeStatus = async (
+  status: number,
+  licenseId: string
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // SQL Query: UPDATE license_type SET status = status WHERE id = id
+
+      const updatedLicenseType = await db
+        .update(licenseType)
+        .set({ status, updated_at: sql`(CURRENT_TIMESTAMP)` })
+        .where(eq(licenseType.id, licenseId))
+        .returning();
+
+      resolve(updatedLicenseType[0]);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
