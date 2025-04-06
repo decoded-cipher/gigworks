@@ -3,6 +3,8 @@ import { Hono } from 'hono';
 const router = new Hono();
 
 import { processCheckService } from '../../services/bot';
+import { getSubCategoryOptionByName } from '../../services/subCategoryOption';
+import { getProfilesBySubCategoryOption } from '../../services/profile';
 
 
 
@@ -48,6 +50,60 @@ router.post('/check_service', async (c) => {
     }
 });
 
+
+
+/**
+ * @route   POST /api/v1/bot/request_service
+ * @desc    Request a service
+ * @access  Public
+ * @params  message
+ * @return  
+ * @error   400, { error }
+ * @status  201, 400
+ *
+ * @example /api/v1/bot/request_service
+ **/
+
+router.post('/request_service', async (c) => {
+    const { service, location } = await c.req.json();
+
+    if (!service || !location) {
+        return c.json({
+            message: 'bad_request',
+            data: null
+        }, 400);
+    }
+
+    try {
+        const subCategoryOption = await getSubCategoryOptionByName(service);
+        if (!subCategoryOption) {
+            return c.json({
+                message: 'service_not_found',
+                data: null
+            }, 404);
+        }
+
+        const profiles = await getProfilesBySubCategoryOption(subCategoryOption.id, location);
+        if (!profiles) {
+            return c.json({
+                message: 'no_profiles_found',
+                data: null
+            }, 404);
+        }
+
+        return c.json({
+            message: 'success',
+            data: profiles
+        }, 201);
+    }
+    
+    catch (error) {
+        return c.json({
+            message: 'service_processing_error',
+            data: null
+        }, 500);
+    }
+});
 
 
 export default router;

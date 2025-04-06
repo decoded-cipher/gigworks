@@ -99,3 +99,25 @@ export const updateSubCategoryOption = async (
     }
   });
 };
+
+
+
+// Get Sub-Category Option By Name
+export const getSubCategoryOptionByName = async (name: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+
+      // SQL Query: SELECT * FROM sub_category_option WHERE name = name
+
+      const result = await db
+        .select()
+        .from(subCategoryOption)
+        .where(sql`${subCategoryOption.name} = ${name}`)
+        .limit(1);
+      
+      resolve(result[0]);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
