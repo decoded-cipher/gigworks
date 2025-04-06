@@ -18,9 +18,12 @@
                         <th scope="col" class="px-6 py-3">
                             Category
                         </th>
-                        <!-- <th scope="col" class="px-6 py-3">
+                        <th scope="col" class="px-6 py-3">
                             Action
-                        </th> -->
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            status
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,11 +37,13 @@
 
                             </th>
 
-                            <!-- <td class="px-6 py-4 flex gap-2">
+                            <td class="px-6 py-4  gap-2">
                                 <button @click="openEditModal(subCategoryOption)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                                <a href="#"
-                                    class="font-medium text-red-600 dark:text-red-500 hover:underline">Disable</a>
-                            </td> -->
+                            </td>
+                            <td class="px-6 py-4  gap-2">
+                                <button v-if="subCategoryOption.status" @click="openDisableModal(subCategoryOption)" class="font-medium text-red-600 dark:text-red-500 hover:underline">Disable</button>
+                                <button v-else @click="openEnableModal(subCategoryOption)" class="font-medium text-green-600 dark:text-green-500 hover:underline">Enable</button>
+                            </td>
                         </tr>
                     </template>
                 </tbody>
@@ -72,9 +77,9 @@
 </template>
 
 <script>
-import { fetchSubCategoryOptions,addSubCategoryOptions} from '@/api';
+import { fetchSubCategoryOptions,addSubCategoryOptions,updateSubCategoryOptions, updateSubCategoryOptionsStatus} from '@/api';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
-
+import Swal from 'sweetalert2';
 export default {
     name: 'SubCategoryOptions',
     components: {
@@ -87,7 +92,7 @@ export default {
             subCategory: {},
             showModal: false,
             isAdd: false,
-            // isEdit: false,
+            isEdit: false,
             subCategoryOptionForm: {
                 name: ''
             },
@@ -127,13 +132,13 @@ export default {
             this.isAdd = true;
             this.isEdit = false;            
         },
-        // openEditModal(subCategoryOption) {
-        //     this.showModal = true;
-        //     this.isEdit = true;
-        //     this.isAdd = false;
-        //     this.subCategoryOptionForm.name = subCategoryOption.name;
-        //     this.editSubCategoryId = subCategoryOption.id;
-        // },   
+        openEditModal(subCategoryOption) {
+            this.showModal = true;
+            this.isEdit = true;
+            this.isAdd = false;
+            this.subCategoryOptionForm.name = subCategoryOption.name;
+            this.editSubCategoryId = subCategoryOption.id;
+        },   
         closeModal() {  
             this.showModal = false;
         },
@@ -141,14 +146,14 @@ export default {
             if (this.isAdd) {
                 this.addSubCategory();
             } else if (this.isEdit) {
-                this.updateSubCategory();
+                this.updateSubCategoryOptions();
             }
         },
         async addSubCategory() {
 
             const data = {
                 name: this.subCategoryOptionForm.name,
-                sub_category_id: this.pageId
+                sub_category_id: this.editSubCategoryId
             }
 
             try {
@@ -159,6 +164,19 @@ export default {
                 console.error(error);
             }
         },
+        async updateSubCategoryOptions() {
+            const data = {
+                name: this.subCategoryOptionForm.name,
+                sub_category_id: this.editSubCategoryId
+            }
+            try {
+                await updateSubCategoryOptions(data);
+                this.fetchSubCategory();
+                this.showModal = false;
+            } catch (error) {
+                console.error(error);   
+            }
+        },
         changePage(page) {
             if (page > 0 && page <= this.totalPages) {
                 this.currentPage = page;
@@ -166,7 +184,73 @@ export default {
         },        
         goBack() {
             this.$router.go(-1);
-        }
+        },
+        openDisableModal(subCategoryOption) {
+            Swal.fire({
+                title: 'Are you sure?',
+                // text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, disable it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.disableSubCategoryOption(subCategoryOption.id);
+                    Swal.fire(
+                        'Disabled!',
+                        'Your sub category has been disabled.',
+                        'success'
+                    );
+                }
+            });
+        },
+        async disableSubCategoryOption(SubCategoryId) {
+            try {
+                const data = {
+                    status: 0,
+                    sub_category_option_id: SubCategoryId
+                }
+                await updateSubCategoryOptionsStatus(data);
+                this.fetchSubCategory();
+            } catch (error) {
+                console.error(error);
+            }
+        },
+
+
+        openEnableModal(subCategoryOption) {
+            Swal.fire({
+                title: 'Are you sure?',
+                // text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, enable it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.enableSubCategoryOption(subCategoryOption.id);
+                    Swal.fire(
+                        'Enabled!',
+                        'Your sub category has been enabled.',
+                        'success'
+                    );
+                }
+            });
+        },
+        async enableSubCategoryOption(SubCategoryId) {
+            try {
+                const data = {
+                    status: 1,
+                    sub_category_option_id: SubCategoryId
+                }
+                await updateSubCategoryOptionsStatus(data);
+                this.fetchSubCategory();
+            } catch (error) {
+                console.error(error);
+            }
+        },
         // async updateSubCategory() {
         //     const data = {
         //         name: this.subCategoryForm.name,

@@ -45,9 +45,11 @@
                                 <button @click="openEditModal(subCategory)"
                                     class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
                             </td>
-                            <td class="px-6 py-4 flex gap-2">
-                                <button href="#"
+                            <td class="px-6 py-4  gap-2">
+                                <button v-if="subCategory.status" @click="openDisableModal(subCategory)"
                                     class="font-medium text-red-600 dark:text-red-500 hover:underline">Disable</button>
+                                <button v-else @click="openEnableModal(subCategory)"
+                                    class="font-medium text-green-600 dark:text-green-500 hover:underline">Enable</button>
                             </td>
                         </tr>
                     </template>
@@ -83,8 +85,9 @@
 </template>
 
 <script>
-import { fetchSubCategories, addSubCategories, updateSubCategories } from '@/api';
+import { fetchSubCategories, addSubCategories, updateSubCategories ,updateSubCategoryStatus } from '@/api';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import Swal from 'sweetalert2';
 
 export default {
     name: 'SubCategory',
@@ -193,7 +196,73 @@ export default {
         },
         goBack() {
             this.$router.go(-1);
-        }
+        },
+        
+        openDisableModal(subCategory) {
+            Swal.fire({
+                title: 'Are you sure?',
+                // text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, disable it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.disablesubCategory(subCategory.id);                    
+                    Swal.fire(
+                        'Disabled!',
+                        'Your license has been disabled.',
+                        'success'
+                    );
+                }
+            });
+        },
+        async disablesubCategory(subCategoryId) {
+            try {
+                const data = {
+                    status: 0,
+                    sub_category_id: subCategoryId
+                }
+                await updateSubCategoryStatus(data);
+                this.fetchSubCategory();
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        openEnableModal(subCategory) {
+            Swal.fire({
+                title: 'Are you sure?',
+                // text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, enable it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.enableSubCategory(subCategory.id);
+                    Swal.fire(
+                        'Enabled!',
+                        'Your category has been enabled.',
+                        'success'
+                    );
+                }
+            });
+        },
+        async enableSubCategory(subCategoryId) {
+            try {
+                const data = {
+                    status: 1,
+                    sub_category_id: subCategoryId
+                }
+                await updateSubCategoryStatus(data);
+                this.fetchSubCategory();
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        
 
     }
 }
