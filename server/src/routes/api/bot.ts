@@ -85,16 +85,23 @@ router.post('/request_service', async (c) => {
         }
 
         const profiles = await getProfilesBySubCategoryOption(subCategoryOption.id, location);
-        if (!profiles) {
+        if (!profiles || profiles.length === 0) {
             return c.json({
                 message: 'no_profiles_found',
                 data: null
             }, 404);
         }
 
+        const formattedMessage = profiles.map((profile, index) => {
+            return `${index + 1}. ${profile.name}* \n📍 ${location} \n🔗 View Profile: https://gigwork.co.in/${profile.slug}`;
+        }).join('\n\n');
+
         return c.json({
             message: 'success',
-            data: profiles
+            data: {
+                profiles: profiles,
+                message: formattedMessage
+            }
         }, 201);
     }
     
