@@ -40,8 +40,10 @@
                             </td>
                             
                             <td class="px-6 py-4  gap-2">
-                                <button href="#"
+                                <button v-if="category.status" @click="openDisableModal(category)" 
                                     class="font-medium text-white bg-red-700 py-2 px-5 rounded-lg hover:underline">Disable</button>
+                                <button v-else @click="openEnableModal(category)" 
+                                    class="font-medium text-white bg-green-700 py-2 px-5 rounded-lg hover:underline">Enable</button>
                             </td>
                             
                         </tr>
@@ -80,7 +82,9 @@
 </template>
 <script>
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
-import { getCategories, addCategories, updateCategories } from '@/api';
+import { getCategories, addCategories, updateCategories, disableCategory , enableCategory } from '@/api';
+import Swal from 'sweetalert2'
+
 
 export default {
     name: 'Category',
@@ -178,7 +182,64 @@ export default {
             if (page > 0 && page <= this.totalPages) {
                 this.currentPage = page;
             }
-        }
+        },
+        openEnableModal(category) {
+            Swal.fire({
+                title: 'Are you sure?',
+                // text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, enable it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.enableCategory(category.id);
+                    Swal.fire(
+                        'Enabled!',
+                        'Your category has been enabled.',
+                        'success'
+                    );
+                }
+            });
+        },
+        async enableCategory(categoryId) {
+            try {
+                await enableCategory(categoryId);
+                this.fetchCategories();
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        openDisableModal(category) {
+            Swal.fire({
+                title: 'Are you sure?',
+                // text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, disable it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.disableCategory(category.id);
+                    Swal.fire(
+                        'Disabled!',
+                        'Your category has been disabled.',
+                        'success'
+                    );
+                }
+            });
+        },
+        async disableCategory(categoryId) {
+            try {
+                await disableCategory(categoryId);
+                this.fetchCategories();
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        
     },
 }
 </script>

@@ -16,9 +16,12 @@
                         <th scope="col" class="px-6 py-3">
                             description
                         </th>
-                        <!-- <th scope="col" class="px-6 py-3">
+                        <th scope="col" class="px-6 py-3">
                             Action
-                        </th> -->
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Status
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -26,22 +29,26 @@
 
                         <tr
                             class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200 h-auto">
-                            <th scope="row" 
+                            <td scope="row" 
                                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 <a class="cursor-pointer hover:underline">{{ license.name }}</a>
 
-                            </th>
-                            <th scope="row" 
+                            </td>
+                            <td scope="row" 
                                 class="px-6 py-4 font-medium text-gray-900  dark:text-white max-w-xs break-words ">
                                 <a class="hover:underline max-w-[200px]">{{ license.description }}</a>
                             
-                            </th>
+                            </td>
 
-                            <!-- <td class="px-6 py-4 flex gap-2">
-                                <button @click="openEditModal(subCategoryOption)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                                <a href="#"
-                                    class="font-medium text-red-600 dark:text-red-500 hover:underline">Disable</a>
-                            </td> -->
+                            <td class="px-6 py-4  gap-2">
+                                <button @click="openEditModal(license)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
+                            </td>
+                            <td class="px-6 py-4  gap-2">
+                                <button v-if="license.status" @click="openDisableModal(license)" 
+                                    class="font-medium text-red-600 dark:text-red-500 hover:underline">Disable</button>
+                                <button v-else @click="openEnableModal(license)" 
+                                    class="font-medium text-green-600 dark:text-green-500 hover:underline">Enable</button>
+                            </td>
                         </tr>
                     </template>
                 </tbody>
@@ -68,8 +75,9 @@
 </template>
 
 <script>
-import { fetchLicense ,addLicenses} from '@/api';
+import { fetchLicense ,addLicenses, updateLicense , updateLicenseStatus} from '@/api';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import Swal from 'sweetalert2';
 
 export default {
     name: 'SubCategoryOptions',
@@ -82,7 +90,7 @@ export default {
             license: [],
             showModal: false,
             isAdd: false,
-            // isEdit: false,
+            isEdit: false,
             licenseForm: {
                 name: '',
                 description: ''
@@ -108,18 +116,23 @@ export default {
             this.isAdd = true;
             this.isEdit = false;            
         },
-        // openEditModal(subCategoryOption) {
-        //     this.showModal = true;
-        //     this.isEdit = true;
-        //     this.isAdd = false;
-        //     this.subCategoryOptionForm.name = subCategoryOption.name;
-        //     this.editSubCategoryId = subCategoryOption.id;
-        // },   
+        openEditModal(license) {
+            this.showModal = true;
+            this.isEdit = true;
+            this.isAdd = false;
+            this.licenseForm.name = license.name;
+            this.editLicenseId = license.id;
+            this.licenseForm.description = license.description; 
+        },   
         closeModal() {  
             this.showModal = false;
         },
         submitForm() {
+            if (this.isEdit) {
+                this.updateLicense();
+            } else if (this.isAdd) {    
                 this.addLicense();
+            }
         },
         async addLicense() {
 
@@ -136,6 +149,90 @@ export default {
                 console.error(error);
             }
         },
+        async updateLicense() {
+            const data = {
+                name: this.licenseForm.name,
+                description: this.licenseForm.description,
+                id: this.editLicenseId
+            }
+            try {
+                await updateLicense(data);
+                this.fetchLicense();
+                this.showModal = false;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        openEnableModal(license) {
+            Swal.fire({
+                title: 'Are you sure?',
+                // text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, enable it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.enableLicense(license.id);
+                    Swal.fire(
+                        'Enabled!',
+                        'Your license has been enabled.',
+                        'success'
+                    );
+                }
+            });
+        },
+        async enableLicense(LicenseId) {
+            try {
+                const data = {
+                    status: 1,
+                    licenseId: LicenseId
+                }
+                await updateLicenseStatus(data);
+                this.fetchLicense();
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        openDisableModal(license) {
+            Swal.fire({
+                title: 'Are you sure?',
+                // text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, disable it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.disableLicense(license.id);
+                    console.log("ohm krim license disable avate");
+                    
+                    Swal.fire(
+                        'Disabled!',
+                        'Your license has been disabled.',
+                        'success'
+                    );
+                }
+            });
+        },
+        async disableLicense(LicenseId) {
+            try {
+                const data = {
+                    status: 0,
+                    licenseId: LicenseId
+                }
+                await updateLicenseStatus(data);
+                this.fetchLicense();
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        
+        
+
+
         // async updateSubCategory() {
         //     const data = {
         //         name: this.subCategoryForm.name,
