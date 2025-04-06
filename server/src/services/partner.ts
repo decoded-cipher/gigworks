@@ -1,106 +1,108 @@
-
-import { eachMonthOfInterval, format } from 'date-fns';
+import { eachMonthOfInterval, format } from "date-fns";
 
 import { count, eq, sql } from "drizzle-orm";
-import { db } from '../config/database/turso';
+import { db } from "../config/database/turso";
 
-import { user, profile, partner, partnerBank, partnerIdProof } from '../config/database/schema';
-import { User, Partner, PartnerBank, PartnerIdProof, partnerIdProofTypes, User } from '../config/database/interfaces';
+import {
+  user,
+  profile,
+  partner,
+  partnerBank,
+  partnerIdProof,
+} from "../config/database/schema";
+import {
+  User,
+  Partner,
+  PartnerBank,
+  PartnerIdProof,
+  partnerIdProofTypes,
+  User,
+} from "../config/database/interfaces";
 import { secureText } from "../utils/helpers";
-
-
 
 // Generate a unique referral code
 const generateReferralCode = async (user: User): Promise<string> => {
-    const prefix = `${user.name.substring(0, 2).toUpperCase()}${user.phone.substring(0, 2).toUpperCase()}`;
-    const suffix = user.phone.slice(-2).toUpperCase();
+  const prefix = `${user.name.substring(0, 2).toUpperCase()}${user.phone
+    .substring(0, 2)
+    .toUpperCase()}`;
+  const suffix = user.phone.slice(-2).toUpperCase();
 
-    for (let attempts = 0; attempts < 10; attempts++) {
-        const randomPart = Math.random().toString(36).substring(2, 4).toUpperCase();
-        const referralCode = `${prefix}${randomPart}${suffix}`;
+  for (let attempts = 0; attempts < 10; attempts++) {
+    const randomPart = Math.random().toString(36).substring(2, 4).toUpperCase();
+    const referralCode = `${prefix}${randomPart}${suffix}`;
 
-        const result = await db
-            .select()
-            .from(partner)
-            .where(sql`referral_code = ${referralCode}`);
+    const result = await db
+      .select()
+      .from(partner)
+      .where(sql`referral_code = ${referralCode}`);
 
-        if (result.length === 0) {
-            return referralCode;
-        }
+    if (result.length === 0) {
+      return referralCode;
     }
+  }
 
-    throw new Error('Unable to generate unique referral code');
+  throw new Error("Unable to generate unique referral code");
 };
-
-
 
 // Create a new partner
 export const createPartner = async (data: Partner, user: User) => {
-    return new Promise(async (resolve, reject) => {
-        try {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // SQL Query : SELECT * FROM partner WHERE user_id = user.id
 
-            // SQL Query : SELECT * FROM partner WHERE user_id = user.id
+      const result = await db
+        .select()
+        .from(partner)
+        .where(sql`user_id = ${user.id}`);
 
-            const result = await db
-                .select()
-                .from(partner)
-                .where(sql`user_id = ${user.id}`);            
+      if (result.length > 0) {
+        resolve(null);
+      }
 
-            if (result.length > 0) {
-                resolve(null);
-            }
+      const referralCode = await generateReferralCode(user);
 
-            const referralCode = await generateReferralCode(user);
+      // SQL Query : INSERT INTO partner (user_id, referral_code) VALUES (user.id, referralCode)
 
-            // SQL Query : INSERT INTO partner (user_id, referral_code) VALUES (user.id, referralCode)
+      const newPartner = await db
+        .insert(partner)
+        .values({
+          ...data,
+          user_id: user.id,
+          referral_code: referralCode,
+        })
+        .returning();
 
-            const newPartner = await db
-                .insert(partner)
-                .values({
-                    ...data,
-                    user_id: user.id,
-                    referral_code: referralCode
-                })
-                .returning();
-
-            resolve(newPartner[0]);
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-
+      resolve(newPartner[0]);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 // Update partner data
 export const updatePartner = async (data: Partner) => {
-    return new Promise(async (resolve, reject) => {
-        try {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // SQL Query : UPDATE partner SET name = $1, phone = $2, email = $3, updated_at = $4 WHERE id = $5 RETURNING *
 
-            // SQL Query : UPDATE partner SET name = $1, phone = $2, email = $3, updated_at = $4 WHERE id = $5 RETURNING *
+      const result = await db
+        .update(partner)
+        .set({ ...data })
+        .where(sql`id = ${data.id}`)
+        .returning();
 
-            const result = await db
-                .update(partner)
-                .set({ ...data })
-                .where(sql`id = ${data.id}`)
-                .returning();
-
-            resolve(result[0]);
-
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-
+      resolve(result[0]);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 // Get partner by user id
 export const getPartnerById = async (userData: User) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-
-            /*
+  return new Promise(async (resolve, reject) => {
+    try {
+      /*
                 SELECT
                     user.name,
                     user.phone,
@@ -120,56 +122,67 @@ export const getPartnerById = async (userData: User) => {
                     partner.user_id = userData.id
             */
 
-            const partnerData = await db
-                .select({
-                    user,
-                    partner,
-                    partnerBank,
-                    partnerIdProof,
-                })
-                .from(partner)
-                .innerJoin(user, sql`${user.id} = ${partner.user_id}`)
-                .leftJoin(partnerBank, sql`${partnerBank.partner_id} = ${partner.id}`)
-                .leftJoin(partnerIdProof, sql`${partnerIdProof.partner_id} = ${partner.id}`)
-                .where(sql`${partner.user_id} = ${userData.id}`);
-        
-            if (!partnerData) {
-                return resolve(null);
-            }
+      const partnerData = await db
+        .select({
+          user,
+          partner,
+          partnerBank,
+          partnerIdProof,
+        })
+        .from(partner)
+        .innerJoin(user, sql`${user.id} = ${partner.user_id}`)
+        .leftJoin(partnerBank, sql`${partnerBank.partner_id} = ${partner.id}`)
+        .leftJoin(
+          partnerIdProof,
+          sql`${partnerIdProof.partner_id} = ${partner.id}`
+        )
+        .where(sql`${partner.user_id} = ${userData.id}`);
 
-            const secureBankDetails = (bank: any) => {
-                ['account_number', 'branch_name', 'ifsc', 'account_holder', 'upi_id'].forEach(field => {
-                    bank[field] = secureText(bank[field], 3);
-                });
-            };
-            
-            const mapProofType = (proof: any) => {
-                proof.proof_type = partnerIdProofTypes.find(p => p.id === proof.proof_type_id)?.name;
-                proof.proof_number = secureText(proof.proof_number, 0);
-            };
-            
-            const securedPartnerData = partnerData.map((data: any) => {
-                if (data.partnerBank) secureBankDetails(data.partnerBank);
-                if (data.partnerIdProof) mapProofType(data.partnerIdProof);
-                return data;
-            });
-                        
-            resolve(securedPartnerData);
+      if (!partnerData) {
+        return resolve(null);
+      }
 
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
+      const secureBankDetails = (bank: any) => {
+        [
+          "account_number",
+          "branch_name",
+          "ifsc",
+          "account_holder",
+          "upi_id",
+        ].forEach((field) => {
+          bank[field] = secureText(bank[field], 3);
+        });
+      };
 
+      const mapProofType = (proof: any) => {
+        proof.proof_type = partnerIdProofTypes.find(
+          (p) => p.id === proof.proof_type_id
+        )?.name;
+        proof.proof_number = secureText(proof.proof_number, 0);
+      };
 
+      const securedPartnerData = partnerData.map((data: any) => {
+        if (data.partnerBank) secureBankDetails(data.partnerBank);
+        if (data.partnerIdProof) mapProofType(data.partnerIdProof);
+        return data;
+      });
+
+      resolve(securedPartnerData);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 // Get partner analytics
-export const getPartnerAnalytics = async (user: User, start: string, end: string) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-
-            /*
+export const getPartnerAnalytics = async (
+  user: User,
+  start: string,
+  end: string
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      /*
                 SELECT
                     strftime('%Y-%m', profile.created_at) AS month,
                     COUNT(profile.id) AS count
@@ -186,39 +199,57 @@ export const getPartnerAnalytics = async (user: User, start: string, end: string
                     strftime('%Y-%m', profile.created_at)
             */
 
-            const referredProfiles = await db
-                .select({
-                    month: sql`strftime('%Y-%m', profile.created_at)`,
-                    count: count(profile.id).as('count'),
-                })
-                .from(partner)
-                .leftJoin(profile, sql`profile.partner_id = partner.id`)
-                .where(sql`
+      const referredProfiles = await db
+        .select({
+          month: sql`strftime('%Y-%m', profile.created_at)`,
+          count: count(profile.id).as("count"),
+        })
+        .from(partner)
+        .leftJoin(profile, sql`profile.partner_id = partner.id`)
+        .where(
+          sql`
                     profile.partner_id = ${partner.id} AND
                     partner.user_id = ${user.id} AND
                     profile.created_at BETWEEN ${start} AND ${end}
-                `)
-                .groupBy(sql`strftime('%Y-%m', profile.created_at)`)
-                .orderBy(sql`strftime('%Y-%m', profile.created_at)`);
+                `
+        )
+        .groupBy(sql`strftime('%Y-%m', profile.created_at)`)
+        .orderBy(sql`strftime('%Y-%m', profile.created_at)`);
 
-            const allMonths = eachMonthOfInterval({
-                start: new Date(start),
-                end: new Date(end),
-            }).map(date => format(date, 'yyyy-MM'));
+      const allMonths = eachMonthOfInterval({
+        start: new Date(start),
+        end: new Date(end),
+      }).map((date) => format(date, "yyyy-MM"));
 
-            const result = allMonths.map(month => {
-                const profile = referredProfiles.find(p => p.month === month);
-                return {
-                    month,
-                    count: profile ? profile.count : 0,
-                };
-            });
+      const result = allMonths.map((month) => {
+        const profile = referredProfiles.find((p) => p.month === month);
+        return {
+          month,
+          count: profile ? profile.count : 0,
+        };
+      });
 
-            resolve(result);
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
+export const updatePartnerStatus = async (id: string, status: number) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // SQL Query : UPDATE partner SET status = $1 WHERE id = $2 RETURNING *
 
+      const result = await db
+        .update(partner)
+        .set({ status: status })
+        .where(eq(partner.id, id))
+        .returning();
+
+      resolve(result[0]);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
