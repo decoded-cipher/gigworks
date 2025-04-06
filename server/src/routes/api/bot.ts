@@ -66,11 +66,22 @@ router.post('/check_service', async (c) => {
  **/
 
 router.post('/request_service', async (c) => {
-    const { service, location } = await c.req.json();
+    const { service } = await c.req.json();
+    const locationHeader = c.req.headers.get('X-User-Location');
 
-    if (!service || !location) {
+    if (!service || !locationHeader) {
         return c.json({
             message: 'bad_request',
+            data: null
+        }, 400);
+    }
+
+    let location;
+    try {
+        location = JSON.parse(locationHeader);
+    } catch (error) {
+        return c.json({
+            message: 'invalid_location_format',
             data: null
         }, 400);
     }
@@ -93,7 +104,7 @@ router.post('/request_service', async (c) => {
         }
 
         const formattedMessage = profiles.map((profile, index) => {
-            return `${index + 1}. ${profile.name}* \n📍 ${location} \n🔗 View Profile: https://gigwork.co.in/${profile.slug}`;
+            return `${index + 1}. ${profile.name}* \n📍 ${location.lat}, ${location.lng} \n🔗 View Profile: https://gigwork.co.in/${profile.slug}`;
         }).join('\n\n');
 
         return c.json({
