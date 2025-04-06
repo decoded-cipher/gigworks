@@ -31,7 +31,7 @@ router.post('/check_service', async (c) => {
     }
 
     try {
-        const response = await processCheckService(message);
+        const response = await processCheckService(message, c.env);
         if (!response) {
             return c.json({
                 message: 'service_not_found',
@@ -45,7 +45,8 @@ router.post('/check_service', async (c) => {
     } catch (error) {
         return c.json({
             message: 'service_processing_error',
-            data: null
+            data: null,
+            error: error
         }, 500);
     }
 });
@@ -100,7 +101,8 @@ router.post('/request_service', async (c) => {
     catch (error) {
         return c.json({
             message: 'service_processing_error',
-            data: null
+            data: null,
+            error: error
         }, 500);
     }
 });

@@ -1,4 +1,5 @@
 
+import { Env } from "hono";
 import { queryGeminiService } from "../config/gemini";
 import { getAllSubCategoryOptions } from "../services/subCategoryOption";
 
@@ -10,7 +11,7 @@ import { getAllSubCategoryOptions } from "../services/subCategoryOption";
  * @returns {Promise<string[] | "NOT_FOUND">} - An array of the top 3 services or "NOT_FOUND"
  */
 
-export const processCheckService = async (message: string): Promise<string[] | "NOT_FOUND"> => {
+export const processCheckService = async (message: string, env: Env): Promise<string[] | "NOT_FOUND"> => {
     try {
 
         const allOptions = await getAllSubCategoryOptions();
@@ -31,9 +32,9 @@ export const processCheckService = async (message: string): Promise<string[] | "
             User message: "${message}"
         `.trim();
 
-        try {
+        try {            
 
-            const response = await queryGeminiService(prompt);
+            const response = await queryGeminiService(prompt, env);
 
             if (response && typeof response === "string") {
 

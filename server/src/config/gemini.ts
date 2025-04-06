@@ -1,9 +1,8 @@
 
+import { Env } from "hono";
+
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { cleanUpContent } from "../utils/helpers";
-
-const genAI = new GoogleGenerativeAI("AIzaSyB8429izStSKq5mG0hUsxCczCNDFxGP3U0");
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 
 
@@ -11,9 +10,13 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
  * Queries the Gemini service with a given message and returns the cleaned response.
  * @param {string} message - The message to send to the Gemini service.
  * @returns {Promise<string>} - The cleaned response from the Gemini service.
- */
+*/
 
-export const queryGeminiService = async (message) => {
+export const queryGeminiService = async (message: string, env: Env): Promise<string> => {
+    
+    const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
     return new Promise(async (resolve, reject) => {
         try {
             const result = await model.generateContent([message]);
