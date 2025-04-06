@@ -30,3 +30,11 @@ export const secureText = (text: string, start: number) => {
 };
 
 
+
+// Clean the content by trimming whitespace and normalizing line breaks
+export const cleanUpContent = (content: string): string => {
+    return content
+        .trim()
+        .replace(/\r\n|\r|\n/g, " ");
+};
+
