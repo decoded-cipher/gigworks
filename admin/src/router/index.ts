@@ -6,7 +6,7 @@ import NotFoundView from '../views/404.vue'
 import LoginView from '../views/Login.vue'
 import category from '../views/Category.vue'
 import SubCategory from '../views/SubCategory.vue'
-import SubCategoryOptions from '../views/SubCategoryOptions.vue'
+import SubCategoryOptions from '../views/subCategoryOptions.vue'
 import licenseTypes from '@/views/licenseTypes.vue'
 
 const router = createRouter({
