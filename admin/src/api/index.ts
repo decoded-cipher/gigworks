@@ -1,9 +1,9 @@
+/// <reference types="vite/client" />
 
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8787/api/v1'; 
-// const BASE_URL = "https://gigworks-server.devmorphix.workers.dev/api/v1"
 
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 
 export const getBusinesses = async (params:any) => {
     const response = await axios.get(`${BASE_URL}/business/renewal`, { params });
