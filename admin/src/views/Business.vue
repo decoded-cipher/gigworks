@@ -38,8 +38,8 @@
       async fetchBusinesses() {
         try {
           const response = await getBusinesses({
-            limit: 100,
-            page: 1,
+            // limit: 10,
+            // page: 1,
             days:365
           });
           this.businesses = response.data.profiles;
