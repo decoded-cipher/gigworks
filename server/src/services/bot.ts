@@ -83,35 +83,31 @@ export const processCheckService = async (message: string, env: Env): Promise<st
  */
 
 export const processRequestService = async (service: string, location: any): Promise<any> => {
-    try {
+    return new Promise(async (resolve, reject) => {
+        try {
 
-        const subCategoryOption = await getSubCategoryOptionByName(service);
-        if (!subCategoryOption) {
-            return c.json({
-                message: 'service_not_found',
-                data: null
-            }, 404);
-        }        
-
-        const profiles = await getProfilesBySubCategoryOption(subCategoryOption.id, location);
-        if (!profiles || profiles.length === 0) {
-            return c.json({
-                message: 'no_profiles_found',
-                data: null
-            }, 404);
-        }        
-
-        const formattedMessage = profiles.map((profile, index) => {
-            return `${index + 1}️⃣ *${profile.name}* \n📞 Phone: ${profile.user.phone || 'N/A'} \n👤 Owner: ${profile.user.name || 'N/A'} \n🔗 View Profile: https://gigwork.co.in/${profile.slug}`;
-        }).join('\n\n');
-
-        return {
-            message: formattedMessage,
-            profiles: profiles
+            const subCategoryOption = await getSubCategoryOptionByName(service);
+            if (!subCategoryOption) {
+                resolve();
+            }        
+    
+            const profiles = await getProfilesBySubCategoryOption(subCategoryOption.id, location);
+            if (!profiles || profiles.length === 0) {
+                resolve();
+            }        
+    
+            const formattedMessage = profiles.map((profile, index) => {
+                return `${index + 1}️⃣ *${profile.name}* \n📞 Phone: ${profile.user.phone || 'N/A'} \n👤 Owner: ${profile.user.name || 'N/A'} \n🔗 View Profile: https://gigwork.co.in/${profile.slug}`;
+            }).join('\n\n');
+    
+            resolve({
+                message: formattedMessage,
+                profiles: profiles
+            });
+    
+        } catch (error) {
+            console.error("Error processing service request:", error);
+            throw error;
         }
-
-    } catch (error) {
-        console.error("Error processing service request:", error);
-        throw error;
-    }
+    })
 }

@@ -77,14 +77,18 @@ router.post('/request_service', async (c) => {
     }
 
     try {
-        const response = await processRequestService(service, location);
+        const response = await processRequestService(service, location, c.env);
+        if (!response) {
+            return c.json({
+                message: 'profile_not_found',
+                data: null
+            }, 404);
+        }
         return c.json({
             message: 'success',
             data: response
         }, 201);
-    }
-    
-    catch (error) {
+    } catch (error) {
         return c.json({
             message: 'service_processing_error',
             data: null,
