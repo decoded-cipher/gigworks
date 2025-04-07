@@ -1,7 +1,8 @@
 
 import { Env } from "hono";
 import { queryGeminiService } from "../config/gemini";
-import { getAllSubCategoryOptions } from "../services/subCategoryOption";
+import { getProfilesBySubCategoryOption } from "../services/profile";
+import { getAllSubCategoryOptions, getSubCategoryOptionByName } from "../services/subCategoryOption";
 
 
 
@@ -71,3 +72,48 @@ export const processCheckService = async (message: string, env: Env): Promise<st
         throw error;
     }
 };
+
+
+
+/**
+ * Process the service request
+ * @param {string} service - The service requested by the user
+ * @param {any} location - The user's location
+ * @returns {Promise<any>} - A formatted message with the profiles or an error message
+ */
+
+export const processRequestService = async (service: string, location: any): Promise<any> => {
+    try {
+
+        const subCategoryOption = await getSubCategoryOptionByName(service);
+        if (!subCategoryOption) {
+            return c.json({
+                message: 'service_not_found',
+                data: null
+            }, 404);
+        }        
+
+        const profiles = await getProfilesBySubCategoryOption(subCategoryOption.id, location);
+        if (!profiles || profiles.length === 0) {
+            return c.json({
+                message: 'no_profiles_found',
+                data: null
+            }, 404);
+        }        
+
+        const formattedMessage = profiles.map((profile, index) => {
+            const latitude = location?.latitude ?? 'Unknown';
+            const longitude = location?.longitude ?? 'Unknown';
+            return `${index + 1}️⃣ *${profile.name}* \n📍 ${latitude}, ${longitude} \n🔗 View Profile: https://gigwork.co.in/${profile.slug}`;
+        }).join('\n\n');
+
+        return {
+            message: formattedMessage,
+            profiles: profiles
+        }
+
+    } catch (error) {
+        console.error("Error processing service request:", error);
+        throw error;
+    }
+}

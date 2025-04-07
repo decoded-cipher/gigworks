@@ -2,9 +2,7 @@
 import { Hono } from 'hono';
 const router = new Hono();
 
-import { processCheckService } from '../../services/bot';
-import { getSubCategoryOptionByName } from '../../services/subCategoryOption';
-import { getProfilesBySubCategoryOption } from '../../services/profile';
+import { processCheckService, processRequestService } from '../../services/bot';
 
 
 
@@ -79,32 +77,10 @@ router.post('/request_service', async (c) => {
     }
 
     try {
-        const subCategoryOption = await getSubCategoryOptionByName(service);
-        if (!subCategoryOption) {
-            return c.json({
-                message: 'service_not_found',
-                data: null
-            }, 404);
-        }
-
-        const profiles = await getProfilesBySubCategoryOption(subCategoryOption.id, location);
-        if (!profiles || profiles.length === 0) {
-            return c.json({
-                message: 'no_profiles_found',
-                data: null
-            }, 404);
-        }
-
-        const formattedMessage = profiles.map((profile, index) => {
-            return `${index + 1}. ${profile.name}* \n📍 ${location.latitude}, ${location.longitude} \n🔗 View Profile: https://gigwork.co.in/${profile.slug}`;
-        }).join('\n\n');
-
+        const response = await processRequestService(service, location);
         return c.json({
             message: 'success',
-            data: {
-                profiles: profiles,
-                message: formattedMessage
-            }
+            data: response
         }, 201);
     }
     
