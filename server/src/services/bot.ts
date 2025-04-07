@@ -102,9 +102,7 @@ export const processRequestService = async (service: string, location: any): Pro
         }        
 
         const formattedMessage = profiles.map((profile, index) => {
-            const latitude = location?.latitude ?? 'Unknown';
-            const longitude = location?.longitude ?? 'Unknown';
-            return `${index + 1}️⃣ *${profile.name}* \n📍 ${latitude}, ${longitude} \n🔗 View Profile: https://gigwork.co.in/${profile.slug}`;
+            return `${index + 1}️⃣ *${profile.name}* \n📞 Phone: ${profile.user.phone || 'N/A'} \n👤 Owner: ${profile.user.name || 'N/A'} \n🔗 View Profile: https://gigwork.co.in/${profile.slug}`;
         }).join('\n\n');
 
         return {

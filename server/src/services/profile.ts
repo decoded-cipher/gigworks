@@ -554,13 +554,15 @@ export const getProfilesBySubCategoryOption = async (
 
       /*
         SELECT 
-            profile.id, 
             profile.name, 
             profile.slug, 
+            user.name,
+            user.phone,
             profile.city
         FROM 
             profile 
             LEFT JOIN sub_category_option ON sub_category_option.id = profile.sub_category_option_id 
+            LEFT JOIN user ON user.id = profile.user_id
         WHERE 
             profile.sub_category_option_id = sub_category_option_id AND 
             profile.city LIKE %location% AND 
@@ -571,13 +573,15 @@ export const getProfilesBySubCategoryOption = async (
         .select({
           name: profile.name,
           slug: profile.slug,
-          city: profile.city
+          city: profile.city,
+          user: {
+            name: user.name,
+            phone: user.phone,
+          },
         })
         .from(profile)
-        .leftJoin(
-          subCategoryOption,
-          sql`${subCategoryOption.id} = ${profile.sub_category_option_id}`
-        )
+        .leftJoin(subCategoryOption, sql`${subCategoryOption.id} = ${profile.sub_category_option_id}`)
+        .leftJoin(user, sql`${user.id} = ${profile.user_id}`)
         .where(
           sql`
             ${profile.sub_category_option_id} = ${sub_category_option_id} AND
