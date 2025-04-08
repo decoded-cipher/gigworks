@@ -314,6 +314,7 @@ export const getRenewalProfiles = async (
           expiryDate: sql`DATETIME(${profilePayment.created_at}, '+1 YEAR')`,
           daysLeft: sql`CAST((julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP)) AS INTEGER)`,
           statusOrder: sql`CASE WHEN ${profilePayment.payment_status} = 'pending' THEN 1 ELSE 2 END`,
+          status: profile.status,
         })
         .from(profile)
         .leftJoin(user, sql`${user.id} = ${profile.user_id}`)
