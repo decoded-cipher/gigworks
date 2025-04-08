@@ -117,7 +117,7 @@
         watch: {
             email: function () {
                 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-                if (emailRegex.test(this.email) && this.password) {
+                if (emailRegex.test(this.email || '') && this.password) {
                     this.enableLogin = true;
                 } else {
                     this.enableLogin = false;

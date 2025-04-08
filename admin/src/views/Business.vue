@@ -43,6 +43,7 @@
             days:365
           });
           this.businesses = response.data.profiles;
+          console.log(this.businesses);
         } catch (error) {
           console.error(error);
         }
