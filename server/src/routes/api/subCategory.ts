@@ -272,7 +272,6 @@ router.delete("/:id", async (c) => {
 
 router.put("/update-status", async (c) => {
   const { status, sub_category_id } = await c.req.json();
-  console.log(status, sub_category_id);
 
   // Validate required fields
   if (!status && !sub_category_id) {
