@@ -3,8 +3,8 @@
 import axios from 'axios';
 
 
-// const BASE_URL = import.meta.env.VITE_BASE_URL; 
-const BASE_URL = "http://127.0.0.1:8787/api/v1";
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
+// const BASE_URL = "http://127.0.0.1:8787/api/v1";
 
 export const getBusinesses = async (params:any) => {
     const response = await axios.get(`${BASE_URL}/business/renewal`, { params });
