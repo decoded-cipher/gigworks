@@ -60,7 +60,7 @@
         </div>
 
         <div class="w-1/4 flex gap text-sm text-white gap-2 justify-end">
-            <div v-if="business.statusOrder = 0" class="flex gap-2">
+            <div v-if="business.status === 0" class="flex gap-2">
                 <button @click="rejectBusiness(business.profileId)"
                     class="bg-red-500 hover:bg-red-600 transition-colors duration-300 ease-in-out px-4 py-2 rounded">
                     Reject
@@ -70,11 +70,11 @@
                     Accept
                 </button>
             </div>
-            <button v-else-if="business.statusOrder = 1" @click="deactivateBusiness(business.profileId)"
+            <button v-else-if="business.status === 1" @click="deactivateBusiness(business.profileId)"
                 class="bg-green-500 hover:bg-green-600 transition-colors duration-300 ease-in-out px-4 py-2 rounded">
                 Deactivate 
             </button>
-            <button v-else-if="business.statusOrder = 2" @click="reactivateBusiness(business.profileId)"
+            <button v-else-if="business.status === 2" @click="reactivateBusiness(business.profileId)"
                 class="bg-yellow-500 hover:bg-yellow-600 transition-colors duration-300 ease-in-out px-4 py-2 rounded">
                 Reactivate
             </button>
@@ -130,7 +130,7 @@ export default {
                     // Call the API to activate the business
                     const data = {
                         status: 1,
-                        businessId: id
+                        profileId: id
                     }
                     this.updateBusinessStatus(data);
 
@@ -157,7 +157,7 @@ export default {
                     // Call the API to reject the business
                     const data = {
                         status: 2,
-                        businessId: id
+                        profileId: id
                     }
                     this.updateBusinessStatus(data);
 
@@ -185,7 +185,7 @@ export default {
                     // Call the API to deactivate the business
                     const data = {
                         status: 2,
-                        businessId: id
+                        profileId: id
                     }
                     this.updateBusinessStatus(data);
 
@@ -212,7 +212,7 @@ export default {
                     // Call the API to reactivate the business
                     const data = {
                         status: 1,
-                        businessId: id
+                        profileId: id
                     }
                     this.updateBusinessStatus(data);
                     console.log(`Business with ID ${id} reactivated`);
@@ -226,7 +226,9 @@ export default {
         },
         async updateBusinessStatus(data: any) {
             try {
-                await updateBusinessStatus(data);
+                let res = await updateBusinessStatus(data);
+                console.log(res);
+                this.$emit('business-updated');
                 console.log("Business status updated successfully");
             } catch (error) {
                 console.error("Error updating business status:", error);
