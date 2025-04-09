@@ -8,51 +8,43 @@
 
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th scope="col" class="px-6 py-3">
-                            License
-                        </th>
-                        <th scope="col" class="px-6 py-3">
-                            description
-                        </th>
-                        <th scope="col" class="px-6 py-3">
-                            Action
-                        </th>
-                        <th scope="col" class="px-6 py-3">
-                            Status
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template v-for="license in license" :key="license.id">
+  <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <tr>
+      <th scope="col" class="px-6 py-3">
+        License
+      </th>
+      <th scope="col" class="px-6 py-3">
+        Description
+      </th>
+      <th scope="col" class="px-6 py-3 whitespace-nowrap text-right">
+        Action
+      </th>
+      <th scope="col" class="px-6 py-3 whitespace-nowrap text-right">
+        Status
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <template v-for="license in license" :key="license.id">
+      <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200 h-auto">
+        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+          <a class="cursor-pointer hover:underline">{{ license.name }}</a>
+        </td>
+        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white max-w-xs break-words">
+          <a class="hover:underline max-w-[200px]">{{ license.description }}</a>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-right">
+          <button @click="openEditModal(license)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-right">
+          <button v-if="license.status" @click="openDisableModal(license)" class="font-medium text-red-600 dark:text-red-500 hover:underline">Disable</button>
+          <button v-else @click="openEnableModal(license)" class="font-medium text-green-600 dark:text-green-500 hover:underline">Enable</button>
+        </td>
+      </tr>
+    </template>
+  </tbody>
+</table>
 
-                        <tr
-                            class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200 h-auto">
-                            <td scope="row" 
-                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                <a class="cursor-pointer hover:underline">{{ license.name }}</a>
-
-                            </td>
-                            <td scope="row" 
-                                class="px-6 py-4 font-medium text-gray-900  dark:text-white max-w-xs break-words ">
-                                <a class="hover:underline max-w-[200px]">{{ license.description }}</a>
-                            
-                            </td>
-
-                            <td class="px-6 py-4  gap-2">
-                                <button @click="openEditModal(license)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                            </td>
-                            <td class="px-6 py-4  gap-2">
-                                <button v-if="license.status" @click="openDisableModal(license)" 
-                                    class="font-medium text-red-600 dark:text-red-500 hover:underline">Disable</button>
-                                <button v-else @click="openEnableModal(license)" 
-                                    class="font-medium text-green-600 dark:text-green-500 hover:underline">Enable</button>
-                            </td>
-                        </tr>
-                    </template>
-                </tbody>
-            </table>
         </div>
 
         <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center z-40 justify-center">
