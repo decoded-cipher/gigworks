@@ -32,15 +32,21 @@ export interface Tag {
 export interface User {
     id: string
     name: string;
+    
     phone: string;
+    
     role?: string;
     status?: string;
 }
 
 export interface Admin {
+    id: string;
     name: string;
+
     email: string;
     password: string;
+    salt: string;
+
     role?: string;
     status?: string;
 }
