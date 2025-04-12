@@ -10,6 +10,7 @@ import {
   partnerBank,
   partnerIdProof,
 } from "../config/database/schema";
+
 import {
   User,
   Partner,
@@ -17,8 +18,11 @@ import {
   PartnerIdProof,
   partnerIdProofTypes,
   User,
+  PartnerBank,
 } from "../config/database/interfaces";
 import { secureText } from "../utils/helpers";
+
+
 
 // Generate a unique referral code
 const generateReferralCode = async (user: User): Promise<string> => {
@@ -43,6 +47,8 @@ const generateReferralCode = async (user: User): Promise<string> => {
 
   throw new Error("Unable to generate unique referral code");
 };
+
+
 
 // Create a new partner
 export const createPartner = async (data: Partner, user: User) => {
@@ -79,6 +85,8 @@ export const createPartner = async (data: Partner, user: User) => {
   });
 };
 
+
+
 // Update partner data
 export const updatePartner = async (data: Partner) => {
   return new Promise(async (resolve, reject) => {
@@ -97,6 +105,8 @@ export const updatePartner = async (data: Partner) => {
     }
   });
 };
+
+
 
 // Get partner by user id
 export const getPartnerById = async (userData: User) => {
@@ -174,6 +184,8 @@ export const getPartnerById = async (userData: User) => {
   });
 };
 
+
+
 // Get partner analytics
 export const getPartnerAnalytics = async (
   user: User,
@@ -236,6 +248,9 @@ export const getPartnerAnalytics = async (
   });
 };
 
+
+
+// Update partner status
 export const updatePartnerStatus = async (id: string, status: number) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -252,4 +267,91 @@ export const updatePartnerStatus = async (id: string, status: number) => {
       reject(error);
     }
   });
+};
+
+
+
+// Get all partners
+export const getAllPartners = async (start_date: string, end_date: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+
+      /*
+        SELECT
+            user.name,
+            user.phone,
+            user.email,
+            partner.referral_code,
+            partnerBank.*,
+            partnerIdProof.*
+        FROM
+            partner
+        LEFT JOIN
+            user ON user.id = partner.user_id
+        LEFT JOIN
+            partnerBank ON partnerBank.partner_id = partner.id
+        LEFT JOIN
+            partnerIdProof ON partnerIdProof.partner_id = partner.id
+        ORDER BY
+            partner.created_at DESC
+      */
+
+      const partnerData = await db
+        .select({
+          user,
+          partner,
+          partnerBank,
+          partnerIdProof,
+        })
+        .from(partner)
+        .innerJoin(user, sql`${user.id} = ${partner.user_id}`)
+        .leftJoin(partnerBank, sql`${partnerBank.partner_id} = ${partner.id}`)
+        .leftJoin(
+          partnerIdProof,
+          sql`${partnerIdProof.partner_id} = ${partner.id}`
+        )
+        .orderBy(sql`${partner.created_at} DESC`);
+
+      if (!partnerData) {
+        resolve(null);
+      }
+
+      const securedPartnerData = await Promise.all(
+        partnerData.map(async (data: {
+          user: User;
+          partner: Partner;
+          partnerBank?: PartnerBank;
+          partnerIdProof?: PartnerIdProof;
+        }) => {
+          if (data.partnerBank) data.partnerBank;
+          if (data.partnerIdProof) data.partnerIdProof;
+          dataSanitizer(data);
+
+          const start = start_date;
+          const end = end_date;
+
+          const analytics = await getPartnerAnalytics(data.user, start, end);
+          return { ...data, analytics };
+        })
+      );
+
+      resolve(securedPartnerData);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+// Data sanitizer for partner data
+const dataSanitizer = (data: any) => {
+  if (Array.isArray(data)) {
+    data.forEach(dataSanitizer);
+  } else if (typeof data === "object" && data !== null) {
+    ['created_at', 'updated_at', 'status', 'role', 'user_id'].forEach((field) => {
+      if (data[field]) {
+        delete data[field];
+      }
+    });
+    Object.values(data).forEach(dataSanitizer);
+  }
 };

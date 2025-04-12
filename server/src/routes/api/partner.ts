@@ -4,17 +4,21 @@ const router = new Hono();
 import { verifyToken } from "../../middleware/authentication";
 
 import { createUser, getUserByPhone } from "../../services/user";
+
 import {
   createPartner,
   updatePartner,
   getPartnerById,
+  getAllPartners,
   getPartnerAnalytics,
   updatePartnerStatus,
 } from "../../services/partner";
+
 import {
   createPartnerBank,
   deletePartnerBank,
 } from "../../services/partnerBank";
+
 import {
   createPartnerIdProof,
   deletePartnerIdProof,
@@ -27,6 +31,8 @@ import {
   PartnerIdProof,
 } from "../../config/database/interfaces";
 import { removeFields } from "../../utils/helpers";
+
+
 
 /**
  * @route   POST /api/v1/partner
@@ -86,6 +92,8 @@ router.post("/", async (c) => {
     );
   }
 });
+
+
 
 /**
  * @route   PATCH /api/v1/partner
@@ -152,6 +160,8 @@ router.patch("/", verifyToken, async (c) => {
   }
 });
 
+
+
 /**
  * @route   GET /api/v1/partner
  * @desc    Get partner data by token
@@ -196,6 +206,53 @@ router.get("/", verifyToken, async (c) => {
   }
 });
 
+
+
+/**
+ * @route   GET /api/v1/partner/all
+ * @desc    Get all partners
+ * @access  Authenticated
+ * @params  token
+ * @return  message, data
+ * @error   400, { error }
+ * @status  200, 400
+ * @example /api/v1/partner/all
+ **/
+
+router.get("/all", async (c) => {
+  try {
+    const start = c.req.query("start");
+    const end = c.req.query("end");
+
+    if (!start || !end) {
+      return c.json(
+        {
+          message: "Start and end dates are required",
+        },
+        400
+      );
+    }
+
+    const user: User = c.req._user;
+    const partners: Partner[] = await getAllPartners(start, end);
+
+    return c.json({
+      message: "All partners fetched successfully",
+      data: partners,
+    });
+  } catch (error) {
+    return c.json(
+      {
+        message: "Internal Server Error",
+        error: error.message,
+      },
+      500
+    );
+  }
+});
+
+
+
 /**
  * @route   GET /api/v1/partner/analytics
  * @desc    Get partner analytics
@@ -238,6 +295,20 @@ router.get("/analytics", verifyToken, async (c) => {
   }
 });
 
+
+
+/**
+ * @route   POST /api/v1/partner/update-status
+ * @desc    Update partner status
+ * @access  Authenticated
+ * @params  token, partnerId, status
+ * @return  message, data
+ * @error   400, { error }
+ * @status  200, 400
+ *
+ * @example /api/v1/partner/update-status
+ **/
+
 router.post("/update-status", async (c) => {
   try {
     const { partnerId, status } = await c.req.json();
@@ -256,4 +327,7 @@ router.post("/update-status", async (c) => {
     );
   }
 });
+
+
+
 module.exports = router;
