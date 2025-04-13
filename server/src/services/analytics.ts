@@ -1,12 +1,24 @@
 
 import { Env } from "hono";
 
+import { getTotalPartnerCount } from "./partner";
+import { getProfileCount } from "./profile";
+import { getUserCount } from "./user";
+
 
 
 // Get overall analytics
 export const getOverallAnalytics = async (start: string, end: string, env: Env) => {
     return new Promise(async (resolve, reject) => {
         try {
+
+            const partnerCount = await getTotalPartnerCount();
+            const profileCount = await getProfileCount();
+            const userCount = await getUserCount();
+
+            if (!partnerCount || !profileCount || !userCount) {
+                reject('Failed to fetch partner, profile, or user count');
+            }
 
             const query = `
                 query {
@@ -67,7 +79,14 @@ export const getOverallAnalytics = async (start: string, end: string, env: Env) 
                 { pageViews: 0, requests: 0, uniqueVisitors: 0 }
             );
                 
-            resolve(totals);
+            resolve({
+                analytics: totals,
+                metrics: {
+                    partners: partnerCount,
+                    profiles: profileCount - 1000,
+                    users: userCount,
+                },
+            });
     
         } catch (error) {
             console.error('Error:', error);

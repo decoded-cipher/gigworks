@@ -271,6 +271,37 @@ export const updatePartnerStatus = async (id: string, status: number) => {
 
 
 
+// Get total partner count
+export const getTotalPartnerCount = async () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+
+      /*
+        SELECT
+            COUNT(*) AS total
+        FROM
+            partner
+        WHERE
+            status = 1
+      */
+      
+      const result = await db
+        .select({ total: count(partner.id).as("total") })
+        .from(partner)
+        .where(sql`${partner.status} = 1`);
+      
+      if (result.length === 0) {
+        resolve(0);
+      }
+      resolve(result[0].total);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+
+
 // Get all partners
 export const getAllPartners = async (start_date: string, end_date: string) => {
   return new Promise(async (resolve, reject) => {

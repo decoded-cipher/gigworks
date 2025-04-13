@@ -60,3 +60,22 @@ export const updateUser = async (data: User) => {
         }
     });
 }
+
+
+
+// Get total user count
+export const getUserCount = async () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : SELECT COUNT(*) FROM user
+
+            let result = await db.select({ count: count(user.id) }).from(user);
+            result = result[0];
+
+            resolve(result.count);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
