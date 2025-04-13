@@ -6,6 +6,17 @@ import axios from 'axios';
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 // const BASE_URL = "http://127.0.0.1:8787/api/v1";
 
+// login
+export const adminLogin = async (data:any) => {  
+    const response = await axios.post(`${BASE_URL}/admin/login`, data);
+    console.log("response",response.status);
+    
+    return response.data;
+}
+
+
+// business
+
 export const getBusinesses = async (params:any) => {
     const response = await axios.get(`${BASE_URL}/business/renewal`, { params });
     return response.data;
@@ -17,7 +28,17 @@ export const updateBusinessStatus = async (data:any) => {
     return response.data;
     
 }
+// partners
+export const getPartners = async (params: { start: string, end: string }) => {
+    const response = await axios.get(`${BASE_URL}/partner/all`, { params });
+    return response;
+  };
 
+
+export const updatePartnerStatus = async (data:any) => {
+    const response = await axios.post(`${BASE_URL}/partner/update-status`, data);
+    return response.data;
+}
 // Categories
 
 export const getCategories = async () => {
