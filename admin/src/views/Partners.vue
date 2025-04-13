@@ -1,23 +1,24 @@
 <template>
     <DashboardLayout>
-        <div class="container mx-auto px-4 py-8">
-      <div class="flex justify-between items-center mb-6">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Partners Management</h1>
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Review and approve partners</p>
-        </div>
-        
-        <!-- Excel export button -->
-        <button 
-          @click="exportToExcel"
-          class="flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          Convert to Excel
-        </button>
-      </div>
+        <div class="container mx-auto px-4 py-4 md:py-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Partners Management</h1>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Review and approve partners</p>
+                </div>
+                
+                <!-- Excel export button -->
+                <button 
+                    @click="exportToExcel"
+                    class="flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span class="hidden sm:inline">Convert to Excel</span>
+                    <span class="sm:hidden">Export</span>
+                </button>
+            </div>
 
             <!-- Date filters -->
             <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
@@ -36,7 +37,7 @@
                     </div>
                     <div class="flex items-end">
                         <button @click="fetchPartners"
-                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                            class="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
                             Apply Filter
                         </button>
                     </div>
