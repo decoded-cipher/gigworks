@@ -16,6 +16,8 @@ import {
 import { User, Profile, SubCategory } from "../config/database/interfaces";
 import { removeFields } from "../utils/helpers";
 
+
+
 // Create a new profile (business) for a user
 export const createProfile = async (data: Profile) => {
   return new Promise(async (resolve, reject) => {
@@ -74,6 +76,8 @@ export const createProfile = async (data: Profile) => {
     }
   });
 };
+
+
 
 // Update a profile partially
 export const updateProfile = async (id: string, data: Profile) => {
@@ -141,6 +145,8 @@ export const updateProfile = async (id: string, data: Profile) => {
   });
 };
 
+
+
 // Get all profiles by category id with pagination
 export const getProfilesByCategory = async (
   category_id: string,
@@ -205,6 +211,8 @@ export const getProfilesByCategory = async (
   });
 };
 
+
+
 // Get all profiles by user
 export const getProfilesByUser = async (user_id: string) => {
   return new Promise(async (resolve, reject) => {
@@ -227,6 +235,8 @@ export const getProfilesByUser = async (user_id: string) => {
   });
 };
 
+
+
 // Check if profile exists
 export const getProfileById = async (id: string) => {
   return new Promise(async (resolve, reject) => {
@@ -245,6 +255,8 @@ export const getProfileById = async (id: string) => {
     }
   });
 };
+
+
 
 // Get total number of profiles (businesses)
 export const getProfileCount = async () => {
@@ -265,6 +277,8 @@ export const getProfileCount = async () => {
     }
   });
 };
+
+
 
 // Get all profiles with upcoming renewals
 export const getRenewalProfiles = async (
@@ -349,6 +363,8 @@ export const getRenewalProfiles = async (
   });
 };
 
+
+
 // Check if profile slug exists
 export const checkProfileSlug = async (slug: string) => {
   return new Promise(async (resolve, reject) => {
@@ -367,6 +383,8 @@ export const checkProfileSlug = async (slug: string) => {
     }
   });
 };
+
+
 
 // Get profile by slug
 export const getProfileBySlug = async (slug: string) => {
@@ -499,6 +517,9 @@ export const getProfileBySlug = async (slug: string) => {
   });
 };
 
+
+
+// Update profile status (approve/reject)
 export const updateProfileStatus = async (id: string, status: number) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -511,6 +532,66 @@ export const updateProfileStatus = async (id: string, status: number) => {
         .set({ payment_status: "success" })
         .where(eq(profilePayment.profile_id, id));
       resolve(profileResult);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+
+
+// Get all profiles by sub-category option
+export const getProfilesBySubCategoryOption = async (
+  sub_category_option_id: string,
+  location: string
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+
+      console.log({
+        sub_category_option_id,
+        location,
+      });
+
+      /*
+        SELECT 
+            profile.name, 
+            profile.slug, 
+            user.name,
+            user.phone,
+            profile.city
+        FROM 
+            profile 
+            LEFT JOIN sub_category_option ON sub_category_option.id = profile.sub_category_option_id 
+            LEFT JOIN user ON user.id = profile.user_id
+        WHERE 
+            profile.sub_category_option_id = sub_category_option_id AND 
+            profile.city LIKE %location% AND 
+            profile.status = 1
+      */
+      
+      let results = await db
+        .select({
+          name: profile.name,
+          slug: profile.slug,
+          city: profile.city,
+          user: {
+            name: user.name,
+            phone: user.phone,
+          },
+        })
+        .from(profile)
+        .leftJoin(subCategoryOption, sql`${subCategoryOption.id} = ${profile.sub_category_option_id}`)
+        .leftJoin(user, sql`${user.id} = ${profile.user_id}`)
+        .where(
+          sql`
+            ${profile.sub_category_option_id} = ${sub_category_option_id} AND
+            ${profile.status} = 1
+          `
+        )
+        .all();      
+
+      resolve(results);
     } catch (error) {
       reject(error);
     }

@@ -2,6 +2,32 @@ import { count, eq, sql } from "drizzle-orm";
 import { db } from "../config/database/turso";
 import { subCategoryOption } from "../config/database/schema";
 
+
+
+// Get all sub-category options
+export const getAllSubCategoryOptions = async () => {
+  try {
+
+    // SQL Query : SELECT * FROM sub_category_option WHERE status = 1 ORDER BY created_at DESC
+
+    const result = await db
+      .select({
+        name: subCategoryOption.name
+      })
+      .from(subCategoryOption)
+      .where(eq(subCategoryOption.status, 1))
+      .orderBy(sql`created_at DESC`);
+
+    const names = result.map(item => item.name);
+
+    return names;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
 // Create a new sub-category
 export const createSubCategoryOption = async (
   name: string,
@@ -24,6 +50,8 @@ export const createSubCategoryOption = async (
   });
 };
 
+
+
 // Update Sub-Category Option Status
 export const updateSubCategoryOptionStatus = async (
   sub_category_option_id: string,
@@ -45,6 +73,8 @@ export const updateSubCategoryOptionStatus = async (
     }
   });
 };
+
+
 
 // Update Sub-Category Option
 export const updateSubCategoryOption = async (
@@ -69,3 +99,25 @@ export const updateSubCategoryOption = async (
     }
   });
 };
+
+
+
+// Get Sub-Category Option By Name
+export const getSubCategoryOptionByName = async (name: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+
+      // SQL Query: SELECT * FROM sub_category_option WHERE name = name
+
+      const result = await db
+        .select()
+        .from(subCategoryOption)
+        .where(sql`${subCategoryOption.name} = ${name}`)
+        .limit(1);
+      
+      resolve(result[0]);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}

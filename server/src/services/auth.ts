@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { count, eq, sql } from "drizzle-orm";
 import { db } from '../config/database/turso';
 import { tokenTable, user } from '../config/database/schema';
-import { User, TokenTable } from "../config/database/interfaces";
+import { User, Admin, TokenTable } from "../config/database/interfaces";
 
 import{ generateToken } from '../middleware/authentication';
 
@@ -93,10 +93,10 @@ export const verifyOTP = async (phone: string, otp: string, env: Env): Promise<b
 
 
 // Create Token
-export const createAuthToken = async (user: User, env: Env): Promise<string> => {
+export const createAuthToken = async (user: User | Admin, env: Env, isAdmin: boolean = false): Promise<string> => {
     return new Promise(async (resolve, reject) => {
         try {
-            
+
             const token = jwt.sign({
                 id: user.id,
                 name: user.name,
@@ -107,7 +107,7 @@ export const createAuthToken = async (user: User, env: Env): Promise<string> => 
             const existingToken = await db
                 .select(tokenTable)
                 .from(tokenTable)
-                .where(sql`${tokenTable.user_id} = ${user.id}`);
+                .where(sql`${isAdmin ? tokenTable.admin_id : tokenTable.user_id} = ${user.id}`);
             
             if (existingToken.length) {
                 await db
@@ -116,12 +116,12 @@ export const createAuthToken = async (user: User, env: Env): Promise<string> => 
                         token,
                         updated_at: sql`(CURRENT_TIMESTAMP)`
                     })
-                    .where(sql`${tokenTable.user_id} = ${user.id}` || sql`${tokenTable.admin_id} = ${user.id}`)
+                    .where(sql`${isAdmin ? tokenTable.admin_id : tokenTable.user_id} = ${user.id}`);
             } else {
                 await db
                     .insert(tokenTable)
                     .values({
-                        user_id: user.id,
+                        [isAdmin ? 'admin_id' : 'user_id']: user.id,
                         token
                     })
                     .returning();

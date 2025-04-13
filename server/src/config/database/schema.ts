@@ -19,6 +19,7 @@ export const admin = sqliteTable('admin', {
     email: text().notNull().unique(),
     password: text().notNull(),
     role: integer().$type('ENUM', [1, 2]).default(2).notNull(), // 1: super admin, 2: admin
+    salt: text().notNull(),
     status: integer().default(1).notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
