@@ -8,7 +8,7 @@ import category from '../views/Category.vue'
 import SubCategory from '../views/SubCategory.vue'
 import SubCategoryOptions from '../views/subCategoryOptions.vue'
 import licenseTypes from '../views/licenseTypes.vue'
-import partners from '../views/partners.vue'
+import partners from '../views/Partners.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
