@@ -4,6 +4,7 @@ const apiRouter = new Hono();
 
 
 import adminRouter from './admin';
+import analyticsRouter from './analytics';
 import botRouter from './bot';
 import businessRouter from './business';
 import categoryRouter from './category';
@@ -18,6 +19,7 @@ import tagRouter from './tag';
 
 
 apiRouter.route('/admin', adminRouter);
+apiRouter.route('/analytics', analyticsRouter);
 apiRouter.route('/bot', botRouter);
 apiRouter.route('/business', businessRouter);
 apiRouter.route('/category', categoryRouter);
