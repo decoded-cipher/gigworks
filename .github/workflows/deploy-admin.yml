@@ -29,6 +29,18 @@ jobs:
         working-directory: ./admin
         run: npm install
 
+      - name: Set environment variables
+        working-directory: ./admin
+        run: |
+          if [[ "${{ github.event.inputs.environment }}" == "PROD" ]]; then
+            echo "VITE_BASE_URL=${{ secrets.VITE_BASE_URL_PROD }}" >> .env
+            echo "VITE_ASSET_BASE_URL=${{ secrets.VITE_ASSET_BASE_URL_PROD }}" >> .env
+          else
+            echo "VITE_BASE_URL=${{ secrets.VITE_BASE_URL_STAGE }}" >> .env
+            echo "VITE_ASSET_BASE_URL=${{ secrets.VITE_ASSET_BASE_URL_STAGE }}" >> .env
+          fi
+        shell: bash
+
       - name: Build the project
         working-directory: ./admin
         run: npm run build
