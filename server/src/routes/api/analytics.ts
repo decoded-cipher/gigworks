@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 const router = new Hono();
 
+import { getOverallAnalytics, getDetailedAnalytics } from '../../services/analytics';
+
 
 
 /**
@@ -19,81 +21,35 @@ router.get('/', async (c) => {
         const start = c.req.query('start');
         const end = c.req.query('end');
 
-        const query = `
-            query {
-                viewer {
-                    zones(filter: {zoneTag: "${c.env.CLOUDFLARE_ANALYTICS_API_ZONE_ID}"}) {
-                        httpRequests1dGroups(
-                            orderBy: [date_DESC], 
-                            limit: 100, 
-                            filter: {
-                                date_geq: "${start}", 
-                                date_lt: "${end}"
-                            }
-                        ) {
-                            dimensions {
-                                date
-                            }
-                            sum {
-                                pageViews
-                                requests
-                            }
-                            uniq {
-                                uniques
-                            }
-                        }
-                    }
-                }
-            }
-        `;
-
-        const response = await fetch(c.env.CLOUDFLARE_ANALYTICS_API, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${c.env.CLOUDFLARE_ANALYTICS_API_TOKEN}`,
-            },
-            body: JSON.stringify({ query }),
-        });
-
-        const rawData = await response.json();
-
-        if (!response.ok) {
-            throw new Error(`API responded with status ${response.status}: ${JSON.stringify(rawData.errors || {})}`);
+        if (!start || !end) {
+            return c.json({
+                message: 'Start and end dates are required'
+            }, 400);
         }
 
-        const groups = rawData?.data?.viewer?.zones?.[0]?.httpRequests1dGroups;
-
-        if (!groups || !Array.isArray(groups)) {
-            throw new Error('Invalid or missing analytics data.');
+        const analyticsData = await getOverallAnalytics(start, end, c.env);
+        
+        if (!analyticsData) {
+            return c.json({
+                message: 'No analytics data found',
+                timestamp: new Date().toISOString()
+            }, 404);
         }
-
-        const totals = groups.reduce(
-            (acc, group) => {
-                acc.pageViews += group.sum.pageViews || 0;
-                acc.requests += group.sum.requests || 0;
-                acc.uniqueVisitors += group.uniq.uniques || 0;
-                return acc;
-            },
-            { pageViews: 0, requests: 0, uniqueVisitors: 0 }
-        );
 
         return c.json({
             message: 'Total analytics data retrieved successfully',
             range: { start, end },
-            totals
+            totals: analyticsData
         });
 
     } catch (error) {
-        console.error('Error:', error);
         return c.json({
             message: 'Failed to retrieve analytics data',
-            error: error.message,
-            details: error.stack,
-            timestamp: new Date().toISOString()
+            error: error
         }, 500);
     }
 });
+
 
 
 /**
@@ -112,106 +68,32 @@ router.get('/days', async (c) => {
         const start = c.req.query('start');
         const end = c.req.query('end');
 
-        const query = `
-            query {
-                viewer {
-                    zones(filter: {zoneTag: "${c.env.CLOUDFLARE_ANALYTICS_API_ZONE_ID}"}) {
-                        httpRequests1dGroups(
-                            orderBy: [date_ASC], 
-                            limit: 100, 
-                            filter: {
-                                date_geq: "${start}",
-                                date_lt: "${end}"
-                            }
-                        ) {
-                            dimensions {
-                                date
-                            }
-                            sum {
-                                browserMap {
-                                    pageViews
-                                    uaBrowserFamily
-                                }
-                                pageViews
-                                requests
-                            }
-                            uniq {
-                                uniques
-                            }
-                        }
-                    }
-                }
-            }
-        `;
-        
-        const response = await fetch(c.env.CLOUDFLARE_ANALYTICS_API, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${c.env.CLOUDFLARE_ANALYTICS_API_TOKEN}`,
-            },
-            body: JSON.stringify({ query }),
-        });
-
-        const rawData = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(`API responded with status ${response.status}: ${JSON.stringify(rawData.errors || {})}`);
-        }
-        
-        if (!rawData.data || !rawData.data.viewer || !rawData.data.viewer.zones || !rawData.data.viewer.zones[0]) {
-            throw new Error(`Invalid API response structure: ${JSON.stringify(rawData)}`);
+        if (!start || !end) {
+            return c.json({
+                message: 'Start and end dates are required'
+            }, 400);
         }
 
-        const analyticsData = rawData.data.viewer.zones[0].httpRequests1dGroups;
-        
+        const analyticsData = await getDetailedAnalytics(start, end, c.env);
+
         if (!analyticsData) {
-            throw new Error('No analytics data found in the response');
+            return c.json({
+                message: 'No analytics data found'
+            }, 404);
         }
-
-        const processedData = analyticsData.map(group => ({
-            date: group.dimensions.date,
-            pageViews: group.sum.pageViews,
-            requests: group.sum.requests,
-            uniqueVisitors: group.uniq.uniques,
-            browsers: group.sum.browserMap.map(browser => ({
-                name: browser.uaBrowserFamily,
-                pageViews: browser.pageViews
-            }))
-        }));
 
         return c.json({
             message: 'Analytics data retrieved successfully',
-            data: processedData
+            data: analyticsData,
         });
     } catch (error) {
         console.error('Error fetching analytics data:', error);
         
         return c.json({
             message: 'Error fetching analytics data',
-            error: error.message,
-            details: error.stack,
-            timestamp: new Date().toISOString()
+            error: error
         }, 500);
     }
-});
-
-
-
-/**
- * @route   GET /api/v1/analytics/health
- * @desc    Health check for the analytics API
- * @access  Public
- * @return  { status, timestamp }
- * @status  200
- * @example /api/v1/analytics/health
-*/
-
-router.get('/health', (c) => {
-    return c.json({
-        status: 'ok',
-        timestamp: new Date().toISOString()
-    });
 });
 
 
