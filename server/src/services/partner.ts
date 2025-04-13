@@ -325,6 +325,7 @@ export const getAllPartners = async (start_date: string, end_date: string) => {
         }) => {
           if (data.partnerBank) data.partnerBank;
           if (data.partnerIdProof) data.partnerIdProof;
+          
           dataSanitizer(data);
 
           const start = start_date;
@@ -347,7 +348,7 @@ const dataSanitizer = (data: any) => {
   if (Array.isArray(data)) {
     data.forEach(dataSanitizer);
   } else if (typeof data === "object" && data !== null) {
-    ['created_at', 'updated_at', 'status', 'role', 'user_id'].forEach((field) => {
+    ['created_at', 'updated_at', 'role', 'user_id'].forEach((field) => {
       if (data[field]) {
         delete data[field];
       }
