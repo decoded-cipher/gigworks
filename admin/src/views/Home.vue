@@ -54,7 +54,8 @@
           </div>
           <div class="mt-4 flex items-center">
             <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              {{ dateRangeText }}
+              <!-- {{ dateRangeText }} -->
+              User statistics and engagement trends
             </span>
           </div>
         </div>
@@ -76,7 +77,10 @@
           </div>
           <div class="mt-4 flex items-center">
             <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              {{ dateRangeText }}
+              <!-- {{ dateRangeText }} -->
+              Profile growth and business insights
+
+
             </span>
           </div>
         </div>
@@ -98,7 +102,10 @@
           </div>
           <div class="mt-4 flex items-center">
             <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              {{ dateRangeText }}
+              <!-- {{ dateRangeText }} -->
+              Partner activity and collaboration data
+
+
             </span>
           </div>
         </div>
@@ -121,7 +128,10 @@
           </div>
           <div class="mt-4 flex items-center">
             <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              {{ dateRangeText }}
+              <!-- {{ dateRangeText }} -->
+              Page traffic and view analysis
+
+
             </span>
           </div>
         </div>
@@ -143,7 +153,10 @@
           </div>
           <div class="mt-4 flex items-center">
             <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              {{ dateRangeText }}
+              <!-- {{ dateRangeText }} -->
+              Request tracking and system logs
+
+
             </span>
           </div>
         </div>
@@ -165,7 +178,10 @@
           </div>
           <div class="mt-4 flex items-center">
             <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
-              {{ dateRangeText }}
+              <!-- {{ dateRangeText }} -->
+              Visitor count and reach summary
+
+
             </span>
           </div>
         </div>
@@ -363,13 +379,18 @@ export default {
         
         if (detailedResponse && detailedResponse.data) {
           this.detailedAnalyticsData = detailedResponse.data;
+          
+          // Immediately initialize the browsers chart with the data
+          // This makes sure it shows something when the page loads
+          this.$nextTick(() => {
+            this.initBrowsersChart(this.detailedAnalyticsData);
+          });
         } else {
           this.detailedAnalyticsData = [];
         }
         
         // Update charts with data
         this.updateCharts(data);
-        this.initBrowsersChart(this.detailedAnalyticsData);
         
       } catch (error) {
         console.error('Error fetching analytics data:', error);
