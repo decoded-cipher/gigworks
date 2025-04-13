@@ -69,7 +69,7 @@
 
                     <div class="flex items-center justify-between mt-4">
                         <!-- <a href="#" class="text-primary text-sm">Forgot your password?</a> -->
-                        <a href="/signup" class="text-primary text-sm">Don't have an account? Sign up</a>
+                        <!-- <a href="/signup" class="text-primary text-sm">Don't have an account? Sign up</a> -->
                     </div>
 
                 </div>
@@ -78,8 +78,8 @@
     </div>
 </template>
 
-<script lang="ts">
-    // import { userLogin } from '@/API/index.js'
+<script >
+    import { adminLogin } from '../api/index'
 
     export default {
         name: 'login',
@@ -98,37 +98,49 @@
             }
         },
         methods: {
+            validateEmail(email) {
+                const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+                return emailRegex.test(email || '');
+            },
+            validateForm() {
+                return this.validateEmail(this.email) && this.password && this.password.length > 0;
+            },
             async userLogin() {
-                // await userLogin({
-                //     email: this.email,
-                //     password: this.password,
-                // }).then((response) => {
-                //     if (response.status === 200) {
-                //         document.cookie = `token=${response.token}; max-age=864000`;
-                //         this.$router.push('/');
-                //     } else {
-                //         this.error = response.error;
-                //     }
-                // }).catch((error) => {
-                //     this.error = error;
-                // });
+                try {
+                    this.error = null; // Clear previous errors
+                    
+                    if (!this.validateForm()) {
+                        this.error = "Please enter a valid email and password";
+                        return;
+                    }
+
+                    const response = await adminLogin({
+                        email: this.email,
+                        password: this.password,
+                    });
+                    
+                    if (response && response.data && response.data.token) {
+                        document.cookie = `token=${response.data.token}; max-age=864000`;
+                        this.$router.push('/');
+                    } else {
+                        this.error = "Invalid response from server. Please try again.";
+                    }
+                } catch (error) {
+                    console.error("Login error:", error);
+                    if (error.response && error.response.data && error.response.data.message) {
+                        this.error = error.response.data.error;
+                    } else {
+                        this.error = "An error occurred during login. Please try again.";
+                    }
+                }
             },
         },
         watch: {
             email: function () {
-                const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-                if (emailRegex.test(this.email || '') && this.password) {
-                    this.enableLogin = true;
-                } else {
-                    this.enableLogin = false;
-                }
+                this.enableLogin = this.validateForm();
             },
             password: function () {
-                if (this.email && this.password) {
-                    this.enableLogin = true;
-                } else {
-                    this.enableLogin = false;
-                }
+                this.enableLogin = this.validateForm();
             },
         },
     };

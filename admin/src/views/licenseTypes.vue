@@ -2,7 +2,7 @@
     <DashboardLayout>
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white">License</h2>
-            <button @click="openAddModal" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Add license</button>
+            <button @click="openAddModal" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Add License</button>
 
         </div>
 
