@@ -14,6 +14,16 @@ export const adminLogin = async (data:any) => {
     return response.data;
 }
 
+// Anayltics
+export const getAnalytics = async (params:any) => {
+    const response = await axios.get(`${BASE_URL}/analytics`, { params });
+    return response.data;
+}
+
+export const getDetailedAnalytics = async (params:any) => {
+    const response = await axios.get(`${BASE_URL}/analytics/days`, { params });     
+    return response.data;
+}
 
 // business
 
