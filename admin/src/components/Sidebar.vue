@@ -44,11 +44,22 @@
                                 </button>
                             </template>
                         </li>
+                        
                     </template>
-
+                    
                 </template>
             </ul>
             
+            <div class="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
+                <button @click="logout" 
+                    class="flex items-center p-2 w-full text-base font-medium text-red-600 rounded transition duration-75 group hover:bg-gray-100 dark:text-red-400 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M3 4.25A2.25 2.25 0 015.25 2h5.5A2.25 2.25 0 0113 4.25v2a.75.75 0 01-1.5 0v-2a.75.75 0 00-.75-.75h-5.5a.75.75 0 00-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 00.75-.75v-2a.75.75 0 011.5 0v2A2.25 2.25 0 0110.75 18h-5.5A2.25 2.25 0 013 15.75V4.25z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M19 10a.75.75 0 00-.75-.75H8.704l1.048-.943a.75.75 0 10-1.004-1.114l-2.5 2.25a.75.75 0 000 1.114l2.5 2.25a.75.75 0 101.004-1.114l-1.048-.943h9.546A.75.75 0 0019 10z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="ml-3">Logout</span>
+                </button>
+            </div>   
         </div>
     </aside>
 
@@ -71,7 +82,7 @@
                     {
                         name: 'Partners',
                         icon: `<svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-5.5-2.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM10 12a5.99 5.99 0 0 0-4.793 2.39A6.483 6.483 0 0 0 10 16.5a6.483 6.483 0 0 0 4.793-2.11A5.99 5.99 0 0 0 10 12Z" clip-rule="evenodd" /></svg>`,
-                        link: '/users',
+                        link: '/partners',
                         active: true,
                     },
                     {
@@ -136,6 +147,13 @@
                 item.open = !item.open;
                 this.openedItem = item;
             },
+            logout() {
+                // Clear the token from cookies by setting it to expire in the past
+                document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                
+                // Redirect to the login page
+                this.$router.push('/login');
+            }
         },
 
         mounted() {

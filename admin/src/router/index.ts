@@ -7,7 +7,8 @@ import LoginView from '../views/Login.vue'
 import category from '../views/Category.vue'
 import SubCategory from '../views/SubCategory.vue'
 import SubCategoryOptions from '../views/subCategoryOptions.vue'
-import licenseTypes from '@/views/licenseTypes.vue'
+import licenseTypes from '../views/licenseTypes.vue'
+import partners from '../views/partners.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,6 +30,15 @@ const router = createRouter({
         title: 'Business',
       },
     },
+    {
+      path: '/partners',
+      name: 'partners',
+      component: partners,
+      meta: {
+        title: 'partners',
+      },
+    },
+    
     {
       path: '/category',
       name: 'category',
