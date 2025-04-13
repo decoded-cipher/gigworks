@@ -1,15 +1,6 @@
 import { Hono } from 'hono';
 const router = new Hono();
 
-const CLOUDFLARE_ANALYTICS_API = 'https://api.cloudflare.com/client/v4/graphql';
-const CLOUDFLARE_ANALYTICS_API_TOKEN = '';
-const CLOUDFLARE_ANALYTICS_API_ZONE_ID = '';
-
-const CLOUDFLARE_ANALYTICS_API_HEADERS = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${CLOUDFLARE_ANALYTICS_API_TOKEN}`,
-};
-
 
 
 /**
@@ -31,7 +22,7 @@ router.get('/', async (c) => {
         const query = `
             query {
                 viewer {
-                    zones(filter: {zoneTag: "${CLOUDFLARE_ANALYTICS_API_ZONE_ID}"}) {
+                    zones(filter: {zoneTag: "${c.env.CLOUDFLARE_ANALYTICS_API_ZONE_ID}"}) {
                         httpRequests1dGroups(
                             orderBy: [date_DESC], 
                             limit: 100, 
@@ -56,9 +47,12 @@ router.get('/', async (c) => {
             }
         `;
 
-        const response = await fetch(CLOUDFLARE_ANALYTICS_API, {
+        const response = await fetch(c.env.CLOUDFLARE_ANALYTICS_API, {
             method: 'POST',
-            headers: CLOUDFLARE_ANALYTICS_API_HEADERS,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${c.env.CLOUDFLARE_ANALYTICS_API_TOKEN}`,
+            },
             body: JSON.stringify({ query }),
         });
 
@@ -121,7 +115,7 @@ router.get('/days', async (c) => {
         const query = `
             query {
                 viewer {
-                    zones(filter: {zoneTag: "${CLOUDFLARE_ANALYTICS_API_ZONE_ID}"}) {
+                    zones(filter: {zoneTag: "${c.env.CLOUDFLARE_ANALYTICS_API_ZONE_ID}"}) {
                         httpRequests1dGroups(
                             orderBy: [date_ASC], 
                             limit: 100, 
@@ -150,9 +144,12 @@ router.get('/days', async (c) => {
             }
         `;
         
-        const response = await fetch(CLOUDFLARE_ANALYTICS_API, {
+        const response = await fetch(c.env.CLOUDFLARE_ANALYTICS_API, {
             method: 'POST',
-            headers: CLOUDFLARE_ANALYTICS_API_HEADERS,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${c.env.CLOUDFLARE_ANALYTICS_API_TOKEN}`,
+            },
             body: JSON.stringify({ query }),
         });
 
