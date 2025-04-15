@@ -97,7 +97,7 @@ export default {
     name: 'BusinessCard',
     data() {
         return {
-            cdn_url: "https://pub-3aaf2182691d4cb6b5270a8f14ad704a.r2.dev",
+            cdn_url: import.meta.env.VITE_ASSET_BASE_URL,
         }
     },
     props: {
