@@ -8,7 +8,7 @@ function terms() {
   return (
     <div>
       <Navbar />
-      <div className="mx-auto px-44 pt-5 pb-16 ">
+      <div className="mx-auto px-4 lg:px-44 pt-5 pb-16 ">
         <h1 className="text-center py-8 font-bold text-4xl">
           Terms & Conditions
         </h1>
