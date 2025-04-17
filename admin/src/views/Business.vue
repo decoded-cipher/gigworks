@@ -117,30 +117,38 @@
       return {
         businesses: [] as Array<any>,
         loading: true,
-        error: null,
+        error: null as string | null,
         currentPage: 1,
         totalPages: 1,
-        limit: 20,
+        limit: 50,
         statusFilter: 'all',
         searchTerm: '',
         daysFilter: 365,
-        searchTimeout: null,
+        searchTimeout: null as number | null,
       };
     },
 
     computed: {
       filteredBusinesses() {
-        // Client-side filtering for search
-        if (!this.searchTerm) {
-          return this.businesses;
+        let filtered = this.businesses;
+        
+        // Apply status filter if not set to 'all'
+        if (this.statusFilter !== 'all') {
+          const statusValue = parseInt(this.statusFilter);
+          filtered = filtered.filter(business => business.status === statusValue);
         }
         
-        const search = this.searchTerm.toLowerCase();
-        return this.businesses.filter(business => 
-          business.profileName?.toLowerCase().includes(search) ||
-          business.email?.toLowerCase().includes(search) ||
-          business.phone?.includes(search)
-        );
+        // Apply search filter if search term exists
+        if (this.searchTerm) {
+          const search = this.searchTerm.toLowerCase();
+          filtered = filtered.filter(business => 
+            business.profileName?.toLowerCase().includes(search) ||
+            business.email?.toLowerCase().includes(search) ||
+            business.phone?.includes(search)
+          );
+        }
+        
+        return filtered;
       }
     },
 
@@ -179,7 +187,7 @@
         }
       },
       
-      changePage(page) {
+      changePage(page:any) {
         if (page < 1 || page > this.totalPages) {
           return;
         }
