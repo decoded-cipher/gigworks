@@ -32,13 +32,13 @@ export  function FooterSection() {
                 </h2>
                 <ul className="text-white text-sm">
                   <li className="mb-4">
-                    <a href="" className="hover:underline">
+                    <a href="/" className="hover:underline">
                       Home
                     </a>
                   </li>
                   <li className="mb-4">
                     <a
-                      href=""
+                      href="/#about"
                       className="hover:underline"
                     >
                       About us
@@ -46,7 +46,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href=""
+                      href="/#partner"
                       className="hover:underline"
                     >
                       Join with us
@@ -54,7 +54,7 @@ export  function FooterSection() {
                   </li>
                   <li className="mb-4">
                     <a
-                      href=""
+                      href="/#contact"
                       className="hover:underline"
                     >
                       Contact us

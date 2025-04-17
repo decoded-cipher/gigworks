@@ -9,6 +9,7 @@ import SubCategory from '../views/SubCategory.vue'
 import SubCategoryOptions from '../views/subCategoryOptions.vue'
 import licenseTypes from '../views/licenseTypes.vue'
 import partners from '../views/Partners.vue'
+import ManageAdmin from '../views/ManageAdmin.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -69,6 +70,14 @@ const router = createRouter({
       component:  licenseTypes,
       meta: {
         title: 'licenseTypes',
+      },
+    },
+    {
+      path: '/manage-admin',
+      name: 'manageAdmin',
+      component:  ManageAdmin,
+      meta: {
+        title: 'manageAdmin',
       },
     },
     {
