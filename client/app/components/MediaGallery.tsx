@@ -31,6 +31,8 @@ export default function MediaGallery({
     type: string;
     isVideo: boolean;
   }>(null);
+
+  
   const [playingStates, setPlayingStates] = useState<{ [key: string]: boolean }>({});
   const [mutedStates, setMutedStates] = useState<{ [key: string]: boolean }>({});
 
@@ -64,7 +66,7 @@ export default function MediaGallery({
       isVideo,
     };
   });
-
+  
   const togglePlay = (id: string) => {
     const video = document.getElementById(`video-${id}`) as HTMLVideoElement;
     if (video) {
@@ -222,15 +224,16 @@ export default function MediaGallery({
                   controls
                   autoPlay
                   playsInline
+                  
                 >
-                  <source src={`${ASSET_BASE_URL}/${selectedMedia.url}`} type={selectedMedia.type} />
-                  <source src={`${ASSET_BASE_URL}/${selectedMedia.url}`} type="video/mp4" />
+                  <source src={`${selectedMedia.url}`} type={selectedMedia.type} />
+                  <source src={`${selectedMedia.url}`} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
               </div>
             ) : (
               <img
-                src={`${ASSET_BASE_URL}/${selectedMedia.url}`}
+                src={`${selectedMedia.url}`}
                 alt="Gallery item"
                 className="w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
               />
