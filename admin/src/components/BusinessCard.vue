@@ -19,9 +19,9 @@
                 </div>
 
                 <div class="flex flex-col">
-                    <h1 class="font-bold text-gray-900 dark:text-white">{{ business.profileName }}</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ business.subCategoryOption }}</p>
-                </div>
+    <h1 class="font-bold text-gray-900 dark:text-white cursor-pointer" @click="showDetails">{{ business.profileName }}</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400">{{ business.subCategoryOption }}</p>
+</div>
             </div>
 
             <!-- Middle sections - Grid on mobile, flex on desktop -->
@@ -87,6 +87,113 @@
             </div>
         </div>
     </div>
+
+    <div v-if="detailsVisible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" 
+        @click.self="closeDetails">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Business Details</h2>
+                <button @click="closeDetails" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Profile information section -->
+            <div class="mb-6">
+                <h3 class="text-lg font-medium mb-2 text-gray-900 dark:text-white">Profile Information</h3>
+                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-shrink-0">
+                                <img v-if="business.avatar" class="w-16 h-16 rounded-full" 
+                                    :src="`${cdn_url}/${business.avatar}`" alt="Business avatar" />
+                                <div v-else class="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                                    <span class="text-gray-400">No Image</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Business Name</p>
+                                <p class="font-medium text-gray-900 dark:text-white">{{ business.profileName }}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Business Owner</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ business.owner }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Category</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ business.category }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Subcategory</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ business.subCategory }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Specialization</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ business.subCategoryOption }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Slug</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ business.slug }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="mb-6">
+                <h3 class="text-lg font-medium mb-2 text-gray-900 dark:text-white">Contact Information</h3>
+                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ business.phone }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ business.email }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Subscription Information -->
+            <div class="mb-6">
+                <h3 class="text-lg font-medium mb-2 text-gray-900 dark:text-white">Subscription Information</h3>
+                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Payment Status</p>
+                            <p class="font-medium text-gray-900 dark:text-white capitalize">{{ business.lastPaymentStatus }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Account Status</p>
+                            <p class="font-medium text-gray-900 dark:text-white">
+                                <span :class="[
+                                    'px-2 py-1 rounded-full text-xs',
+                                    business.status === 0 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                                    business.status === 1 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                                ]">
+                                    {{ business.status === 0 ? 'Pending' : business.status === 1 ? 'Active' : 'Inactive' }}
+                                </span>
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Expiry Date</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ business.expiryDate }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Days Left</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ business.daysLeft }} Days</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -98,6 +205,7 @@ export default {
     data() {
         return {
             cdn_url: import.meta.env.VITE_ASSET_BASE_URL,
+            detailsVisible: false,
         }
     },
     props: {
@@ -107,7 +215,12 @@ export default {
         },
     },
     methods: {
-        
+        showDetails() {
+            this.detailsVisible = true;
+        },
+        closeDetails() {
+            this.detailsVisible = false;
+        },
         connectWhatsApp(phone: string) {
             window.open(`https://wa.me/${phone}`, '_blank');
         },
