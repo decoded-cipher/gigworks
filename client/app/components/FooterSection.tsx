@@ -234,7 +234,7 @@ export  function FooterSection() {
                         fill="white"
                       />
                     </svg>
-                    <a href="#" className="hover:underline">
+                    <a href="tel:+917306104563" className="hover:underline">
                     +91 73061 04563
                     </a>
                   </li>

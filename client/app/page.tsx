@@ -337,7 +337,7 @@ export default function GigWorkLandingPage() {
                     </span>
                   </button>
                 </Link>
-                <Link href="" className="w-full lg:w-[204px]">
+                <Link href="https://wa.me/918590012027" className="w-full lg:w-[204px]">
                   <button className="w-full h-[60px] border border-grn text-white hover:bg-tertiary px-4 py-3 md:px-8 md:py-4 rounded-md transition duration-300">
                     <div className="flex items-center justify-center">
                       <span className="text-base md:text-2xl font-bold">
