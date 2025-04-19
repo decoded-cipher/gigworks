@@ -3,8 +3,8 @@ import { Resend } from 'resend';
 
 
 export const sendEmail = async (
-    first_name: string, 
-    last_name: string, 
+    firstName: string, 
+    lastName: string, 
     email: string, 
     phone: string, 
     message: string,
@@ -22,7 +22,7 @@ export const sendEmail = async (
     const { data, error } = await resend.emails.send({
 
         from: env.RESEND_FROM_EMAIL,
-        to: [email],
+        to: "gigwork404@gmail.com",
         subject: `New Contact Form Submission`,
         html: `
             <!DOCTYPE html>
@@ -70,7 +70,7 @@ export const sendEmail = async (
                                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                                         <tr>
                                             <td width="130" style="padding: 10px 0; font-weight: 600; color: #334155;">Name:</td>
-                                            <td style="padding: 10px 0; color: #111827; font-size: 16px;">${first_name} ${last_name}</td>
+                                            <td style="padding: 10px 0; color: #111827; font-size: 16px;">${firstName} ${lastName}</td>
                                         </tr>
                                         <tr>
                                             <td width="130" style="padding: 10px 0; font-weight: 600; color: #334155;">Email:</td>
@@ -157,8 +157,8 @@ export const sendEmail = async (
     });
 
     if (error) {
-        return console.error({ error });
+        console.error('Error sending email:', error);
+        return null;
     }
-
-    console.log({ data });
+    return data;
 }

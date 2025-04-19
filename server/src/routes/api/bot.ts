@@ -159,21 +159,40 @@ router.post('/request_service', async (c) => {
 
 router.post('/send_email', async (c) => {
 
-    const user_agent = c.req.header('User-Agent');
-    const { first_name, last_name, email, phone, message } = await c.req.json();
-    
-    if (!first_name || !last_name || !email || !phone || !message) {
+    const user_agent = c.req.header('User-Agent')
+    const { firstName, lastName, email, phone, message, turnstileToken } = await c.req.json();
+
+    if (!firstName || !lastName || !email || !phone || !message || !turnstileToken) {
         return c.json({
-            message: 'bad_request',
-            data: null
+        message: 'bad_request',
+        data: null
         }, 400);
     }
-    
+
+    const ip = c.req.header('CF-Connecting-IP') || ''
+    const verify = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+            secret: c.env.TURNSTILE_SECRET_KEY,
+            response: turnstileToken,
+            remoteip: ip,
+        }),
+    })
+
+    const result = await verify.json()
+    if (!result.success) {
+        return c.json({
+            message: 'turnstile_failed',
+            error: result['error-codes'],
+        }, 403)
+    }
+
     const date = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }); 
     const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    
+
     try {
-        const response = await sendEmail(first_name, last_name, email, phone, message, date, time, user_agent, c.env);
+        const response = await sendEmail(firstName, lastName, email, phone, message, date, time, user_agent, c.env);
         if (!response) {
             return c.json({
                 message: 'email_not_sent',
