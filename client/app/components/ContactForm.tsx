@@ -12,11 +12,11 @@ export function ContactForm() {
     message: ''
   })
 
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
+  
   const [isLoading, setIsLoading] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const turnstileRef = useRef<HTMLDivElement>(null)
-
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   useEffect(() => {
     if (!window.turnstile) {
@@ -36,7 +36,7 @@ export function ContactForm() {
           setTurnstileToken(token)
         },
       })
-
+  
       return () => {
         window.turnstile?.remove?.(widgetId)
       }
@@ -54,7 +54,13 @@ export function ContactForm() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
-
+  
+    if (!turnstileToken) {
+      console.error('Turnstile token is missing.')
+      setIsLoading(false)
+      return
+    }
+  
     submitContactForm({ ...formData, turnstileToken })
       .then(response => {
         console.log('Form submitted successfully:', response)
