@@ -210,7 +210,7 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
                   onClick={() => setSelectedImageIndex(index)}
                 >
                   {image.isVideo ? (
-                    <video className="w-full h-full object-cover" controls>
+                    <video className="w-full h-full object-cover" controls autoPlay muted loop>
                       <source src={image.src} type="video/mp4" />
                     </video>
                   ) : (
@@ -298,6 +298,8 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
                         className="w-full max-h-[80vh] object-contain rounded-lg" 
                         controls 
                         autoPlay
+                        muted
+                         
                       >
                         <source src={image.src} type="video/mp4" />
                       </video>
