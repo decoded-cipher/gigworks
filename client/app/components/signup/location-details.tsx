@@ -19,6 +19,7 @@ interface Location {
   latitude: number | null
   longitude: number | null
   fullAddress: string
+  googleMapsLocation?: string // Add this property
 }
 
 interface OperatingHour {
@@ -97,14 +98,27 @@ export default function LocationDetails({
     })
   }
 
+  // Update the handleAddressChange function to handle both address and googleMapsLocation
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    updateFormData({
-      address: {
-        ...formData.address,
-        [name]: value
-      }
-    })
+    
+    if (name === 'location') {
+      // Handle the Google Maps Location field
+      updateFormData({
+        location: {
+          ...formData.location,
+          googleMapsLocation: value
+        }
+      })
+    } else {
+      // Handle regular address fields
+      updateFormData({
+        address: {
+          ...formData.address,
+          [name]: value
+        }
+      })
+    }
   }
 
   const handleOperatingHoursChange = (
@@ -248,12 +262,11 @@ export default function LocationDetails({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="w-full bg-white rounded-md p-4 sm:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <h2 className="py-2 sm:py-4 font-semibold text-xl">
                 Address & Location <span className="text-red-500">*</span>
               </h2>
-              <div className="space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <input
                   type="text"
                   name="streetAddress"
@@ -290,9 +303,17 @@ export default function LocationDetails({
                   className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
                   required
                 />
+                <input
+                  type="text"
+                  name='location'
+                  value={formData.location.googleMapsLocation}
+                  onChange={handleAddressChange}
+                  placeholder='Google Maps Location'
+                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030] col-span-2"
+                  required
+                />
               </div>
             </div>
-          </div>
 
           {/* Operating Hours */}
           <div className="mt-6 space-y-1">

@@ -659,3 +659,49 @@ export const createLicense = async (businessId: string, licenseData: {
   }
 };
 
+// location search
+
+export const fetchServices = async (query: string) => {
+  try {
+    console.log(query);
+    
+    const response = await axios.get(
+      `${BASE_URL}/api/v1/sub_category_option?search=${query}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching services:', error);
+    throw error;
+  }
+}
+
+
+// fetch location based services
+
+export const searchBusinesses = async (
+  service: string, 
+  coordinates: { lat: string; lon: string }
+) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/bot/request_service`,
+      { service },
+      { 
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Location': JSON.stringify({
+            latitude: coordinates.lat,
+            longitude: coordinates.lon
+          })
+        }
+      }
+    );
+    console.log(response.data);
+    
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error searching businesses:', error);
+    throw error;
+  }
+};
