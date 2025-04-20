@@ -659,3 +659,25 @@ export const createLicense = async (businessId: string, licenseData: {
   }
 };
 
+export const submitContactForm = async (formData: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  message: string;
+  turnstileToken: string;
+}) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/bot/send_email`,
+      {
+        ...formData
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error submitting contact form:', error);
+    throw error;
+  }
+}
+

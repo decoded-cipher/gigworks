@@ -2,10 +2,47 @@ import { Hono } from "hono";
 const router = new Hono();
 
 import {
+  getAllSubCategoryOptions,
   createSubCategoryOption,
   updateSubCategoryOption,
   updateSubCategoryOptionStatus,
 } from "../../services/subCategoryOption";
+
+
+/**
+ * @route   GET /api/v1/sub_category_option
+ * @desc    Get all sub_category_options
+ * @access  Public
+ * @return  message, data
+ * @error   500, { error }
+ * @status  200, 500
+ *
+ * @example /api/v1/sub_category_option
+ **/
+
+router.get("/", async (c) => {
+  try {
+    const { search } = c.req.query();
+
+    const sub_category_options = await getAllSubCategoryOptions(search);
+    return c.json(
+      {
+        message: "Sub category options retrieved successfully",
+        data: sub_category_options,
+      },
+      200
+    );
+  } catch (error) {
+    return c.json(
+      {
+        message: "Internal Server Error",
+        error: error.message,
+      },
+      500
+    );
+  }
+});
+
 
 /**
  * @route   POST /api/v1/sub_category_option
@@ -54,6 +91,8 @@ router.post("/", async (c) => {
   }
 });
 
+
+
 /**
  * @route   PATCH /update-status
  * @desc    Update the status of a sub_category_option
@@ -66,6 +105,7 @@ router.post("/", async (c) => {
  *
  * @example  /api/v1/sub_category_option/update-status
  **/
+
 router.patch("/update-status", async (c) => {
   const { sub_category_option_id, status } = await c.req.json();
 
@@ -101,6 +141,8 @@ router.patch("/update-status", async (c) => {
   }
 });
 
+
+
 /**
  * @route   PATCH /:id
  * @desc    Update a sub_category_option by ID
@@ -114,6 +156,7 @@ router.patch("/update-status", async (c) => {
  *
  * @example  /api/v1/sub_category_option/:sub_category_option_id
  **/
+
 router.patch("/:id", async (c) => {
   const sub_category_option_id = c.req.param("id") || "";
   const { name } = await c.req.json();
@@ -158,5 +201,7 @@ router.patch("/:id", async (c) => {
     );
   }
 });
+
+
 
 module.exports = router;
