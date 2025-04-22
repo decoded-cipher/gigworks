@@ -5,12 +5,13 @@ import { subCategoryOption } from "../config/database/schema";
 
 
 // Get all sub-category options
-export const getAllSubCategoryOptions = async () => {
+export const getAllSubCategoryOptions = async (search: string) => {
   try {
 
-    // SQL Query : SELECT * FROM sub_category_option WHERE status = 1 ORDER BY created_at DESC
+    // SQL Query : SELECT * FROM sub_category_option WHERE status = 1
+    // AND name LIKE '%search%' LIMIT 10 OFFSET 0
 
-    const result = await db
+    let query = db
       .select({
         name: subCategoryOption.name
       })
@@ -18,7 +19,12 @@ export const getAllSubCategoryOptions = async () => {
       .where(eq(subCategoryOption.status, 1))
       .orderBy(sql`created_at DESC`);
 
-    const names = result.map(item => item.name);
+    if (search) {
+      query = query.where(sql`${subCategoryOption.name} LIKE ${`%${search}%`}`).limit(10).offset(0);
+    }
+
+    const result = await query;
+    const names = result.map((item) => item.name);
 
     return names;
   } catch (error) {
