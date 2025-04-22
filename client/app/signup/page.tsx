@@ -39,6 +39,7 @@ export interface FormData {
     latitude: number | null;
     longitude: number | null;
     fullAddress: string;
+    googleMapsLocation?: string;  // Add this field
   };
   operatingHours: Array<{
     day: string;
@@ -102,6 +103,7 @@ export default function SignupPage() {
       latitude: null,
       longitude: null,
       fullAddress: "",
+      
     },
     operatingHours: [
       {
@@ -187,6 +189,7 @@ export default function SignupPage() {
         city: formData.address.city,
         state: formData.address.state,
         zip: formData.address.pinCode,
+        maps_url: formData.location.googleMapsLocation || "", // Add this line
         socials: {
           website: formData.socialMediaHandles.find(h => h.platform === "Website")?.link || "",
           facebook: formData.socialMediaHandles.find(h => h.platform === "Facebook")?.link || "",
