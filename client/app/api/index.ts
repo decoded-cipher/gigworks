@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { log } from 'console';
 
 // const BASE_URL = "https://gigworks-server.devmorphix.workers.dev";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -729,3 +730,32 @@ export const submitContactForm = async (formData: {
   }
 }
 
+export const fetchCorrdinates = async (url: string ) =>{
+  console.log(url);
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    if (!token) {
+      throw new Error('No token provided');
+    }
+
+    const data = {
+      url: url
+    };
+    const response = await axios.post(`${BASE_URL}/api/v1/location`, data,{
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }) 
+    console.log(response.data.data);
+    return response.data;
+  }
+  catch (error) {
+    console.error('Error fetching coordinates:', error);
+    throw error;
+  }
+
+}
