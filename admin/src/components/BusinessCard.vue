@@ -136,7 +136,9 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Slug</p>
-                            <p class="font-medium text-gray-900 dark:text-white">{{ business.slug }}</p>
+                            <a :href="`https://gigwork.co.in/${business.slug}`">
+                                <p class="font-medium text-gray-900 dark:text-white">{{ business.slug }}</p>
+                            </a> 
                         </div>
                     </div>
                 </div>
