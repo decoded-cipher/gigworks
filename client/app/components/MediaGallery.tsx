@@ -103,7 +103,7 @@ export default function MediaGallery({
           <ImageUploadButton
             businessId={businessId}
             category="media"
-            label="Add Media"
+            label="Add Media & Description"
             multiple={true}
             onUploadComplete={(assetPath, mediaId) => {
               if (!mediaId) {

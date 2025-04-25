@@ -2,6 +2,30 @@
 
 import { useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import { fetchCorrdinates } from '../../api/index'
+// Import marker icon assets to fix the missing marker icon issue
+import markerIcon from 'leaflet/dist/images/marker-icon.png'
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
+import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+
+// Dynamically import the Leaflet components to avoid SSR issues
+const MapWithNoSSR = dynamic(
+  () => import('../MapComponent'), 
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="rounded-md border border-gray-300 h-[300px] flex items-center justify-center bg-gray-100">
+        <div className="flex flex-col items-center text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <p>Loading map...</p>
+        </div>
+      </div>
+    )
+  }
+)
 
 const LocationPicker = dynamic(
   () => import("../../components/LocationPicker"),
@@ -98,18 +122,45 @@ export default function LocationDetails({
     })
   }
 
-  // Update the handleAddressChange function to handle both address and googleMapsLocation
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Update the handleAddressChange function to extract coordinates from Google Maps link
+  const handleAddressChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     
     if (name === 'location') {
-      // Handle the Google Maps Location field
+      // Update Google Maps Location field immediately
       updateFormData({
         location: {
           ...formData.location,
           googleMapsLocation: value
         }
       })
+      
+      // Check if it's a Google Maps link
+      if (value && (value.includes('google.com/maps') || value.includes('maps.app.goo.gl'))) {
+        try {
+          // Call the API to fetch coordinates
+          const response = await fetchCorrdinates(value);
+          console.log('Coordinates fetched:', response);
+          
+          if (response?.data.coordinates) {
+            // Update form data with the fetched coordinates
+            console.log('Updating form data with coordinates:', response.data.coordinates);
+            
+            updateFormData({
+              location: {
+                ...formData.location,
+                googleMapsLocation: value,
+                latitude: response.data.coordinates.latitude,
+                longitude: response.data.coordinates.longitude
+              }
+              
+            });
+          }
+          console.log('Form data updated with coordinates:', formData.location);
+        } catch (error) {
+          console.error('Error fetching coordinates:', error);
+        }
+      }
     } else {
       // Handle regular address fields
       updateFormData({
@@ -171,7 +222,7 @@ export default function LocationDetails({
     // Prevent removing if it's Monday and it's the only entry
     if (index === 0 && formData.operatingHours.length === 1 && formData.operatingHours[0].day === "Monday") {
       return
-    }
+    } 
     
     updateFormData({
       operatingHours: formData.operatingHours.filter((_, i) => i !== index)
@@ -312,6 +363,35 @@ export default function LocationDetails({
                   className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030] col-span-2"
                   required
                 />
+                {/* Replace the iframe section with this */}
+                <div className="col-span-2 mt-4 z-10">
+                  {formData.location.latitude && formData.location.longitude ? (
+                    <MapWithNoSSR 
+                      position={[formData.location.latitude, formData.location.longitude]} 
+                      popupText={formData.address.streetAddress || "Business Location"}
+                    />
+                  ) : formData.location.googleMapsLocation ? (
+                    <div className="rounded-md border border-gray-300 h-[300px] flex items-center justify-center bg-gray-100">
+                      <div className="flex flex-col items-center text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <p>Extracting coordinates from the link...</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="rounded-md border border-gray-300 h-[300px] flex items-center justify-center bg-gray-100">
+                      <div className="flex flex-col items-center text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <p>Enter a Google Maps link to see the location</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
