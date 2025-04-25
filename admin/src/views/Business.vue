@@ -120,7 +120,7 @@
         error: null as string | null,
         currentPage: 1,
         totalPages: 1,
-        limit: 50,
+        limit: 100,
         statusFilter: 'all',
         searchTerm: '',
         daysFilter: 365,
