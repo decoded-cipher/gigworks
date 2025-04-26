@@ -37,8 +37,6 @@ import {
 } from "../../config/database/interfaces";
 import { verifyToken } from "../../middleware/authentication";
 
-
-
 /**
  * @route   POST /api/v1/business
  * @desc    Create a new business
@@ -109,8 +107,6 @@ router.post("/", async (c) => {
   }
 });
 
-
-
 /**
  * @route   GET /api/v1/business/renewal
  * @desc    Get all businesses that need renewal
@@ -128,8 +124,8 @@ router.get("/renewal", async (c) => {
     const page = Number(c.req.query("page")) || 1;
     const limit = Number(c.req.query("limit")) || 10;
     const days = Number(c.req.query("days")) || 0;
-
-    let profiles = await getRenewalProfiles(page, limit, days);
+    const search = c.req.query("search") || "";
+    let profiles = await getRenewalProfiles(page, limit, days, search);
 
     if (!profiles) {
       return c.json(
@@ -210,8 +206,6 @@ router.get("/count", async (c) => {
   }
 });
 
-
-
 /**
  * @route   GET /api/v1/business/:slug
  * @desc    Get a business by slug
@@ -255,8 +249,6 @@ router.get("/:slug", async (c) => {
     );
   }
 });
-
-
 
 /**
  * @route   GET /api/v1/business/slug/check
@@ -302,8 +294,6 @@ router.get("/slug/check", async (c) => {
     );
   }
 });
-
-
 
 /**
  * @route   GET /api/v1/business?category_id=123
@@ -373,8 +363,6 @@ router.get("/", async (c) => {
   }
 });
 
-
-
 /**
  * @route   PATCH /api/v1/business/:id
  * @desc    Update a business by id
@@ -430,8 +418,6 @@ router.patch("/:id", verifyToken, async (c) => {
   }
 });
 
-
-
 /**
  * @route   POST /api/v1/business/:id/media
  * @desc    Add media to a business by id
@@ -478,8 +464,6 @@ router.post("/:id/media", verifyToken, async (c) => {
   }
 });
 
-
-
 /**
  * @route   DELETE /api/v1/business/:id/media/:media_id
  * @desc    Remove media from a business by id
@@ -523,8 +507,6 @@ router.delete("/:id/media/:media_id", verifyToken, async (c) => {
     );
   }
 });
-
-
 
 /**
  * @route   POST /api/v1/business/:id/tag
@@ -571,8 +553,6 @@ router.post("/:id/tag", verifyToken, async (c) => {
   }
 });
 
-
-
 /**
  * @route   DELETE /api/v1/business/:id/tag/:tag_id
  * @desc    Remove tag from a business by id
@@ -616,8 +596,6 @@ router.delete("/:id/tag/:tag_id", verifyToken, async (c) => {
     );
   }
 });
-
-
 
 /**
  * @route   POST /api/v1/business/:id/license
@@ -664,8 +642,6 @@ router.post("/:id/license", verifyToken, async (c) => {
   }
 });
 
-
-
 /**
  * @route   DELETE /api/v1/business/:id/license/:license_id
  * @desc    Remove license from a business by id
@@ -709,8 +685,6 @@ router.delete("/:id/license/:license_id", verifyToken, async (c) => {
     );
   }
 });
-
-
 
 /**
  * @route   POST /api/v1/business/update-status
