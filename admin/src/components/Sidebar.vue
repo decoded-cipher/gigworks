@@ -238,13 +238,13 @@ export default {
             this.$router.push('/login');
         },
         interakt() {
-            window.open('https://www.interakt.shop/', '_blank');
+            window.open('https://app.interakt.ai/login', '_blank');
         },
         phonePe() {
-            window.open('https://www.phonepe.com/business-solutions/payment-gateway/', '_blank');
+            window.open('https://business.phonepe.com/login', '_blank');
         },
         Zoho() {
-            window.open('https://accounts.zoho.in/signin?servicename=ZohoHome&signupurl=https://www.zoho.com/signup.html', '_blank');
+            window.open('https://www.zoho.com/mail/login.html', '_blank');
         },
         blog() {
             window.open('https://blog.gigwork.co.in/ghost/', '_blank');

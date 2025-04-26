@@ -120,7 +120,7 @@
         error: null as string | null,
         currentPage: 1,
         totalPages: 1,
-        limit: 100,
+        limit: 10,
         statusFilter: 'all',
         searchTerm: '',
         daysFilter: 365,
@@ -130,25 +130,11 @@
 
     computed: {
       filteredBusinesses() {
-        let filtered = this.businesses;
+        // let filtered = this.businesses;
         
-        // Apply status filter if not set to 'all'
-        if (this.statusFilter !== 'all') {
-          const statusValue = parseInt(this.statusFilter);
-          filtered = filtered.filter(business => business.status === statusValue);
-        }
+       
         
-        // Apply search filter if search term exists
-        if (this.searchTerm) {
-          const search = this.searchTerm.toLowerCase();
-          filtered = filtered.filter(business => 
-            business.profileName?.toLowerCase().includes(search) ||
-            business.email?.toLowerCase().includes(search) ||
-            business.phone?.includes(search)
-          );
-        }
-        
-        return filtered;
+        return this.businesses;
       }
     },
 
@@ -166,14 +152,17 @@
             limit: this.limit,
             page: this.currentPage,
             days: this.daysFilter,
-            status: this.statusFilter !== 'all' ? this.statusFilter : undefined
+            status: this.statusFilter !== 'all' ? this.statusFilter : undefined, 
           });
+          
+          console.log('API Response:', response);
+          
           
           this.businesses = response.data.profiles;
           
           // Update pagination info if available in response
-          if (response.data.totalPages) {
-            this.totalPages = response.data.totalPages;
+          if (response.data.meta.total_pages) {
+            this.totalPages = response.data.meta.total_pages;
           } else {
             // Estimate total pages
             this.totalPages = Math.ceil(this.businesses.length / this.limit);
