@@ -28,7 +28,10 @@ export const getDetailedAnalytics = async (params:any) => {
 // business
 
 export const getBusinesses = async (params:any) => {
+    console.log(params);
+    
     const response = await axios.get(`${BASE_URL}/business/renewal`, { params });
+
     return response.data;
 };
 
