@@ -40,7 +40,7 @@
           <!-- Search input -->
           <div class="sm:flex-1">
             <label for="searchTerm" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
-            <input type="text" id="searchTerm" v-model="searchTerm" @input="debounceSearch" placeholder="Search by name or email"
+            <input type="text" id="searchTerm" v-model="searchTerm" @input="debounceSearch" placeholder="Search by name"
               class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white">
           </div>
           
@@ -120,7 +120,7 @@
         error: null as string | null,
         currentPage: 1,
         totalPages: 1,
-        limit: 10,
+        limit: 100,
         statusFilter: 'all',
         searchTerm: '',
         daysFilter: 365,
@@ -130,11 +130,25 @@
 
     computed: {
       filteredBusinesses() {
-        // let filtered = this.businesses;
+        let filtered = this.businesses;
         
-       
+        // Apply status filter if not set to 'all'
+        if (this.statusFilter !== 'all') {
+          const statusValue = parseInt(this.statusFilter);
+          filtered = filtered.filter(business => business.status === statusValue);
+        }
         
-        return this.businesses;
+        // Apply search filter if search term exists
+        if (this.searchTerm) {
+          const search = this.searchTerm.toLowerCase();
+          filtered = filtered.filter(business => 
+            business.profileName?.toLowerCase().includes(search) ||
+            business.email?.toLowerCase().includes(search) ||
+            business.phone?.includes(search)
+          );
+        }
+        
+        return filtered;
       }
     },
 
