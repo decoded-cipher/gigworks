@@ -272,7 +272,8 @@ export const getRenewalProfiles = async (
   limit: number,
   days: number,
   search: string,
-  category_id: string
+  category_id: string,
+  status: number
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -298,6 +299,35 @@ export const getRenewalProfiles = async (
                     (page - 1) * limit
             */
 
+      // First build the base conditions
+      const conditions = [
+        sql`julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) < ${days}`,
+      ];
+      // Add search condition if provided
+
+      if (search) {
+        conditions.push(
+          sql`(LOWER(${profile.name}) LIKE LOWER(${"%" + search + "%"}) OR LOWER(${user.name}) LIKE LOWER(${"%" + search + "%"}))`
+        );
+      }
+
+      // Add category filter if provided
+      if (category_id) {
+        conditions.push(sql`${profile.category_id} = ${category_id}`);
+      }
+
+      // Add status filter if provided (0,1,2,3)
+      if (status !== undefined) {
+        conditions.push(sql`${profile.status} = ${status}`);
+      }
+
+      // Combine all conditions with AND
+      const whereClause =
+        conditions.length > 1
+          ? sql.join(conditions, sql` AND `)
+          : conditions[0];
+
+      // Main query
       let results = await db
         .select({
           profileId: profile.id,
@@ -332,17 +362,13 @@ export const getRenewalProfiles = async (
           subCategoryOption,
           sql`${subCategoryOption.id} = ${profile.sub_category_option_id}`
         )
-        .where(
-          sql`julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) < ${days}
-            ${search ? sql` AND (LOWER(${profile.name}) LIKE LOWER(${"%" + search + "%"}) OR LOWER(${user.name}) LIKE LOWER(${"%" + search + "%"})` : sql``}
-            ${category_id ? sql` AND ${profile.category_id} = ${category_id}` : sql``}`
-        )
+        .where(whereClause)
         .orderBy("statusOrder")
         .orderBy(profilePayment.created_at)
         .limit(limit)
         .offset((page - 1) * limit);
 
-      // Get total count with search and category filters
+      // Count query
       const totalCount = await db
         .select({ count: sql`COUNT(*)` })
         .from(profile)
@@ -351,11 +377,7 @@ export const getRenewalProfiles = async (
           profilePayment,
           sql`${profilePayment.profile_id} = ${profile.id}`
         )
-        .where(
-          sql`julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) < ${days}
-            ${search ? sql` AND (LOWER(${profile.name}) LIKE LOWER(${"%" + search + "%"}) OR LOWER(${user.name}) LIKE LOWER(${"%" + search + "%"})` : sql``}
-            ${category_id ? sql` AND ${profile.category_id} = ${category_id}` : sql``}`
-        );
+        .where(whereClause);
 
       resolve({
         data: results,
