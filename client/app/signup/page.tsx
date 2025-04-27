@@ -8,6 +8,7 @@ import BusinessOverview from "../components/signup/bussiness-overview";
 import LocationDetails from "../components/signup/location-details";
 import BusinessOperations from "../components/signup/business-operations";
 import { createBusiness } from "../api/index";
+import { form } from "framer-motion/client";
 
 // Define the main form data interface
 export interface FormData {
@@ -190,6 +191,8 @@ export default function SignupPage() {
         state: formData.address.state,
         zip: formData.address.pinCode,
         maps_url: formData.location.googleMapsLocation || "", // Add this line
+        latitude: formData.location.latitude,
+        longitude: formData.location.longitude,
         socials: {
           website: formData.socialMediaHandles.find(h => h.platform === "Website")?.link || "",
           facebook: formData.socialMediaHandles.find(h => h.platform === "Facebook")?.link || "",
@@ -217,6 +220,8 @@ export default function SignupPage() {
         gstin: formData.gstin,
         referral_code: formData.referral_code
       };
+      
+      console.log("asdf",formData.location);
       
       const payload:any = {
         user: {

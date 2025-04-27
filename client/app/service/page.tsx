@@ -1,0 +1,409 @@
+"use client"
+
+import { useState } from "react"
+import {
+  Home,
+  Book,
+  PenToolIcon as Tool,
+  Briefcase,
+  Calendar,
+  Heart,
+  Users,
+  Truck,
+  Search,
+  MessageCircle,
+  MapPin,
+  Phone,
+  Mail,
+} from "lucide-react"
+import Link from "next/link"
+
+export default function HomePage() {
+  const [language, setLanguage] = useState<"en" | "ml">("en")
+
+  const toggleLanguage = () => {
+    setLanguage(language === "en" ? "ml" : "en")
+  }
+
+  const translations = {
+    // Translations based on current language
+    heroTitle: language === "en" ? "Find Trusted Experts Near You" : "നിങ്ങൾക്ക് അടുത്തുള്ള വിശ്വസനീയരായ വിദഗ്ധരെ കണ്ടെത്തുക",
+    heroSubtitle:
+      language === "en"
+        ? "Connect with skilled professionals in Kerala via WhatsApp for all your service needs"
+        : "നിങ്ങളുടെ എല്ലാ സേവന ആവശ്യങ്ങൾക്കും വാട്സ്ആപ്പ് വഴി കേരളത്തിലെ വിദഗ്ധ പ്രൊഫഷണലുകളുമായി ബന്ധപ്പെടുക",
+    searchPlaceholder: language === "en" ? "Search for a service..." : "ഒരു സേവനം തിരയുക...",
+    whatsappCTA: language === "en" ? "Chat on WhatsApp" : "വാട്സ്ആപ്പിൽ ചാറ്റ് ചെയ്യുക",
+    categoriesTitle: language === "en" ? "Browse Services by Category" : "വിഭാഗം അനുസരിച്ച് സേവനങ്ങൾ ബ്രൗസ് ചെയ്യുക",
+    howItWorksTitle: language === "en" ? "How It Works" : "ഇത് എങ്ങനെ പ്രവർത്തിക്കുന്നു",
+    testimonialsTitle: language === "en" ? "What Our Users Say" : "ഞങ്ങളുടെ ഉപയോക്താക്കൾ പറയുന്നത്",
+    ctaTitle: language === "en" ? "Ready to Find Your Service Provider?" : "നിങ്ങളുടെ സേവന ദാതാവിനെ കണ്ടെത്താൻ തയ്യാറാണോ?",
+    ctaSubtitle:
+      language === "en"
+        ? "Start a conversation on WhatsApp and get connected with the best professionals in Kerala"
+        : "വാട്സ്ആപ്പിൽ ഒരു സംഭാഷണം ആരംഭിക്കുകയും കേരളത്തിലെ മികച്ച പ്രൊഫഷണലുകളുമായി ബന്ധപ്പെടുകയും ചെയ്യുക",
+    startWhatsapp: language === "en" ? "Start on WhatsApp" : "വാട്സ്ആപ്പിൽ ആരംഭിക്കുക",
+    footerTagline:
+      language === "en"
+        ? "Connecting Kerala with trusted local service providers"
+        : "കേരളത്തെ വിശ്വസനീയമായ പ്രാദേശിക സേവന ദാതാക്കളുമായി ബന്ധിപ്പിക്കുന്നു",
+    quickLinks: language === "en" ? "Quick Links" : "ക്വിക്ക് ലിങ്കുകൾ",
+    aboutUs: language === "en" ? "About Us" : "ഞങ്ങളെക്കുറിച്ച്",
+    services: language === "en" ? "Services" : "സേവനങ്ങൾ",
+    contactUs: language === "en" ? "Contact Us" : "ഞങ്ങളെ സമീപിക്കുക",
+    contact: language === "en" ? "Contact" : "ബന്ധപ്പെടുക",
+    allRightsReserved: language === "en" ? "All Rights Reserved" : "എല്ലാ അവകാശങ്ങളും നിക്ഷിപ്തം",
+    signIn: language === "en" ? "Sign In" : "സൈൻ ഇൻ",
+  }
+
+  const categories = [
+    {
+      name: "Home Services",
+      nameMl: "ഹോം സർവീസസ്",
+      icon: "home",
+    },
+    {
+      name: "Education",
+      nameMl: "വിദ്യാഭ്യാസം",
+      icon: "book",
+    },
+    {
+      name: "Repairs",
+      nameMl: "റിപ്പയറുകൾ",
+      icon: "tool",
+    },
+    {
+      name: "Professional",
+      nameMl: "പ്രൊഫഷണൽ",
+      icon: "briefcase",
+    },
+    {
+      name: "Events",
+      nameMl: "ഇവന്റുകൾ",
+      icon: "calendar",
+    },
+    {
+      name: "Healthcare",
+      nameMl: "ആരോഗ്യ പരിരക്ഷ",
+      icon: "heart",
+    },
+    {
+      name: "Beauty",
+      nameMl: "സൗന്ദര്യം",
+      icon: "users",
+    },
+    {
+      name: "Delivery",
+      nameMl: "ഡെലിവറി",
+      icon: "truck",
+    },
+  ]
+
+  const steps = [
+    {
+      title: "Search or Choose a Category",
+      titleMl: "തിരയുക അല്ലെങ്കിൽ ഒരു വിഭാഗം തിരഞ്ഞെടുക്കുക",
+      description: "Find the service you need from our wide range of categories",
+      descriptionMl: "ഞങ്ങളുടെ വിപുലമായ വിഭാഗങ്ങളിൽ നിന്ന് നിങ്ങൾക്ക് ആവശ്യമായ സേവനം കണ്ടെത്തുക",
+      icon: "search",
+    },
+    {
+      title: "Chat on WhatsApp",
+      titleMl: "വാട്സ്ആപ്പിൽ ചാറ്റ് ചെയ്യുക",
+      description: "Connect directly with service providers via WhatsApp",
+      descriptionMl: "വാട്സ്ആപ്പ് വഴി സേവന ദാതാക്കളുമായി നേരിട്ട് ബന്ധപ്പെടുക",
+      icon: "message",
+    },
+    {
+      title: "Get the Service",
+      titleMl: "സേവനം നേടുക",
+      description: "Receive quality service from trusted local professionals",
+      descriptionMl: "വിശ്വസനീയമായ പ്രാദേശിക പ്രൊഫഷണലുകളിൽ നിന്ന് ഗുണനിലവാരമുള്ള സേവനം ലഭിക്കുക",
+      icon: "users",
+    },
+  ]
+
+  const testimonials = [
+    {
+      name: "Priya Thomas",
+      location: "Kochi",
+      text: "Found an excellent electrician through Gigwork. He fixed all the issues in my new apartment within hours. The WhatsApp connection made it so easy!",
+      textMl:
+        "ഗിഗ്‌വർക്ക് വഴി ഒരു മികച്ച ഇലക്ട്രീഷ്യനെ കണ്ടെത്തി. എന്റെ പുതിയ അപ്പാർട്ട്മെന്റിലെ എല്ലാ പ്രശ്നങ്ങളും അദ്ദേഹം മണിക്കൂറുകൾക്കുള്ളിൽ പരിഹരിച്ചു. വാട്സ്ആപ്പ് കണക്ഷൻ അത് വളരെ എളുപ്പമാക്കി!",
+      rating: 5,
+    },
+    {
+      name: "Rahul Menon",
+      location: "Trivandrum",
+      text: "Needed a math tutor for my daughter urgently. Gigwork connected me with a qualified teacher in my neighborhood within minutes. Highly recommend!",
+      textMl:
+        "എന്റെ മകൾക്ക് അടിയന്തിരമായി ഒരു മാത്തമാറ്റിക്സ് ട്യൂട്ടർ ആവശ്യമായിരുന്നു. മിനിറ്റുകൾക്കുള്ളിൽ ഗിഗ്‌വർക്ക് എന്നെ എന്റെ അയൽപക്കത്തെ ഒരു യോഗ്യതയുള്ള അധ്യാപകനുമായി ബന്ധിപ്പിച്ചു. ശക്തമായി ശുപാർശ ചെയ്യുന്നു!",
+      rating: 5,
+    },
+    {
+      name: "Anoop Krishnan",
+      location: "Calicut",
+      text: "Used Gigwork to find a plumber on a Sunday. Not only did they respond quickly, but the service was professional and affordable. This app is a game-changer!",
+      textMl:
+        "ഞായറാഴ്ച ഒരു പ്ലംബറെ കണ്ടെത്താൻ ഗിഗ്‌വർക്ക് ഉപയോഗിച്ചു. അവർ വേഗത്തിൽ പ്രതികരിച്ചു മാത്രമല്ല, സേവനം പ്രൊഫഷണലും താങ്ങാനാവുന്നതുമായിരുന്നു. ഈ ആപ്പ് ഒരു ഗെയിം ചേഞ്ചർ ആണ്!",
+      rating: 4,
+    },
+  ]
+
+  // Helper function to render category icon
+  const renderCategoryIcon = (iconName: string) => {
+    switch (iconName) {
+      case "home":
+        return <Home className="h-6 w-6 text-green-600" />
+      case "book":
+        return <Book className="h-6 w-6 text-green-600" />
+      case "tool":
+        return <Tool className="h-6 w-6 text-green-600" />
+      case "briefcase":
+        return <Briefcase className="h-6 w-6 text-green-600" />
+      case "calendar":
+        return <Calendar className="h-6 w-6 text-green-600" />
+      case "heart":
+        return <Heart className="h-6 w-6 text-green-600" />
+      case "users":
+        return <Users className="h-6 w-6 text-green-600" />
+      case "truck":
+        return <Truck className="h-6 w-6 text-green-600" />
+      default:
+        return <Home className="h-6 w-6 text-green-600" />
+    }
+  }
+
+  // Helper function to render step icon
+  const renderStepIcon = (iconName: string) => {
+    switch (iconName) {
+      case "search":
+        return <Search className="h-10 w-10 text-green-600" />
+      case "message":
+        return <MessageCircle className="h-10 w-10 text-green-600" />
+      case "users":
+        return <Users className="h-10 w-10 text-green-600" />
+      default:
+        return <Search className="h-10 w-10 text-green-600" />
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-white shadow-sm">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center">
+            <div className="text-2xl font-bold text-green-600">Gigwork</div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button onClick={toggleLanguage} className="text-sm font-medium text-gray-600 hover:text-green-600">
+              {language === "en" ? "മലയാളം" : "English"}
+            </button>
+            <button className="hidden md:block px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+              {translations.signIn}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="bg-gradient-to-b from-green-50 to-white py-12 md:py-20">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-6">{translations.heroTitle}</h1>
+          <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">{translations.heroSubtitle}</p>
+
+          {/* Search Bar */}
+          <div className="relative max-w-md mx-auto mb-12">
+            <input
+              type="text"
+              placeholder={translations.searchPlaceholder}
+              className="w-full px-5 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm"
+            />
+            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition">
+              <Search className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* WhatsApp Button (Mobile) */}
+          <div className="md:hidden">
+            <a
+              href="https://wa.me/+919876543210"
+              className="inline-flex items-center px-5 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition shadow-md"
+            >
+              <MessageCircle className="h-5 w-5 mr-2" />
+              {translations.whatsappCTA}
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Categories Section */}
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-10">
+            {translations.categoriesTitle}
+          </h2>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {categories.map((category, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-lg shadow-md hover:shadow-lg transition p-4 text-center cursor-pointer"
+              >
+                <div className="bg-green-100 p-4 rounded-full inline-flex items-center justify-center mb-3">
+                  {renderCategoryIcon(category.icon)}
+                </div>
+                <h3 className="font-medium text-gray-800">{language === "en" ? category.name : category.nameMl}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-10">
+            {translations.howItWorksTitle}
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {steps.map((step, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-md p-6 text-center relative">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
+                  {index + 1}
+                </div>
+                <div className="mb-4 flex justify-center">{renderStepIcon(step.icon)}</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-800">
+                  {language === "en" ? step.title : step.titleMl}
+                </h3>
+                <p className="text-gray-600">{language === "en" ? step.description : step.descriptionMl}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-10">
+            {translations.testimonialsTitle}
+          </h2>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                <div className="flex items-start mb-4">
+                  <div className="bg-gray-200 rounded-full w-12 h-12 flex items-center justify-center mr-4">
+                    <Users className="h-6 w-6 text-gray-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-800">{testimonial.name}</h3>
+                    <p className="text-sm text-gray-500">{testimonial.location}</p>
+                  </div>
+                </div>
+                <p className="text-gray-600 italic">{language === "en" ? testimonial.text : testimonial.textMl}</p>
+                <div className="mt-3 flex">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <svg
+                      key={star}
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill={star <= testimonial.rating ? "currentColor" : "none"}
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={`h-5 w-5 ${star <= testimonial.rating ? "text-yellow-400" : "text-gray-300"}`}
+                    >
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-12 bg-green-600 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6">{translations.ctaTitle}</h2>
+          <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">{translations.ctaSubtitle}</p>
+          <a
+            href="https://wa.me/+919876543210"
+            className="inline-flex items-center px-6 py-3 bg-white text-green-600 rounded-full hover:bg-gray-100 transition shadow-md font-medium"
+          >
+            <MessageCircle className="h-5 w-5 mr-2" />
+            {translations.startWhatsapp}
+          </a>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white py-10">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-xl font-bold mb-4">Gigwork</h3>
+              <p className="text-gray-400">{translations.footerTagline}</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-4">{translations.quickLinks}</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="#" className="text-gray-400 hover:text-white transition">
+                    {translations.aboutUs}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-gray-400 hover:text-white transition">
+                    {translations.services}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-gray-400 hover:text-white transition">
+                    {translations.contactUs}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-4">{translations.contact}</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li className="flex items-center">
+                  <MapPin className="h-5 w-5 mr-2" />
+                  Kochi, Kerala, India
+                </li>
+                <li className="flex items-center">
+                  <Phone className="h-5 w-5 mr-2" />
+                  +91 9876 543 210
+                </li>
+                <li className="flex items-center">
+                  <Mail className="h-5 w-5 mr-2" />
+                  info@gigwork.in
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2025 Gigwork. {translations.allRightsReserved}</p>
+          </div>
+        </div>
+      </footer>
+
+      {/* Fixed WhatsApp Button */}
+      <a
+        href="https://wa.me/+919876543210"
+        className="fixed bottom-6 right-6 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 transition z-50 flex items-center justify-center"
+      >
+        <MessageCircle className="h-6 w-6" />
+      </a>
+    </div>
+  )
+}
