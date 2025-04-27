@@ -125,7 +125,14 @@ router.get("/renewal", async (c) => {
     const limit = Number(c.req.query("limit")) || 10;
     const days = Number(c.req.query("days")) || 0;
     const search = c.req.query("search") || "";
-    let profiles = await getRenewalProfiles(page, limit, days, search);
+    const category_id = c.req.query("category") || "";
+    let profiles = await getRenewalProfiles(
+      page,
+      limit,
+      days,
+      search,
+      category_id
+    );
 
     if (!profiles) {
       return c.json(

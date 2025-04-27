@@ -271,7 +271,8 @@ export const getRenewalProfiles = async (
   page: number,
   limit: number,
   days: number,
-  search: string
+  search: string,
+  category_id: string
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -302,6 +303,7 @@ export const getRenewalProfiles = async (
           profileId: profile.id,
           profileName: profile.name,
           category: category.name,
+          categoryId: category.id,
           subCategory: subCategory.name,
           subCategoryOption: subCategoryOption.name,
           avatar: profile.avatar,
@@ -332,14 +334,15 @@ export const getRenewalProfiles = async (
         )
         .where(
           sql`julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) < ${days}
-          ${search ? sql` AND (LOWER(${profile.name}) LIKE LOWER(${"%" + search + "%"}) OR LOWER(${user.name}) LIKE LOWER(${"%" + search + "%"}))` : sql``}`
+            ${search ? sql` AND (LOWER(${profile.name}) LIKE LOWER(${"%" + search + "%"}) OR LOWER(${user.name}) LIKE LOWER(${"%" + search + "%"})` : sql``}
+            ${category_id ? sql` AND ${profile.category_id} = ${category_id}` : sql``}`
         )
         .orderBy("statusOrder")
         .orderBy(profilePayment.created_at)
         .limit(limit)
         .offset((page - 1) * limit);
 
-      // Get total count with search filter
+      // Get total count with search and category filters
       const totalCount = await db
         .select({ count: sql`COUNT(*)` })
         .from(profile)
@@ -350,7 +353,8 @@ export const getRenewalProfiles = async (
         )
         .where(
           sql`julianday(DATETIME(${profilePayment.created_at}, '+1 YEAR')) - julianday(CURRENT_TIMESTAMP) < ${days}
-          ${search ? sql` AND (LOWER(${profile.name}) LIKE LOWER(${"%" + search + "%"}) OR LOWER(${user.name}) LIKE LOWER(${"%" + search + "%"}))` : sql``}`
+            ${search ? sql` AND (LOWER(${profile.name}) LIKE LOWER(${"%" + search + "%"}) OR LOWER(${user.name}) LIKE LOWER(${"%" + search + "%"})` : sql``}
+            ${category_id ? sql` AND ${profile.category_id} = ${category_id}` : sql``}`
         );
 
       resolve({
