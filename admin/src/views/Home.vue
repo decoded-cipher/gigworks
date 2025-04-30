@@ -44,7 +44,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</p>
-              <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-1">{{ usersCount.toLocaleString() }}</h3>
+              <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-1">{{ partnersCount+businessCount }}</h3>
             </div>
             <div class="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
