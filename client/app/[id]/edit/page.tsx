@@ -21,7 +21,7 @@ import {
 import MediaGallery from "@/app/components/MediaGallery";
 import Cookies from "js-cookie";
 import OperatingHours from "@/app/components/OperatingHours";
-import { deletebusinessMedia, DeleteLicense, fetchLicenseData } from "@/app/api";
+import { deletebusinessMedia, DeleteLicense, fetchLicenseData, fetchCorrdinates } from "@/app/api";
 import { toast } from "react-hot-toast"; // Add toast for notifications
 import ImageCropper from "@/app/components/ImageCropper";
 import { text } from "stream/consumers";
@@ -119,8 +119,7 @@ export default function EditBusinessPage() {
   // Move all hooks to the top, before any conditional logic
   const [isMounted, setIsMounted] = useState(false);
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
-  
-
+  const [isLoadingCoordinates, setIsLoadingCoordinates] = useState(false);
   const [licenseTypes, setLicenseTypes] = useState<LicenseType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -203,6 +202,69 @@ export default function EditBusinessPage() {
     }
   }, [router]);
 
+  // Update the handleGoogleMapsLinkChange function to fix the coordinate saving issue
+const handleGoogleMapsLinkChange = async (value: string) => {
+  // First, save pending changes for location_url
+  setPendingChanges((prev) => ({
+    ...prev,
+    location_url: value,
+  }));
+  
+  // Then, update the UI state for immediate feedback
+  setBusinessData((prev) => {
+    if (!prev) return null;
+    return {
+      ...prev,
+      profile: {
+        ...prev.profile,
+        location_url: value,
+      }
+    };
+  });
+  
+  // Check if it's a valid Google Maps URL
+  if (value && (value.includes('google.com/maps') || value.includes('maps.app.goo.gl'))) {
+    try {
+      setIsLoadingCoordinates(true);
+      
+      // Call API to fetch coordinates
+      const response = await fetchCorrdinates(value);
+      console.log('Coordinates fetched:', response);
+      
+      // Check for the correct response structure - this is key!
+      const coordinates = response.data?.coordinates || response.coordinates;
+      
+      if (coordinates) {
+        // Update both pendingChanges and businessData state
+        setPendingChanges((prev) => ({
+          ...prev,
+          latitude: coordinates.latitude,
+          longitude: coordinates.longitude,
+        }));
+        
+        setBusinessData((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            profile: {
+              ...prev.profile,
+              latitude: coordinates.latitude,
+              longitude: coordinates.longitude,
+            }
+          };
+        });
+        
+        toast.success("Location coordinates extracted successfully");
+      }
+    } catch (error) {
+      console.error('Error fetching coordinates:', error);
+      toast.error("Failed to extract coordinates from the URL");
+    } finally {
+      setIsLoadingCoordinates(false);
+    }
+  }
+};
+
   const handledeletelicenses = async (licenseId: string) => {
     Swal.fire({
       text: "Are you sure you want to delete this license?",
@@ -238,49 +300,50 @@ export default function EditBusinessPage() {
     }
   };
 
-  const handleFieldChange = (field: string, value: any) => {
-    setPendingChanges((prev) => {
-      const fieldParts = field.split(".");
-      if (fieldParts.length > 1 && fieldParts[0] === "socials") {
-        return {
-          ...prev,
-          socials: {
-            ...(prev.socials || {}),
-            [fieldParts[1]]: value,
-          },
-        };
-      }
+ // Update this function to handle location fields
+const handleFieldChange = (field: string, value: any) => {
+  setPendingChanges((prev) => {
+    const fieldParts = field.split(".");
+    if (fieldParts.length > 1 && fieldParts[0] === "socials") {
       return {
         ...prev,
-        [field]: value,
+        socials: {
+          ...(prev.socials || {}),
+          [fieldParts[1]]: value,
+        },
       };
-    });
+    }
+    return {
+      ...prev,
+      [field]: value,
+    };
+  });
 
-    // Update local state for immediate UI feedback
-    setBusinessData((prev) => {
-      if (!prev) return null;
-      if (field.startsWith("socials.")) {
-        const socialField = field.split(".")[1];
-        return {
-          ...prev,
-          profile: {
-            ...prev.profile,
-            socials: {
-              ...prev.profile.socials,
-              [socialField]: value,
-            },
-          },
-        };
-      }
+  // Update local state for immediate UI feedback
+  setBusinessData((prev) => {
+    if (!prev) return null;
+    if (field.startsWith("socials.")) {
+      const socialField = field.split(".")[1];
       return {
         ...prev,
         profile: {
           ...prev.profile,
-          [field]: value,
+          socials: {
+            ...prev.profile.socials,
+            [socialField]: value,
+          },
         },
       };
-    });
-  };
+    }
+    return {
+      ...prev,
+      profile: {
+        ...prev.profile,
+        [field]: value,
+      },
+    };
+  });
+};
 
   const handleOperatingHoursUpdate = (newHours: { [key: string]: string }) => {
     setPendingChanges((prev) => ({
@@ -718,6 +781,32 @@ export default function EditBusinessPage() {
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
+              <div>
+  <label className="block text-sm font-medium mb-1">
+    Google Maps Link
+  </label>
+  <input
+    type="text"
+    defaultValue={businessData.profile.location_url || ""}
+    onChange={(e) => handleGoogleMapsLinkChange( e.target.value)}
+    className="w-full p-2 border rounded-lg"
+    placeholder="Paste Google Maps URL here"
+  />
+  {isLoadingCoordinates && (
+    <p className="text-sm text-gray-500 mt-1">
+      <span className="inline-block animate-spin mr-1">⟳</span> 
+      Extracting coordinates...
+    </p>
+  )}
+</div>
+
+{/* Add display for coordinates */}
+{businessData.profile.latitude && businessData.profile.longitude && (
+  <div className="mt-2 text-sm text-gray-600">
+    <p>Latitude: {businessData.profile.latitude}</p>
+    <p>Longitude: {businessData.profile.longitude}</p>
+  </div>
+)}
             </div>
           </section>
 
