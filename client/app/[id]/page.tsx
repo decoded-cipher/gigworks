@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-
+import dynamic from "next/dynamic";
 import {
   MapPin,
   Mail,
@@ -22,7 +22,7 @@ import Cookies from "js-cookie";
 
 import ImageGrid from "@/app/components/imgsec";
 import { FooterSection } from "@/app/components/FooterSection";
-import { div } from "framer-motion/client";
+import { a, div } from "framer-motion/client";
 import DynamicQRCode from "@/app/components/QrSection";
 import ScrollToTopButton from "@/app/components/ScrollToTop";
 import {
@@ -33,6 +33,8 @@ import {
 } from "@/app/api";
 import { useParams, useRouter } from "next/navigation";
 import PendingPage from "../components/pending";
+import Lottie from "lottie-react";
+import loadingAnimation from "../../public/assets/loader/Animation - 1746022897581.json";
 // Add this interface with other interfaces
 interface ApiError {
   status: number;
@@ -71,6 +73,9 @@ interface BusinessProfile {
   city: string;
   state: string;
   country: string;
+  latitude: number;
+  longitude: number;
+  location_url: string;
   operating_hours: {
     [key: string]: string;
   };
@@ -141,6 +146,37 @@ const DevMorphixWebsite = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const MapWithNoSSR = dynamic(() => import("../components/MapComponent"), {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-full bg-gray-100 rounded-lg">
+        <div className="flex flex-col items-center text-gray-500">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-8 w-8 mb-2 animate-pulse"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+          <p>Loading map...</p>
+        </div>
+      </div>
+    ),
+  });
+
   // Add JWT token handler function
   const handleJWTToken = () => {
     try {
@@ -207,7 +243,6 @@ const DevMorphixWebsite = () => {
       }
       const res = await UserLogout(token);
 
-
       if (res.status === 200) {
         Cookies.remove("token");
         localStorage.removeItem("userData");
@@ -270,7 +305,7 @@ const DevMorphixWebsite = () => {
       } catch (err) {
         const error = err as ApiError;
         if (error.status === 404) {
-          setError('pending');
+          setError("pending");
           return;
         }
         console.error("Error fetching business data:", error);
@@ -320,18 +355,25 @@ const DevMorphixWebsite = () => {
       alert("No phone number available");
     }
   };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
+          <div className="w-32 h-32">
+            <Lottie
+              animationData={loadingAnimation}
+              loop={true}
+              autoplay={true}
+            />
+          </div>
           <p className="mt-4 text-gray-600">Loading business profile...</p>
         </div>
       </div>
     );
   }
 
-  if (error === 'pending') {
+  if (error === "pending") {
     return <PendingPage />;
   }
 
@@ -457,8 +499,9 @@ const DevMorphixWebsite = () => {
 
           {/* Navigation menu */}
           <div
-            className={`w-full md:block md:w-auto ${isMenuOpen ? "block" : "hidden"
-              }`}
+            className={`w-full md:block md:w-auto ${
+              isMenuOpen ? "block" : "hidden"
+            }`}
             id="navbar-default"
           >
             <ul className="font-medium flex flex-col p-2 sm:p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-4 lg:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
@@ -495,7 +538,10 @@ const DevMorphixWebsite = () => {
               />
             </div>
             {isOwner && (
-              <div className="absolute top-5 sm:top-12 left-4" id="account-dropdown">
+              <div
+                className="absolute top-5 sm:top-12 left-4"
+                id="account-dropdown"
+              >
                 <button
                   onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
                   className="p-2 px-4 text-xs text-white bg-black hover:bg-gray-800 rounded-lg transition-colors flex items-center gap-2"
@@ -511,8 +557,9 @@ const DevMorphixWebsite = () => {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className={`transform transition-transform ${isAccountMenuOpen ? "rotate-180" : ""
-                      }`}
+                    className={`transform transition-transform ${
+                      isAccountMenuOpen ? "rotate-180" : ""
+                    }`}
                   >
                     <path d="m6 9 6 6 6-6" />
                   </svg>
@@ -693,43 +740,46 @@ const DevMorphixWebsite = () => {
             id="service"
             style={{ scrollMarginTop: "100px" }}
           >
-
             {businessData?.profile.additional_services && (
-            <section className="bg-white rounded-full p-6 mb-8">
-              <h2 className="text-2xl font-bold text-center mb-6">
-                Services Provides
-              </h2>
-              <div className="max-w-4xl mx-auto">
-                <div className="flex flex-wrap gap-6 justify-center">
-                  {(
-                    businessData?.profile.additional_services.split(",").slice(0, 5).map(service => {
-                      // Convert camelCase to Title Case with spaces
-                      return service.trim().replace(/([A-Z])/g, ' $1')
-                                         .replace(/^./, str => str.toUpperCase())
-                                         .trim();
-                    }) || [
-                      "App Development",
-                      "Web Development",
-                      "Cloud Services",
-                      "UI/UX Design",
-                      "Digital Marketing",
-                    ]
-                  ).map((service: string, index: number) => (
-                    <button
-                      key={index}
-                      className="w-[250px] bg-stone-800 border-2 text-white border-stone-800 rounded-full px-6 py-2.5 flex items-center justify-center gap-2 hover:bg-white hover:text-black transition-colors duration-300"
-                    >
-                      <span className="text-sm sm:text-base whitespace-nowrap">
-                        {service}
-                      </span>
-                    </button>
-                  ))}
+              <section className="bg-white rounded-full p-6 mb-8">
+                <h2 className="text-2xl font-bold text-center mb-6">
+                  Services Provides
+                </h2>
+                <div className="max-w-4xl mx-auto">
+                  <div className="flex flex-wrap gap-6 justify-center">
+                    {(
+                      businessData?.profile.additional_services
+                        .split(",")
+                        .slice(0, 5)
+                        .map((service) => {
+                          // Convert camelCase to Title Case with spaces
+                          return service
+                            .trim()
+                            .replace(/([A-Z])/g, " $1")
+                            .replace(/^./, (str) => str.toUpperCase())
+                            .trim();
+                        }) || [
+                        "App Development",
+                        "Web Development",
+                        "Cloud Services",
+                        "UI/UX Design",
+                        "Digital Marketing",
+                      ]
+                    ).map((service: string, index: number) => (
+                      <button
+                        key={index}
+                        className="w-[250px] bg-stone-800 border-2 text-white border-stone-800 rounded-full px-6 py-2.5 flex items-center justify-center gap-2 hover:bg-white hover:text-black transition-colors duration-300"
+                      >
+                        <span className="text-sm sm:text-base whitespace-nowrap">
+                          {service}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </section>
-          )}
+              </section>
+            )}
             <hr className="my-4 mx-10 "></hr>
-
 
             <section
               className="flex flex-col md:flex-row gap-6 mb-8"
@@ -740,7 +790,31 @@ const DevMorphixWebsite = () => {
               <div className="md:w-1/2">
                 <div className="bg-white rounded-lg p-6 h-full">
                   <div className="h-[500px] rounded-lg overflow-hidden">
-                    {businessData?.profile.slug.toLowerCase() === "emilia" ? (
+                    {businessData?.profile.latitude &&
+                    businessData?.profile.longitude ? (
+                      <button
+                        onClick={() => {
+                          window.open(
+                            `${businessData.profile.location_url}`,
+                            "_blank"
+                          );
+                        }}
+                        className="w-full h-full"
+                        title="View on Google Maps"
+                      >
+                        {/* Map Component */}
+                        <MapWithNoSSR
+                          position={[
+                            businessData.profile.latitude,
+                            businessData.profile.longitude,
+                          ]}
+                          popupText={
+                            businessData.profile.name || "Business Location"
+                          }
+                        />
+                      </button>
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                      "emilia" ? (
                       <>
                         <iframe
                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3934.8730957553427!2d76.56412737495825!3d9.463395593246565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b062f23a403b63b%3A0xfed9fd50695f7df8!2sEMILIA%20BEAUTY%20HUB%20CHANGANACHERRY!5e0!3m2!1sen!2sin!4v1702359671799!5m2!1sen!2sin"
@@ -867,114 +941,110 @@ const DevMorphixWebsite = () => {
                           referrerPolicy="no-referrer-when-downgrade"
                         ></iframe>
                       </>
-
-                    
                     ) : businessData?.profile.slug.toLowerCase() ===
-                    "altech" ? (
-                    <>
-                      <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1039.0457764470052!2d76.5675167!3d9.437330400000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06255b1dcfebb3%3A0x3109daf53a6bf1ff!2sHrishikesh%20building!5e1!3m2!1sen!2sin!4v1737356965310!5m2!1sen!2sin"
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0 }}
-                        allowFullScreen
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                      ></iframe>
-                    </>
-                  ) : businessData?.profile.slug.toLowerCase() ===
-                  "fabtech" ? (
-                  <>
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d2078.1127415475403!2d76.5664288!3d9.4338151!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06251eeb8d34ad%3A0xef156d4ab8447e21!2sFabtech%20interior%20and%20exterior%20gypsum!5e1!3m2!1sen!2sin!4v1737615318000!5m2!1sen!2sin"
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    ></iframe>
-                  </>
-                ) : businessData?.profile.slug.toLowerCase() ===
-                "drona" ? (
-                <>
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1039.0456727537864!2d76.5674698!3d9.4373648!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625701baac7ab%3A0xa786339129ca58de!2sDrona%20fitness%20centre!5e1!3m2!1sen!2sin!4v1737615500571!5m2!1sen!2sin"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  ></iframe>
-                </>
-              ) : businessData?.profile.slug.toLowerCase() ===
-              "mktech" ? (
-              <>
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d4156.036580982765!2d76.567734!3d9.449475000000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOcKwMjYnNTguMSJOIDc2wrAzNCcwMy44IkU!5e1!3m2!1sen!2sin!4v1737615571336!5m2!1sen!2sin"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                ></iframe>
-              </>
-            ) : businessData?.profile.slug.toLowerCase() ===
-            "abdigitalvision" ? (
-            <>
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d43046.333304051135!2d76.58383945!3d9.4507664!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625913e4243d7%3A0xf6c0ab6d281939a6!2sThrikkodithanam%2C%20Kerala!5e1!3m2!1sen!2sin!4v1737615756685!5m2!1sen!2sin"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              ></iframe>
-            </>
-          ) : businessData?.profile.slug.toLowerCase() ===
-          "sriambikadecor" ? (
-          <>
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d5380.799053926908!2d76.5624093!3d9.4502936!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625bd70eb9cfb%3A0xdbee1de18b9c2bd8!2sSri%20Ambika%20Decoration!5e1!3m2!1sen!2sin!4v1737615901900!5m2!1sen!2sin"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            ></iframe>
-          </>
-        ) : businessData?.profile.slug.toLowerCase() ===
-        "kasthuritissue" ? (
-        <>
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d719.9638923314029!2d76.5666106241674!3d9.449273442096539!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625b7fd82ef3b%3A0x2f0376ec4bbc0c1!2sKasthuri%20premium%20tissues!5e0!3m2!1sen!2sin!4v1737634242110!5m2!1sen!2sin"
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
-        </>
-      ) : businessData?.profile.slug.toLowerCase() ===
-      "highlights" ? (
-      <>
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3561.6865699278346!2d76.560034!3d9.439651199999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625000deeaf6d%3A0xccd860b6c0f7451f!2sHighlights%20unisex%20salon%20and%20makeup%20studio%20mukkattupadi%20changanacherry!5e1!3m2!1sen!2sin!4v1738653509591!5m2!1sen!2sin"
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          allowFullScreen
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        ></iframe>
-      </>
-    ) : (
-
+                      "altech" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1039.0457764470052!2d76.5675167!3d9.437330400000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06255b1dcfebb3%3A0x3109daf53a6bf1ff!2sHrishikesh%20building!5e1!3m2!1sen!2sin!4v1737356965310!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                      </>
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                      "fabtech" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d2078.1127415475403!2d76.5664288!3d9.4338151!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06251eeb8d34ad%3A0xef156d4ab8447e21!2sFabtech%20interior%20and%20exterior%20gypsum!5e1!3m2!1sen!2sin!4v1737615318000!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                      </>
+                    ) : businessData?.profile.slug.toLowerCase() === "drona" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1039.0456727537864!2d76.5674698!3d9.4373648!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625701baac7ab%3A0xa786339129ca58de!2sDrona%20fitness%20centre!5e1!3m2!1sen!2sin!4v1737615500571!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                      </>
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                      "mktech" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d4156.036580982765!2d76.567734!3d9.449475000000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOcKwMjYnNTguMSJOIDc2wrAzNCcwMy44IkU!5e1!3m2!1sen!2sin!4v1737615571336!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                      </>
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                      "abdigitalvision" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d43046.333304051135!2d76.58383945!3d9.4507664!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625913e4243d7%3A0xf6c0ab6d281939a6!2sThrikkodithanam%2C%20Kerala!5e1!3m2!1sen!2sin!4v1737615756685!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                      </>
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                      "sriambikadecor" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d5380.799053926908!2d76.5624093!3d9.4502936!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625bd70eb9cfb%3A0xdbee1de18b9c2bd8!2sSri%20Ambika%20Decoration!5e1!3m2!1sen!2sin!4v1737615901900!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                      </>
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                      "kasthuritissue" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d719.9638923314029!2d76.5666106241674!3d9.449273442096539!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625b7fd82ef3b%3A0x2f0376ec4bbc0c1!2sKasthuri%20premium%20tissues!5e0!3m2!1sen!2sin!4v1737634242110!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                      </>
+                    ) : businessData?.profile.slug.toLowerCase() ===
+                      "highlights" ? (
+                      <>
+                        <iframe
+                          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3561.6865699278346!2d76.560034!3d9.439651199999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0625000deeaf6d%3A0xccd860b6c0f7451f!2sHighlights%20unisex%20salon%20and%20makeup%20studio%20mukkattupadi%20changanacherry!5e1!3m2!1sen!2sin!4v1738653509591!5m2!1sen!2sin"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                      </>
+                    ) : (
                       <iframe
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d251482.44857791857!2d76.1643857954714!3d9.982669325611842!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d514abec6bf%3A0xbd582caa5844192!2sKochi%2C%20Kerala!5e0!3m2!1sen!2sin!4v1702359671799!5m2!1sen!2sin"
                         width="100%"
@@ -984,6 +1054,21 @@ const DevMorphixWebsite = () => {
                       />
                     )}
                   </div>
+
+                  {/* Add a View on Google Maps link if coordinates are available */}
+                  {businessData?.profile.latitude &&
+                    businessData?.profile.longitude && (
+                      <div className="mt-2">
+                        <a
+                          href={`${businessData.profile.location_url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-500 hover:text-blue-700"
+                        >
+                          View on Google Maps →
+                        </a>
+                      </div>
+                    )}
                 </div>
               </div>
 
@@ -1190,8 +1275,8 @@ const DevMorphixWebsite = () => {
           >
             <DynamicQRCode
               slug={slug || ""}
-            // currentUrl={window.location.href} 
-            // handleShare={handleShare} 
+              // currentUrl={window.location.href}
+              // handleShare={handleShare}
             />
           </section>
         </main>

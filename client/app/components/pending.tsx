@@ -1,5 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import Lottie from 'lottie-react'
+import loadingAnimation from '../../public/assets/loader/Animation - 1746022897581.json'
 
 function Pending() {
   const [hasToken, setHasToken] = useState(false);
@@ -12,9 +14,23 @@ function Pending() {
   return (
     <div className='flex flex-col items-center justify-center h-screen'>
       {hasToken ? (
+        <div className="w-32 h-32">
+        <Lottie
+          animationData={loadingAnimation}
+          loop={true}
+          autoplay={true}
+        />
         <h2>Welcome to gigwork. Approval pending</h2>
+      </div>
       ) : (
+        <div className="w-32 h-32">
+          <Lottie
+            animationData={loadingAnimation}
+            loop={true}
+            autoplay={true}
+          />
         <h2>Page not found</h2>
+        </div>
       )}
     </div>
   );
