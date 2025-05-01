@@ -149,6 +149,12 @@ function Privacy() {
                   the deletion of your personal information by contacting us. We will
                   comply with your request, subject to our legal obligations.
                 </li>
+                <li>
+                  <span className="font-semibold">Third-Party Links:</span> We are not
+                  responsible for the privacy practices or content of these external
+                  sites. We encourage you to review the privacy policies of any
+                  third-party sites you visit.
+                </li>
               </ul>
             </section>
             

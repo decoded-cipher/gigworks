@@ -17,7 +17,7 @@ function Terms() {
           
           <div className="prose prose-lg max-w-none">
             <p className="mb-6">
-              Welcome to <span className="font-semibold">GigWork</span>. These Terms &
+              Welcome to <span className="font-semibold">GigWork</span>. These Terms &amp;
               Conditions (&quot;Terms&quot;) govern your use of our website and
               services. By accessing or using our website, you agree to comply with
               and be bound by these Terms. If you do not agree to these Terms,
@@ -118,7 +118,7 @@ function Terms() {
                   <span className="font-semibold">No Warranty:</span> Our website and
                   services are provided on an &quot;as is&quot; and &quot;as
                   available&quot; basis. We make no warranties, express or implied,
-                  regarding the website's operation, accuracy, reliability, or
+                  regarding the website&apos;s operation, accuracy, reliability, or
                   availability.
                 </li>
                 <li>

@@ -10,8 +10,8 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 
 // Dynamically import the Leaflet components to avoid SSR issues
 const MapWithNoSSR = dynamic(
-  () => import('../MapComponent'), 
-  { 
+  () => import('../MapComponent'),
+  {
     ssr: false,
     loading: () => (
       <div className="rounded-md border border-gray-300 h-[300px] flex items-center justify-center bg-gray-100">
@@ -89,8 +89,8 @@ export default function LocationDetails({
       };
       updateFormData(initialSchedule);
     } else if (
-      formData.operatingHours.length === 1 && 
-      formData.operatingHours[0].day === "Monday" && 
+      formData.operatingHours.length === 1 &&
+      formData.operatingHours[0].day === "Monday" &&
       (!formData.operatingHours[0].startTime || !formData.operatingHours[0].endTime)
     ) {
       // Ensure default times are set for Monday if they're missing
@@ -125,7 +125,7 @@ export default function LocationDetails({
   // Update the handleAddressChange function to extract coordinates from Google Maps link
   const handleAddressChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    
+
     if (name === 'location') {
       // Update Google Maps Location field immediately
       updateFormData({
@@ -134,18 +134,18 @@ export default function LocationDetails({
           googleMapsLocation: value
         }
       })
-      
+
       // Check if it's a Google Maps link
       if (value && (value.includes('google.com/maps') || value.includes('maps.app.goo.gl'))) {
         try {
           // Call the API to fetch coordinates
           const response = await fetchCorrdinates(value);
           console.log('Coordinates fetched:', response);
-          
+
           if (response?.data.coordinates) {
             // Update form data with the fetched coordinates
             console.log('Updating form data with coordinates:', response.data.coordinates);
-            
+
             updateFormData({
               location: {
                 ...formData.location,
@@ -153,7 +153,7 @@ export default function LocationDetails({
                 latitude: response.data.coordinates.latitude,
                 longitude: response.data.coordinates.longitude
               }
-              
+
             });
           }
           console.log('Form data updated with coordinates:', formData.location);
@@ -186,7 +186,7 @@ export default function LocationDetails({
       }
       return hour;
     });
-    
+
     updateFormData({
       operatingHours: newHours
     });
@@ -197,7 +197,7 @@ export default function LocationDetails({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target
-    const newHandles = formData.socialMediaHandles.map((handle, i) => 
+    const newHandles = formData.socialMediaHandles.map((handle, i) =>
       i === index ? { ...handle, [name]: value } : handle
     )
     updateFormData({ socialMediaHandles: newHandles })
@@ -207,7 +207,7 @@ export default function LocationDetails({
     const selectedDays = formData.operatingHours.map(hour => hour.day)
     const availableDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
       .filter(day => !selectedDays.includes(day))
-    
+
     if (availableDays.length > 0) {
       updateFormData({
         operatingHours: [
@@ -222,17 +222,17 @@ export default function LocationDetails({
     // Prevent removing if it's Monday and it's the only entry
     if (index === 0 && formData.operatingHours.length === 1 && formData.operatingHours[0].day === "Monday") {
       return
-    } 
-    
+    }
+
     updateFormData({
       operatingHours: formData.operatingHours.filter((_, i) => i !== index)
     })
-  }  
+  }
   const addSocialMediaHandle = () => {
     const selectedPlatforms = formData.socialMediaHandles.map(handle => handle.platform)
     const availablePlatforms = [
       "Instagram",
-      "Facebook", 
+      "Facebook",
       "X (Twitter)",
       "LinkedIn",
       "Website",
@@ -245,7 +245,7 @@ export default function LocationDetails({
       "GitHub",
       "Medium",
     ].filter(platform => !selectedPlatforms.includes(platform))
-    
+
     if (availablePlatforms.length > 0) {
       updateFormData({
         socialMediaHandles: [
@@ -264,14 +264,14 @@ export default function LocationDetails({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     // Ensure Monday has default times before submission
     const updatedHours = formData.operatingHours.map(hour => ({
       ...hour,
       startTime: hour.startTime || "09:00",
       endTime: hour.endTime || "17:00"
     }));
-  
+
     updateFormData({ operatingHours: updatedHours });
     onNext();
   };
@@ -280,7 +280,7 @@ export default function LocationDetails({
     const selectedDays = formData.operatingHours
       .filter((_, index) => index !== currentIndex)
       .map(hour => hour.day)
-    
+
     return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
       .filter(day => !selectedDays.includes(day))
   }
@@ -289,7 +289,7 @@ export default function LocationDetails({
     const selectedPlatforms = formData.socialMediaHandles
       .filter((_, index) => index !== currentIndex)
       .map(handle => handle.platform)
-    
+
     return [
       "Instagram",
       "Facebook",
@@ -313,87 +313,87 @@ export default function LocationDetails({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="w-full bg-white rounded-md p-4 sm:p-6">
-            <div>
-              <h2 className="py-2 sm:py-4 font-semibold text-xl">
-                Address & Location <span className="text-red-500">*</span>
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  name="streetAddress"
-                  value={formData.address.streetAddress}
-                  onChange={handleAddressChange}
-                  placeholder="Street Address"
-                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
-                  required
-                />
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.address.city}
-                  onChange={handleAddressChange}
-                  placeholder="City/Town"
-                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
-                  required
-                />
-                <input
-                  type="text"
-                  name="state"
-                  value={formData.address.state}
-                  onChange={handleAddressChange}
-                  placeholder="State"
-                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
-                  required
-                />
-                <input
-                  type="text"
-                  name="pinCode"
-                  value={formData.address.pinCode}
-                  onChange={handleAddressChange}
-                  placeholder="Pin Code"
-                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
-                  required
-                />
-                <input
-                  type="text"
-                  name='location'
-                  value={formData.location.googleMapsLocation}
-                  onChange={handleAddressChange}
-                  placeholder='Google Maps Location'
-                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030] col-span-2"
-                  required
-                />
-                {/* Replace the iframe section with this */}
-                <div className="col-span-2 mt-4 z-10">
-                  {formData.location.latitude && formData.location.longitude ? (
-                    <MapWithNoSSR 
-                      position={[formData.location.latitude, formData.location.longitude]} 
-                      popupText={formData.address.streetAddress || "Business Location"}
-                    />
-                  ) : formData.location.googleMapsLocation ? (
-                    <div className="rounded-md border border-gray-300 h-[300px] flex items-center justify-center bg-gray-100">
-                      <div className="flex flex-col items-center text-gray-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <p>Extracting coordinates from the link...</p>
-                      </div>
+          <div>
+            <h2 className="py-2 sm:py-4 font-semibold text-xl">
+              Address & Location <span className="text-red-500">*</span>
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input
+                type="text"
+                name="streetAddress"
+                value={formData.address.streetAddress}
+                onChange={handleAddressChange}
+                placeholder="Street Address"
+                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                required
+              />
+              <input
+                type="text"
+                name="city"
+                value={formData.address.city}
+                onChange={handleAddressChange}
+                placeholder="City/Town"
+                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                required
+              />
+              <input
+                type="text"
+                name="state"
+                value={formData.address.state}
+                onChange={handleAddressChange}
+                placeholder="State"
+                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                required
+              />
+              <input
+                type="text"
+                name="pinCode"
+                value={formData.address.pinCode}
+                onChange={handleAddressChange}
+                placeholder="Pin Code"
+                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030]"
+                required
+              />
+              <input
+                type="text"
+                name='location'
+                value={formData.location.googleMapsLocation}
+                onChange={handleAddressChange}
+                placeholder='Google Maps Location'
+                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-[#303030] col-span-2"
+                required
+              />
+              {/* Replace the iframe section with this */}
+              <div className="col-span-2 mt-4 z-10">
+                {formData.location.latitude && formData.location.longitude ? (
+                  <MapWithNoSSR
+                    position={[formData.location.latitude, formData.location.longitude]}
+                    popupText={formData.address.streetAddress || "Business Location"}
+                  />
+                ) : formData.location.googleMapsLocation ? (
+                  <div className="rounded-md border border-gray-300 h-[300px] flex items-center justify-center bg-gray-100">
+                    <div className="flex flex-col items-center text-gray-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <p>Extracting coordinates from the link...</p>
                     </div>
-                  ) : (
-                    <div className="rounded-md border border-gray-300 h-[300px] flex items-center justify-center bg-gray-100">
-                      <div className="flex flex-col items-center text-gray-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <p>Enter a Google Maps link to see the location</p>
-                      </div>
+                  </div>
+                ) : (
+                  <div className="rounded-md border border-gray-300 h-[300px] flex items-center justify-center bg-gray-100">
+                    <div className="flex flex-col items-center text-gray-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <p>Enter a Google Maps link to see the location</p>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
+          </div>
 
           {/* Operating Hours */}
           <div className="mt-6 space-y-1">
@@ -427,13 +427,13 @@ export default function LocationDetails({
                       // First dropdown shows Monday only if it's the initial entry
                       formData.operatingHours.length === 1 ? (
                         <>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                        <option value="Sunday">Sunday</option>
+                          <option value="Monday">Monday</option>
+                          <option value="Tuesday">Tuesday</option>
+                          <option value="Wednesday">Wednesday</option>
+                          <option value="Thursday">Thursday</option>
+                          <option value="Friday">Friday</option>
+                          <option value="Saturday">Saturday</option>
+                          <option value="Sunday">Sunday</option>
                         </>
                       ) : (
                         ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
