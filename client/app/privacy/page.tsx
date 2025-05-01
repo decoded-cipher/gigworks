@@ -63,7 +63,7 @@ function Privacy() {
                 <li>
                   <span className="font-semibold">Provide and Improve Our Services:</span> To 
                   operate, maintain, and enhance our directory, including
-                  personalizing your experience and improving our website's
+                  personalizing your experience and improving our website&apos;s
                   functionality.
                 </li>
                 <li>
@@ -150,7 +150,7 @@ function Privacy() {
                   comply with your request, subject to our legal obligations.
                 </li>
                 <li>
-                  <span className="font-semibold">Third-Party Links:</span> We are not
+                  <span className="font-semibold">Third-Party Links:</span> We aren&apos;t
                   responsible for the privacy practices or content of these external
                   sites. We encourage you to review the privacy policies of any
                   third-party sites you visit.
