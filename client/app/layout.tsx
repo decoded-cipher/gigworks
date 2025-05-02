@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google';
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://gigwork.co.in'),
-    title: 'Gigwork - WhatsApp Business Integration Platform',
+    title: 'GigWork - Find Verified Professionals & Skilled Service Providers',
     description: 'GigWork is a trusted directory platform that helps you discover verified professionals and skilled service providers across various fields. Easily find and connect with the right expert for your task — anytime, anywhere.',
     keywords: 'Gigwork, WhatsApp business, Kerala business, customer communication, business growth, digital transformation, service providers, plumbers',
     openGraph: {
@@ -13,14 +13,14 @@ export const metadata: Metadata = {
         locale: 'en_IN',
         url: 'https://gigwork.co.in',
         siteName: 'Gigwork',
-        title: 'Gigwork - WhatsApp Business Integration Platform',
+        title: 'GigWork - Find Verified Professionals & Skilled Service Providers',
         description: 'Transform your business with WhatsApp integration. Connect with customers seamlessly on India\'s growing business platform.',
         images: [
             {
                 url: 'https://gigwork.co.in/assets/og-image.png',
                 width: 1200,
                 height: 630,
-                alt: 'Gigwork - WhatsApp Business Integration Platform',
+                alt: 'GigWork - Find Verified Professionals & Skilled Service Providers',
             },
         ],
     },
