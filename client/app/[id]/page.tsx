@@ -787,7 +787,7 @@ const DevMorphixWebsite = () => {
               style={{ scrollMarginTop: "100px" }}
             >
               {/* Map Section - Left Side */}
-              <div className="md:w-1/2">
+              <div className="md:w-1/2 z-10">
                 <div className="bg-white rounded-lg p-6 h-full">
                   <div className="h-[500px] rounded-lg overflow-hidden">
                     {businessData?.profile.latitude &&
