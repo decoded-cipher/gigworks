@@ -121,6 +121,9 @@ export default {
                 this.subCategory = response.data.subCategory;
                 this.subCategoriesOptions = response.data.subCategoryOption;
                 console.log(this.subCategoriesOptions);
+
+                console.log("subCategory",this.subCategory);
+                
                 
             } catch (error) {
                 console.error(error);
@@ -129,7 +132,7 @@ export default {
         openAddModal() {
             this.showModal = true;
             this.isAdd = true;
-            this.isEdit = false;            
+            this.isEdit = false;           
         },
         openEditModal(subCategoryOption) {
             this.showModal = true;
@@ -152,8 +155,9 @@ export default {
 
             const data = {
                 name: this.subCategoryOptionForm.name,
-                sub_category_id: this.editSubCategoryId
+                sub_category_id: this.subCategory.id
             }
+            console.log("data",data);
 
             try {
                 await addSubCategoryOptions(data);
