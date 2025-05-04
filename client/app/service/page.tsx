@@ -5,6 +5,8 @@ import gigworks from "../../public/assets/media/gigworksblk.svg";
 import Image from "next/image";
 import { fetchBusinessData } from "../api/index";
 import { CategorySkeleton } from "../components/categorySkelton";
+import ServiceSearchSection from "../components/ServiceSearchSection";
+
 
 import {
   Home,
@@ -344,38 +346,31 @@ const getCategoryIcon = (categoryTitle: string) => {
 
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-green-50 to-white py-12 md:py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
-            {translations.heroTitle}
-          </h1>
-          <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            {translations.heroSubtitle}
-          </p>
+  <div className="container mx-auto px-4 text-center">
+    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
+      {translations.heroTitle}
+    </h1>
+    <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+      {translations.heroSubtitle}
+    </p>
 
-          {/* Search Bar */}
-          <div className="relative max-w-md mx-auto mb-12">
-            <input
-              type="text"
-              placeholder={translations.searchPlaceholder}
-              className="w-full px-5 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm"
-            />
-            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition">
-              <Search className="h-5 w-5" />
-            </button>
-          </div>
+    {/* Replace the old search bar with the new component */}
+    <div className="max-w-3xl mx-auto mb-12">
+      <ServiceSearchSection />
+    </div>
 
-          {/* WhatsApp Button (Mobile) */}
-          <div className="md:hidden">
-            <a
-              href="https://wa.me/+919876543210"
-              className="inline-flex items-center px-5 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition shadow-md"
-            >
-              <MessageCircle className="h-5 w-5 mr-2" />
-              {translations.whatsappCTA}
-            </a>
-          </div>
-        </div>
-      </section>
+    {/* WhatsApp Button (Mobile) */}
+    <div className="md:hidden">
+      <a
+        href="https://wa.me/+919876543210"
+        className="inline-flex items-center px-5 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition shadow-md"
+      >
+        <MessageCircle className="h-5 w-5 mr-2" />
+        {translations.whatsappCTA}
+      </a>
+    </div>
+  </div>
+</section>
 
      {/* Categories Section - Original UI with dynamic data */}
 <section className="py-12 bg-white">
