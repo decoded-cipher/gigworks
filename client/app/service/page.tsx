@@ -258,6 +258,9 @@ export default function HomePage() {
         return <Home className="h-6 w-6 text-green-600" />;
     }
   };
+  const whatsapp = () => {  
+    window.open("https://wa.me/+918590012027", "_blank");
+  }
 
   // Helper function to render step icon
   const renderStepIcon = (iconName: string) => {
@@ -387,7 +390,7 @@ export default function HomePage() {
             >
               {language === "en" ? "മലയാളം" : "English"}
             </button> */}
-            <button className="inline-flex items-center justify-center hidden md:flex px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+            <button onClick={whatsapp} className="inline-flex items-center justify-center hidden md:flex px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
               {/* Simplified WhatsApp SVG */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -423,7 +426,7 @@ export default function HomePage() {
           {/* WhatsApp Button (Mobile) */}
           <div className="md:hidden">
             <a
-              href="https://wa.me/+919876543210"
+              href="https://wa.me/+918590012027"
               className="inline-flex items-center px-5 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition shadow-md"
             >
               <MessageCircle className="h-5 w-5 mr-2" />
@@ -612,7 +615,7 @@ export default function HomePage() {
             {translations.ctaSubtitle}
           </p>
           <a
-            href="https://wa.me/+919876543210"
+            href="https://wa.me/+918590012027"
             className="inline-flex items-center px-6 py-3 bg-white text-green-600 rounded-full hover:bg-gray-100 transition shadow-md font-medium"
           >
             <svg
@@ -655,7 +658,7 @@ export default function HomePage() {
 
       {/* Fixed WhatsApp Button */}
       <a
-        href="https://wa.me/+919876543210"
+        href="https://wa.me/+918590012027"
         className="fixed bottom-6 right-6 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 transition z-50 flex items-center justify-center"
       >
         <svg
