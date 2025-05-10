@@ -70,6 +70,10 @@ export interface Profile {
     state?: string;
     zip?: string;
     country?: string;
+    
+    latitude?: number;
+    longitude?: number;
+    location_url?: string;
 
     operating_hours?: string;
     socials?: string;
@@ -181,4 +185,5 @@ export interface PartnerIdProof {
 export interface Coordinates {
     latitude: number;
     longitude: number;
+    location_url?: string;
 };

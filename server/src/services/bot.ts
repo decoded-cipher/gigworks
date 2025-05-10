@@ -111,3 +111,41 @@ export const processRequestService = async (service: string, location: any): Pro
         }
     })
 }
+
+
+
+export const sendMessageToInterakt = async (message: string, phone: string, env: Env) => {
+
+    const url = `https://api.interakt.ai/v1/public/message/`;
+
+    const payload = {
+        userId: "",
+        fullPhoneNumber: `+91${phone}`,
+        callbackData: "some_callback_data",
+        type: "Text",
+        data: {
+            message: message
+        }
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Authorization": `Basic ${env.INTERAKT_API_KEY}`,
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error sending message: ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error sending message to Interakt:", error);
+        throw error;
+    }
+}

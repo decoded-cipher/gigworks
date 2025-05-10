@@ -65,10 +65,14 @@ router.post('/check_service', async (c) => {
  **/
 
 router.post('/request_service', async (c) => {
-    const { service } = await c.req.json();
+    let { service, location } = await c.req.json();
     
     const locationHeader = c.req.header('X-User-Location');
-    const location = JSON.parse(locationHeader);
+
+    if (locationHeader) {
+        const locationData = JSON.parse(locationHeader);
+        location = JSON.parse(locationHeader) || location;
+    }
 
     if (!service || !location) {
         return c.json({

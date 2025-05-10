@@ -1,3 +1,4 @@
+
 import { count, eq, sql } from "drizzle-orm";
 import { db } from "../config/database/turso";
 import {
@@ -15,6 +16,8 @@ import {
 } from "../config/database/schema";
 import { User, Profile, SubCategory } from "../config/database/interfaces";
 import { removeFields } from "../utils/helpers";
+
+
 
 // Create a new profile (business) for a user
 export const createProfile = async (data: Profile) => {
@@ -75,6 +78,8 @@ export const createProfile = async (data: Profile) => {
   });
 };
 
+
+
 // Update a profile partially
 export const updateProfile = async (id: string, data: Profile) => {
   return new Promise(async (resolve, reject) => {
@@ -93,6 +98,9 @@ export const updateProfile = async (id: string, data: Profile) => {
         "state",
         "zip",
         "country",
+        "latitude",
+        "longitude",
+        "location_url",
         "operating_hours",
         "socials",
         "type",
@@ -140,6 +148,8 @@ export const updateProfile = async (id: string, data: Profile) => {
     }
   });
 };
+
+
 
 // Get all profiles by category id with pagination
 export const getProfilesByCategory = async (
@@ -205,6 +215,8 @@ export const getProfilesByCategory = async (
   });
 };
 
+
+
 // Get all profiles by user
 export const getProfilesByUser = async (user_id: string) => {
   return new Promise(async (resolve, reject) => {
@@ -227,6 +239,8 @@ export const getProfilesByUser = async (user_id: string) => {
   });
 };
 
+
+
 // Check if profile exists
 export const getProfileById = async (id: string) => {
   return new Promise(async (resolve, reject) => {
@@ -245,6 +259,8 @@ export const getProfileById = async (id: string) => {
     }
   });
 };
+
+
 
 // Get total number of profiles (businesses)
 export const getProfileCount = async () => {
@@ -265,6 +281,8 @@ export const getProfileCount = async () => {
     }
   });
 };
+
+
 
 // Get all profiles with upcoming renewals
 export const getRenewalProfiles = async (
@@ -389,6 +407,8 @@ export const getRenewalProfiles = async (
   });
 };
 
+
+
 // Check if profile slug exists
 export const checkProfileSlug = async (slug: string) => {
   return new Promise(async (resolve, reject) => {
@@ -407,6 +427,8 @@ export const checkProfileSlug = async (slug: string) => {
     }
   });
 };
+
+
 
 // Get profile by slug
 export const getProfileBySlug = async (slug: string) => {
@@ -539,6 +561,8 @@ export const getProfileBySlug = async (slug: string) => {
   });
 };
 
+
+
 // Update profile status (approve/reject)
 export const updateProfileStatus = async (id: string, status: number) => {
   return new Promise(async (resolve, reject) => {
@@ -557,6 +581,8 @@ export const updateProfileStatus = async (id: string, status: number) => {
     }
   });
 };
+
+
 
 // Get all profiles by sub-category option
 export const getProfilesBySubCategoryOption = async (
