@@ -485,6 +485,28 @@ export const createBusiness = async (data: BusinessPayload) => {
 }
 
 
+export const getPaymentLink = async () => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    if (!token) {
+      throw new Error('No token provided');
+    }
+
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/payment/initiate`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching payment link:', error);
+    throw error;
+  }
+}
+
+
 export const fetchsubCategoryByCategory = async (categoryId: string) => {
   try {
     const response = await axios.get(
