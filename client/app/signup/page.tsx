@@ -10,6 +10,20 @@ import BusinessOperations from "../components/signup/business-operations";
 import { createBusiness, getPaymentLink } from "../api/index";
 import { form } from "framer-motion/client";
 
+declare global {
+  interface Window {
+    PhonePeCheckout?: {
+      transact: (options: {
+        tokenUrl: string;
+        type: "IFRAME" | "REDIRECT";
+        callback: (status: string) => void;
+      }) => void;
+      closePage?: () => void;
+    };
+  }
+}
+
+
 // Define the main form data interface
 export interface FormData {
   // Business Overview
@@ -75,16 +89,22 @@ export interface FormData {
 
 export default function SignupPage() {
   
-  // useEffect(() => {
-  //   const script = document.createElement("script");
-  //   script.src = "https://mercury-stg.phonepe.com/web/bundle/checkout.js";
-  //   script.defer = true;
-  //   document.body.appendChild(script);
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://mercury-stg.phonepe.com/web/bundle/checkout.js";
+    script.defer = true;
+    script.onload = () => {
+      console.log("PhonePeCheckout loaded");
+    };
+    script.onerror = () => {
+      toast.error("Failed to load PhonePe SDK.");
+    };
+    document.body.appendChild(script);
   
-  //   return () => {
-  //     document.body.removeChild(script);
-  //   };
-  // }, []);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);  
   
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({

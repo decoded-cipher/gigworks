@@ -105,7 +105,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     }}
                 />
 
-                <script src="https://mercury.phonepe.com/web/bundle/checkout.js"></script>
 
             </head>
             <body>{children}</body>
