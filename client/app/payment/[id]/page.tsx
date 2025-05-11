@@ -32,7 +32,7 @@ export default function PaymentStatus() {
         const result = await checkPaymentStatus(transactionId)
         
         if (result?.status) {
-          setStatus(result.status)
+          setStatus(result.data.payment_status)
         }
       } catch (error) {
         console.error('Payment verification failed:', error)
