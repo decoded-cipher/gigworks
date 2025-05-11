@@ -285,7 +285,7 @@ export default function SignupPage() {
       });
       console.log("Payment response:", paymentResponse);
 
-      const tokenUrl = paymentResponse?.paymentUrl;
+      const tokenUrl = paymentResponse?.data?.paymentUrl;
 
       const callback = (status: string) => {
         if (status === 'USER_CANCEL') {
