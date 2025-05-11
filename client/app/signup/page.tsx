@@ -68,6 +68,7 @@ export interface FormData {
 
   // Business Operations
   referral_code: string;
+  paymentMethod: 'cash' | 'phonepe' | '';
   gstin: string;
   otherLicenses: Array<{
     type: string;
@@ -154,6 +155,7 @@ export default function SignupPage() {
 
     // Business Operations initial state
     referral_code: "",
+    paymentMethod: '',
     gstin: "",
     otherLicenses: [
       {
@@ -276,7 +278,7 @@ export default function SignupPage() {
 
       const paymentResponse = await getPaymentLink({
         profile_id: response?.data?.id,
-        mode: "phonepe", // cash or phonepe
+        mode: formData.paymentMethod, // cash or phonepe
         type: "new",
       });
       console.log("Payment response:", paymentResponse);
