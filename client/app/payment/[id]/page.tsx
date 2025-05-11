@@ -28,11 +28,12 @@ export default function PaymentStatus() {
   useEffect(() => {
     const verifyPayment = async () => {
       try {
+        
         const transactionId = Array.isArray(params.id) ? params.id[0] : params.id // Ensure transactionId is a string
         const result = await checkPaymentStatus(transactionId)
-        
-        if (result?.status) {
+        if (result) {
           setStatus(result.data.payment_status)
+          
         }
       } catch (error) {
         console.error('Payment verification failed:', error)
