@@ -261,10 +261,6 @@ export default function SignupPage() {
           phone: userData.phone
         },
         profile: profileData,
-        payment: {
-          mode: "phonepe",
-          // mode: "cash",
-        },
         license: formData.otherLicenses
           .filter(license => license.type && license.registrationNumber)
           .map(license => ({
@@ -280,7 +276,7 @@ export default function SignupPage() {
 
       const paymentResponse = await getPaymentLink({
         profile_id: response?.data?.id,
-        mode: "phonepe",
+        mode: "phonepe", // cash or phonepe
         type: "new",
       });
       console.log("Payment response:", paymentResponse);
@@ -290,10 +286,20 @@ export default function SignupPage() {
       const callback = (status: string) => {
         if (status === 'USER_CANCEL') {
           toast.error("Payment was cancelled.");
+          console.log(">> Payment cancelled");
+          
         } else if (status === 'CONCLUDED') {
           toast.success("Payment successful!");
+          console.log(">> Payment successful");
+
         } else if (status === 'FAILED') {
           toast.error("Payment failed. Please try again.");
+          console.log(">> Payment failed");
+
+        } else {
+          toast.error("Unknown payment status.");
+          console.log(">> Unknown payment status");
+          
         }
       };
 
