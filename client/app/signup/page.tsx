@@ -289,14 +289,17 @@ export default function SignupPage() {
         if (status === 'USER_CANCEL') {
           toast.error("Payment was cancelled.");
           console.log(">> Payment cancelled");
+          router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
           
         } else if (status === 'CONCLUDED') {
           toast.success("Payment successful!");
           console.log(">> Payment successful");
+          router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
 
         } else if (status === 'FAILED') {
           toast.error("Payment failed. Please try again.");
           console.log(">> Payment failed");
+          router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
 
         } else {
           toast.error("Unknown payment status.");

@@ -14,22 +14,22 @@ function Pending() {
   return (
     <div className='flex flex-col items-center justify-center h-screen'>
       {hasToken ? (
-        <div className="w-32 h-32">
+        <div className="w-auto h-1/2">
         <Lottie
           animationData={loadingAnimation}
           loop={true}
           autoplay={true}
         />
-        <h2>Welcome to gigwork. Approval pending</h2>
+        <h2 className='text-center'>Welcome to gigwork. Approval pending</h2>
       </div>
       ) : (
-        <div className="w-32 h-32">
+        <div className="w-auto h-1/2">
           <Lottie
             animationData={loadingAnimation}
             loop={true}
             autoplay={true}
           />
-        <h2>Page not found</h2>
+        <h2 className='text-center'>Page not found</h2>
         </div>
       )}
     </div>

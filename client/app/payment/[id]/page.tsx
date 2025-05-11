@@ -1,24 +1,51 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams, useParams } from "next/navigation"
 import { CheckCircle, XCircle, Clock } from "lucide-react"
+import { checkPaymentStatus } from "../../api/index"
 
 export default function PaymentStatus() {
   const router = useRouter()
+  const params = useParams()
   const searchParams = useSearchParams()
-  const status = searchParams.get("status") || "success"
-const nextUrl = searchParams.get("next") 
+  const [status, setStatus] = useState(searchParams.get("status") || "pending")
+  const [isLoading, setIsLoading] = useState(true)
+
+  const nextUrl = searchParams.get("next") 
     ? searchParams.get("next")?.startsWith('/') 
       ? searchParams.get("next") 
       : `/${searchParams.get("next")}`
     : "/"
+
   const [timeLeft, setTimeLeft] = useState(5)
   const [redirecting, setRedirecting] = useState(!!searchParams.get("next"))
 
+  // Add payment status check on component mount
   useEffect(() => {
-    if (searchParams.get("next")) {
-            console.log('Redirecting to:', nextUrl) 
+    const verifyPayment = async () => {
+      try {
+        const transactionId = Array.isArray(params.id) ? params.id[0] : params.id // Ensure transactionId is a string
+        const result = await checkPaymentStatus(transactionId)
+        
+        if (result?.status) {
+          setStatus(result.status)
+        }
+      } catch (error) {
+        console.error('Payment verification failed:', error)
+        setStatus('failed')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    verifyPayment()
+  }, [params.id])
+
+  // Existing redirect effect
+  useEffect(() => {
+    if (searchParams.get("next") && !isLoading) {
+      console.log('Redirecting to:', nextUrl) 
       const timer = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
@@ -32,7 +59,7 @@ const nextUrl = searchParams.get("next")
 
       return () => clearInterval(timer)
     }
-  }, [nextUrl, router, searchParams])
+  }, [nextUrl, router, searchParams, isLoading])
 
   const statusConfig = {
     success: {
@@ -61,7 +88,15 @@ const nextUrl = searchParams.get("next")
     },
   }
 
-  const currentStatus = statusConfig[status as keyof typeof statusConfig] || statusConfig.success
+  const currentStatus = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      </div>
+    )
+  }
 
   return (
     <div className={`min-h-screen flex items-center justify-center ${currentStatus.bgColor} p-4`}>
