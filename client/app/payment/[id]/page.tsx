@@ -5,6 +5,9 @@ import { useRouter, useSearchParams, useParams } from "next/navigation"
 import { CheckCircle, XCircle, Clock } from "lucide-react"
 import { checkPaymentStatus } from "../../api/index"
 
+export const runtime = "edge";
+
+
 export default function PaymentStatus() {
   const router = useRouter()
   const params = useParams()
