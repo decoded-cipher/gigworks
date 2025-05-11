@@ -289,18 +289,22 @@ export default function SignupPage() {
         if (status === 'USER_CANCEL') {
           toast.error("Payment was cancelled.");
           console.log(">> Payment cancelled");
-          router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
+          setTimeout(() => {
+            router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
+          }, 5000);
           
         } else if (status === 'CONCLUDED') {
           toast.success("Payment successful!");
           console.log(">> Payment successful");
-          router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
-
+          setTimeout(() => {
+            router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
+          }, 5000);
         } else if (status === 'FAILED') {
           toast.error("Payment failed. Please try again.");
           console.log(">> Payment failed");
-          router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
-
+          setTimeout(() => {
+            router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
+          }, 5000);
         } else {
           toast.error("Unknown payment status.");
           console.log(">> Unknown payment status");
