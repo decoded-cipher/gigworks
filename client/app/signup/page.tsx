@@ -291,20 +291,20 @@ export default function SignupPage() {
           console.log(">> Payment cancelled");
           setTimeout(() => {
             router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
-          }, 5000);
+          }, 2000);
           
         } else if (status === 'CONCLUDED') {
           toast.success("Payment successful!");
           console.log(">> Payment successful");
           setTimeout(() => {
             router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
-          }, 5000);
+          }, 2000);
         } else if (status === 'FAILED') {
           toast.error("Payment failed. Please try again.");
           console.log(">> Payment failed");
           setTimeout(() => {
             router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
-          }, 5000);
+          }, 2000);
         } else {
           toast.error("Unknown payment status.");
           console.log(">> Unknown payment status");
