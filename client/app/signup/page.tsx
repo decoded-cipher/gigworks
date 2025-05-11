@@ -275,19 +275,23 @@ export default function SignupPage() {
       };
 
       
-      // const response = await createBusiness(payload);
-      // const profileSlug = response.data.slug;
+      const response = await createBusiness(payload);
       toast.success("Business created successfully!");
 
-      const paymentResponse = await getPaymentLink();
-      const tokenUrl = paymentResponse.url;
+      const paymentResponse = await getPaymentLink({
+        profile_id: response?.data?.id,
+        mode: "phonepe",
+        type: "new",
+      });
+      console.log("Payment response:", paymentResponse);
+
+      const tokenUrl = paymentResponse?.paymentUrl;
 
       const callback = (status: string) => {
         if (status === 'USER_CANCEL') {
           toast.error("Payment was cancelled.");
         } else if (status === 'CONCLUDED') {
           toast.success("Payment successful!");
-          // router.push(`/${profileSlug}`);
         } else if (status === 'FAILED') {
           toast.error("Payment failed. Please try again.");
         }
