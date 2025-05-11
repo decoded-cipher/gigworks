@@ -476,8 +476,8 @@ export const getProfileBySlug = async (slug: string) => {
         )
         .where(
           sql`
-                        ${profile.slug} = ${slug} AND ${profile.status} = 1
-                    `
+            ${profile.slug} = ${slug} AND ${profile.status} = 1
+          `
         )
         .get();
 
@@ -488,17 +488,17 @@ export const getProfileBySlug = async (slug: string) => {
 
       const [licenses, media, tags] = await Promise.all([
         /*
-                        SELECT 
-                            license_type.name, 
-                            profile_license.license_number, 
-                            profile_license.license_url, 
-                            license_type.description 
-                        FROM 
-                            profile_license 
-                            LEFT JOIN license_type ON license_type.id = profile_license.license_type_id 
-                        WHERE 
-                            profile_license.profile_id = profileResult.profile.id
-                    */
+          SELECT 
+              license_type.name, 
+              profile_license.license_number, 
+              profile_license.license_url, 
+              license_type.description 
+          FROM 
+              profile_license 
+              LEFT JOIN license_type ON license_type.id = profile_license.license_type_id 
+          WHERE 
+              profile_license.profile_id = profileResult.profile.id
+        */
 
         db
           .select({
@@ -519,6 +519,7 @@ export const getProfileBySlug = async (slug: string) => {
           .all(),
 
         // SQL Query : SELECT * FROM profile_media WHERE profile_id = profileResult.profile.id
+
         db
           .select({
             id: profileMedia.id,
@@ -530,6 +531,7 @@ export const getProfileBySlug = async (slug: string) => {
           .all(),
 
         // SQL Query : SELECT * FROM profile_tag WHERE profile_id = profileResult.profile.id
+        
         db
           .select()
           .from(profileTag)
