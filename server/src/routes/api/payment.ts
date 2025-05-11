@@ -7,7 +7,7 @@ import { decode } from 'js-base64'
 import { User, ProfilePayment } from '../../config/database/interfaces';
 import { verifyToken } from "../../middleware/authentication";
 
-import { createPayment, initPayment, paymentCallback } from '../../services/payment';
+import { createPayment, initPayment, paymentCallback, getPaymentStatus } from '../../services/payment';
 import { updateProfileStatus } from '../../services/profile';
 
 
@@ -101,7 +101,7 @@ router.post('/callback', async (c) => {
         let paymentResponse = await paymentCallback({
             transaction_id: decodedData.data.merchantTransactionId,
             payment_status: decodedData.code === 'PAYMENT_SUCCESS' ? 'success' : 'failed',
-            amount: Number(decodedData.amount) / 100,
+            amount: decodedData.amount,
             payment_mode: decodedData.data.paymentInstrument.type,
             reference_id: decodedData.data.transactionId,
         } as ProfilePayment);
@@ -150,7 +150,7 @@ router.get('/status', verifyToken, async (c) => {
             return c.json({ error: 'User not found' }, 400);
         }
 
-        let paymentStatusResponse = await getPaymentStatus(transaction_id, user.id);
+        let paymentStatusResponse = await getPaymentStatus(transaction_id);
         if (!paymentStatusResponse) {
             return c.json({ error: 'Failed to get payment status' }, 400);
         }

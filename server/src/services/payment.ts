@@ -140,3 +140,28 @@ export const getPayments = async (profile_id: string) => {
     });
 }
 
+
+
+// Get Payment Status
+export const getPaymentStatus = async (transaction_id: string) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            // SQL Query : SELECT * FROM profile_payment WHERE transaction_id = transaction_id
+
+            let result = await db
+                .select({
+                    transaction_id: profilePayment.transaction_id,
+                    payment_status: profilePayment.payment_status
+                })
+                .from(profilePayment)
+                .where(sql`${profilePayment.transaction_id} = ${transaction_id}`)
+                .get();
+            
+            return resolve(result);
+
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
