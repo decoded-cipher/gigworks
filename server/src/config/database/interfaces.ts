@@ -95,7 +95,8 @@ export interface ProfilePayment {
     amount: number;
     payment_mode?: string;
     payment_status?: string;
-    payment_id?: string;
+    transaction_id?: string;
+    reference_id?: string;
     payment_date?: string;
 }
 

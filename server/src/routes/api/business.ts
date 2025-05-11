@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 const router = new Hono();
 
-import { createPayment } from "../../services/payment";
 import { createUser, getUserByPhone } from "../../services/user";
 import { addProfileTag, removeProfileTag } from "../../services/profileTag";
 
@@ -30,7 +29,6 @@ import {
 import {
   User,
   Profile,
-  ProfilePayment,
   ProfileMedia,
   ProfileLicense,
   ProfileTag,
@@ -54,23 +52,18 @@ import { verifyToken } from "../../middleware/authentication";
 router.post("/", async (c) => {
   try {
     const data = await c.req.json();
-    const profileStatus = data.payment.payment_status === "success" ? 1 : 0;
-
-    let user: User = await getUserByPhone(data.user.phone);
+    const user: User = await getUserByPhone(data.user.phone);
 
     let profile: Profile = await createProfile({
       ...data.profile,
       user_id: user.id,
-      status: profileStatus,
+      status: 0,
     });
 
     if (!profile) {
-      return c.json(
-        {
-          message: "Business creation failed",
-        },
-        400
-      );
+      return c.json({
+        message: "Business creation failed"
+      }, 400);
     }
 
     let license: License | null = null;
@@ -78,34 +71,21 @@ router.post("/", async (c) => {
       license = await addProfileLicense(profile.id, data.license);
     }
 
-    let payment: ProfilePayment | null = null;
-    if (data.payment) {
-      payment = await createPayment({
-        ...data.payment,
-        profile_id: profile.id,
-      });
-    }
+    return c.json({
+      message: "Business created successfully",
+      data: {
+        id: profile.id,
+        name: profile.name,
+        slug: profile.slug,
+        user_id: profile.user_id,
+      },
+    }, 201);
 
-    return c.json(
-      {
-        message: "Business created successfully",
-        data: {
-          user,
-          profile,
-          license,
-          payment,
-        },
-      },
-      201
-    );
   } catch (error) {
-    return c.json(
-      {
-        message: "Internal Server Error",
-        error: error.message,
-      },
-      500
-    );
+    return c.json({
+      message: "Internal Server Error",
+      error: error.message,
+    }, 500);
   }
 });
 
