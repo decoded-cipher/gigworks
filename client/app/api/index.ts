@@ -485,7 +485,7 @@ export const createBusiness = async (data: BusinessPayload) => {
 }
 
 
-export const getPaymentLink = async () => {
+export const getPaymentLink = async (data: { profile_id: string, mode: string, type: string }) => {
   try {
     const token = document.cookie
       .split('; ')
@@ -497,7 +497,13 @@ export const getPaymentLink = async () => {
     }
 
     const response = await axios.post(
-      `${BASE_URL}/api/v1/payment/initiate`
+      `${BASE_URL}/api/v1/payment/initiate`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
     );
     return response.data;
   } catch (error) {
