@@ -262,8 +262,8 @@ export default function SignupPage() {
         },
         profile: profileData,
         payment: {
-          amount: 250,
-          payment_status: 'pending'  // Add this required field
+          mode: "phonepe",
+          // mode: "cash",
         },
         license: formData.otherLicenses
           .filter(license => license.type && license.registrationNumber)
@@ -274,22 +274,13 @@ export default function SignupPage() {
           }))
       };
 
+      
       // const response = await createBusiness(payload);
-
-      // setLocalStorage('userProfiles', {
-      //   name:  formData.businessName,
-      //   slug: formData.slug,
-      //   avatar: formData.avatar,
-      // });
-      // Extract the slug from the response
-      // const profileSlug = response.data.profile.slug;
-      
-      // toast.success("Business created successfully!");
-      
+      // const profileSlug = response.data.slug;
+      toast.success("Business created successfully!");
 
       const paymentResponse = await getPaymentLink();
       const tokenUrl = paymentResponse.url;
-      console.log("Payment URL:", tokenUrl);
 
       const callback = (status: string) => {
         if (status === 'USER_CANCEL') {
@@ -297,6 +288,8 @@ export default function SignupPage() {
         } else if (status === 'CONCLUDED') {
           toast.success("Payment successful!");
           // router.push(`/${profileSlug}`);
+        } else if (status === 'FAILED') {
+          toast.error("Payment failed. Please try again.");
         }
       };
 
