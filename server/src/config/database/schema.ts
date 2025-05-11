@@ -236,6 +236,10 @@ export const profile = sqliteTable('profile', {
     zip: text(),  // pin code
     country: text().default('India'),
 
+    latitude: text(),
+    longitude: text(),
+    location_url: text(), // google maps url
+
     operating_hours: text(),
     socials: text(),
 

@@ -1,14 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import BusinessOverview from "../components/signup/bussiness-overview";
 import LocationDetails from "../components/signup/location-details";
 import BusinessOperations from "../components/signup/business-operations";
-import { createBusiness } from "../api/index";
+import { createBusiness, getPaymentLink } from "../api/index";
 import { form } from "framer-motion/client";
+
+declare global {
+  interface Window {
+    PhonePeCheckout?: {
+      transact: (options: {
+        tokenUrl: string;
+        type: "IFRAME" | "REDIRECT";
+        callback: (status: string) => void;
+      }) => void;
+      closePage?: () => void;
+    };
+  }
+}
+
 
 // Define the main form data interface
 export interface FormData {
@@ -74,6 +88,24 @@ export interface FormData {
 // };
 
 export default function SignupPage() {
+  
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://mercury-stg.phonepe.com/web/bundle/checkout.js";
+    script.defer = true;
+    script.onload = () => {
+      console.log("PhonePeCheckout loaded");
+    };
+    script.onerror = () => {
+      toast.error("Failed to load PhonePe SDK.");
+    };
+    document.body.appendChild(script);
+  
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);  
+  
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     // Business Overview initial state
@@ -229,10 +261,6 @@ export default function SignupPage() {
           phone: userData.phone
         },
         profile: profileData,
-        payment: {
-          amount: 250,
-          payment_status: 'pending'  // Add this required field
-        },
         license: formData.otherLicenses
           .filter(license => license.type && license.registrationNumber)
           .map(license => ({
@@ -242,21 +270,50 @@ export default function SignupPage() {
           }))
       };
 
+      
       const response = await createBusiness(payload);
-
-      // setLocalStorage('userProfiles', {
-      //   name:  formData.businessName,
-      //   slug: formData.slug,
-      //   avatar: formData.avatar,
-      // });
-      // Extract the slug from the response
-      const profileSlug = response.data.profile.slug;
-      
       toast.success("Business created successfully!");
+
+      const paymentResponse = await getPaymentLink({
+        profile_id: response?.data?.id,
+        mode: "phonepe", // cash or phonepe
+        type: "new",
+      });
+      console.log("Payment response:", paymentResponse);
+
+      const tokenUrl = paymentResponse?.data?.paymentUrl;
+
+      const callback = (status: string) => {
+        if (status === 'USER_CANCEL') {
+          toast.error("Payment was cancelled.");
+          console.log(">> Payment cancelled");
+          
+        } else if (status === 'CONCLUDED') {
+          toast.success("Payment successful!");
+          console.log(">> Payment successful");
+
+        } else if (status === 'FAILED') {
+          toast.error("Payment failed. Please try again.");
+          console.log(">> Payment failed");
+
+        } else {
+          toast.error("Unknown payment status.");
+          console.log(">> Unknown payment status");
+          
+        }
+      };
+
+      if (window?.PhonePeCheckout?.transact) {
+        window.PhonePeCheckout.transact({
+          tokenUrl,
+          type: "IFRAME",
+          callback
+        });
+      } else {
+        toast.error("PhonePe SDK not loaded");
+      }
       
-      // Redirect to the profile page with the slug
-      router.push(`/${profileSlug}`);
-      
+
     } catch (error: any) {
       console.error("Error creating business:", error);
       const errorMessage = error.response?.data?.error || "Failed to create business. Please try again.";
