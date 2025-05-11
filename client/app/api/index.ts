@@ -787,3 +787,32 @@ export const fetchCorrdinates = async (url: string ) =>{
   }
 
 }
+
+export const checkPaymentStatus = async (transaction_id: string) => {
+  try {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    if (!token) {
+      throw new Error('No token provided');
+    }
+
+    const response = await axios.get(
+      `${BASE_URL}/api/v1/payment/status`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          transaction_id
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error checking payment status:', error);
+    throw error;
+  }
+}

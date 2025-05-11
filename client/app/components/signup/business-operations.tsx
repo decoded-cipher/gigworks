@@ -341,16 +341,21 @@ export default function BusinessOperations({
           </div>
 
           {/* Payment Methods */}
-          <h2 className="text-xl font-semibold text-start py-4">
-            Payment Methods Accepted
+          <h2 className="text-xl font-semibold text-start pt-4">
+            Select Payment Methods Your Business Accepts
           </h2>
+          <p className="text-sm text-gray-500 mb-2">
+            Please select the payment methods your business accepts from
+            customers.
+          </p>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {Object.entries(formData.paymentMethods).map(
               ([method, checked]) => (
                 <div key={method} className="flex items-center">
                   <input
                     type="checkbox"
-                    id={method}
+                    id={`business_${method}`}  // Changed ID to be unique
                     name={`paymentMethods.${method}`}
                     checked={checked}
                     onChange={handleInputChange}
@@ -364,30 +369,85 @@ export default function BusinessOperations({
             )}
           </div>
 
-          {/* Additional Services */}
-          {/* <h2 className="text-xl font-semibold text-start py-4">
-            Additional Services
+          <h2 className="text-xl font-semibold text-start pt-4">
+            Payment Methods
           </h2>
+          <p className="text-sm text-gray-500 mb-2">
+            Please select your preferred payment method for Gigworks
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {Object.entries(formData.additionalServices).map(
-              ([service, checked]) => (
-                <div key={service} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={service}
-                    name={`additionalServices.${service}`}
-                    checked={checked}
-                    onChange={handleInputChange}
-                    className="mr-2"
+            {/* Cash Payment Option */}
+            <div
+              onClick={() => updateFormData({ paymentMethod: "cash" })}
+              className={`flex items-center p-4 border rounded-lg hover:border-green-500 cursor-pointer transition-all ${
+                formData.paymentMethod === "cash"
+                  ? "border-green-500 bg-green-50"
+                  : ""
+              }`}
+            >
+              <input
+                type="radio"
+                id="cash"
+                name="paymentMethod"
+                value="cash"
+                checked={formData.paymentMethod === "cash"}
+                onChange={(e) => handleInputChange(e)}
+                className="mr-3 h-4 w-4 text-green-600"
+              />
+              <label
+                htmlFor="cash"
+                className="flex items-center text-base flex-1 cursor-pointer"
+              >
+                <svg
+                  className="w-6 h-6 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
                   />
-                  <label htmlFor={service} className="text-base capitalize">
-                    {service.replace(/([A-Z])/g, " $1")}
-                  </label>
-                </div>
-              )
-            )}
-          </div> */}
+                </svg>
+                Cash Payment
+              </label>
+            </div>
 
+            {/* PhonePe Payment Option */}
+            <div
+              onClick={() => updateFormData({ paymentMethod: "phonepe" })}
+              className={`flex items-center p-4 border rounded-lg hover:border-green-500 cursor-pointer transition-all ${
+                formData.paymentMethod === "phonepe"
+                  ? "border-green-500 bg-green-50"
+                  : ""
+              }`}
+            >
+              <input
+                type="radio"
+                id="phonepe"
+                name="paymentMethod"
+                value="phonepe"
+                checked={formData.paymentMethod === "phonepe"}
+                onChange={(e) => handleInputChange(e)}
+                className="mr-3 h-4 w-4 text-green-600"
+              />
+              <label
+                htmlFor="phonepe"
+                className="flex items-center text-base flex-1 cursor-pointer"
+              >
+                <svg
+                  className="w-6 h-6 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm1 17.5h-2v-2h2v2zm0-4.5h-2v-8h2v8z" />
+                </svg>
+                Pay Online
+              </label>
+            </div>
+          </div>
           {/* Referrals */}
           <h2 className="text-xl font-semibold text-start py-4">
             Referrals <span className="text-gray-500 text-sm">if any</span>

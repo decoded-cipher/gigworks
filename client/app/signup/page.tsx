@@ -68,6 +68,7 @@ export interface FormData {
 
   // Business Operations
   referral_code: string;
+  paymentMethod: 'cash' | 'phonepe' | '';
   gstin: string;
   otherLicenses: Array<{
     type: string;
@@ -154,6 +155,7 @@ export default function SignupPage() {
 
     // Business Operations initial state
     referral_code: "",
+    paymentMethod: '',
     gstin: "",
     otherLicenses: [
       {
@@ -276,7 +278,7 @@ export default function SignupPage() {
 
       const paymentResponse = await getPaymentLink({
         profile_id: response?.data?.id,
-        mode: "phonepe", // cash or phonepe
+        mode: formData.paymentMethod, // cash or phonepe
         type: "new",
       });
       console.log("Payment response:", paymentResponse);
@@ -287,14 +289,17 @@ export default function SignupPage() {
         if (status === 'USER_CANCEL') {
           toast.error("Payment was cancelled.");
           console.log(">> Payment cancelled");
+          router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
           
         } else if (status === 'CONCLUDED') {
           toast.success("Payment successful!");
           console.log(">> Payment successful");
+          router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
 
         } else if (status === 'FAILED') {
           toast.error("Payment failed. Please try again.");
           console.log(">> Payment failed");
+          router.push(`/payment/${paymentResponse.data.transactionId}?next=${response.data.slug}`);
 
         } else {
           toast.error("Unknown payment status.");
