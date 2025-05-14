@@ -4,10 +4,9 @@ const router = new Hono();
 
 import { generateOTP, verifyOTP, createAuthToken, deleteAuthToken } from '../services/auth';
 import { getUserByPhone, createUser, updateUser } from '../services/user';
+import { sendMessageToInterakt } from '../services/bot';
 import { getProfilesByUser } from '../services/profile';
 import { User } from '../config/database/interfaces';
-
-// import { sendMessage } from '../services/message';
 
 
 
@@ -33,8 +32,7 @@ router.post('/register', async (c) => {
         }
 
         let user = await getUserByPhone(phone);
-        const otp = await generateOTP(phone, c.env);
-
+        
         if (user) {
             if (user.status === 1) {
                 return c.json({
@@ -46,10 +44,12 @@ router.post('/register', async (c) => {
             user = await createUser({ phone, name, role } as User);
         }
 
-        // await sendMessage(phone, `Your OTP is ${otp}`);
+        const otp = await generateOTP(phone, c.env);
+
+        await sendMessageToInterakt(otp, phone, c.env);
+
         return c.json({
-            message: 'OTP sent successfully',
-            otp
+            message: 'OTP sent successfully'
         });
 
     } catch (error) {

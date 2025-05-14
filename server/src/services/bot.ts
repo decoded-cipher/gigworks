@@ -114,17 +114,22 @@ export const processRequestService = async (service: string, location: any): Pro
 
 
 
-export const sendMessageToInterakt = async (message: string, phone: string, env: Env) => {
-
+export const sendMessageToInterakt = async (otp: string, phone: string, env: Env) => {
     const url = `https://api.interakt.ai/v1/public/message/`;
 
     const payload = {
-        userId: "",
-        fullPhoneNumber: `+91${phone}`,
-        callbackData: "some_callback_data",
-        type: "Text",
-        data: {
-            message: message
+        type: "Template",
+        phoneNumber: phone,
+        countryCode: "91",
+        callbackData: "user_login_otp",
+        template: {
+            name: "gigwork",
+            languageCode: "en",
+            headerValues: [],
+            bodyValues: [otp],
+            buttonValues: {
+                "0": [otp]
+            }
         }
     };
 
@@ -148,4 +153,4 @@ export const sendMessageToInterakt = async (message: string, phone: string, env:
         console.error("Error sending message to Interakt:", error);
         throw error;
     }
-}
+};
