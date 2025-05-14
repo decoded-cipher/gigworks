@@ -34,6 +34,8 @@ router.post('/register', async (c) => {
         let user = await getUserByPhone(phone);
         
         if (user) {
+        console.log(user);
+        
             if (user.status === 1) {
                 return c.json({
                     error: 'User already exists. Please login'

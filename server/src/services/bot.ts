@@ -1,4 +1,3 @@
-
 import { Env } from "hono";
 import { queryGeminiService } from "../config/gemini";
 import { getProfilesBySubCategoryOption } from "../services/profile";
@@ -117,6 +116,12 @@ export const processRequestService = async (service: string, location: any): Pro
 export const sendMessageToInterakt = async (otp: string, phone: string, env: Env) => {
     const url = `https://api.interakt.ai/v1/public/message/`;
 
+    console.log('[Interakt Debug] Sending OTP:', {
+        phone,
+        otp,
+        apiKeyExists: !!env.INTERAKT_API_KEY
+    });
+
     const payload = {
         type: "Template",
         phoneNumber: phone,
@@ -134,6 +139,8 @@ export const sendMessageToInterakt = async (otp: string, phone: string, env: Env
     };
 
     try {
+        console.log('[Interakt Debug] Request payload:', JSON.stringify(payload, null, 2));
+
         const response = await fetch(url, {
             method: "POST",
             headers: {
@@ -144,13 +151,20 @@ export const sendMessageToInterakt = async (otp: string, phone: string, env: Env
             body: JSON.stringify(payload)
         });
 
+        const responseData = await response.json();
+        console.log('[Interakt Debug] API Response:', responseData);
+
         if (!response.ok) {
-            throw new Error(`Error sending message: ${response.statusText}`);
+            throw new Error(`Interakt API error: ${response.status} - ${response.statusText}`);
         }
 
-        return await response.json();
+        return responseData;
     } catch (error) {
-        console.error("Error sending message to Interakt:", error);
-        throw error;
+        console.error("[Interakt Debug] Error details:", {
+            message: error.message,
+            stack: error.stack,
+            response: error.response?.data
+        });
+        throw new Error(`Failed to send WhatsApp OTP: ${error.message}`);
     }
 };
