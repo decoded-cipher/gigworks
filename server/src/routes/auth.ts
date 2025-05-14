@@ -166,7 +166,7 @@ router.post('/login', async (c) => {
         }
 
         const otp = await generateOTP(phone, c.env);
-        // await sendMessage(phone, `Your OTP is ${otp}`);
+        await sendMessageToInterakt(otp, phone, c.env);
 
         return c.json({
             message: 'OTP sent successfully',
