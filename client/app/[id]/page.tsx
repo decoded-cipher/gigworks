@@ -326,13 +326,19 @@ const DevMorphixWebsite = () => {
   const handleShare = async () => {
     try {
       if (navigator.share) {
-        await navigator.share({
-          title: businessData?.profile.name,
-          // text: businessData?.profile.description,
-          // url: window.location.href,
-          url: `https://gigwork.co.in/${slug}`,
-        });
-        
+        const shareText = 
+`${businessData?.profile.name}
+
+📍 Location: ${businessData?.profile.address}, ${businessData?.profile.city}
+📞 Contact: +91 ${businessData?.user.phone}
+
+Visit our business profile:`;
+
+      await navigator.share({
+        title: businessData?.profile.name,
+        text: shareText,
+        url: `https://gigwork.co.in/${slug}`,
+      });
       } else {
         console.log("Link copied to clipboard!");
         // Fallback - copy to clipboard
