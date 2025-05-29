@@ -328,12 +328,18 @@ const DevMorphixWebsite = () => {
       if (navigator.share) {
         await navigator.share({
           title: businessData?.profile.name,
-          text: businessData?.profile.description,
-          url: window.location.href,
+          // text: businessData?.profile.description,
+          // url: window.location.href,
+          url: `https://gigwork.co.in/${slug}`,
         });
+        
       } else {
+        console.log("Link copied to clipboard!");
         // Fallback - copy to clipboard
         await navigator.clipboard.writeText(window.location.href);
+        console.log(navigator.clipboard.writeText(window.location.href));
+        
+    
         alert("Link copied to clipboard!");
       }
     } catch (error) {
