@@ -280,7 +280,7 @@ const ImageSection = ({ images = defaultImages, media = [], className }: ImageSe
               <Swiper
                 initialSlide={selectedImageIndex}
                 modules={[Navigation, Pagination]}
-                pagination={{ clickable: true }}
+                // pagination={{ clickable: true }}
                 className="h-full w-full flex items-center"
                 onSwiper={(swiper) => {
                   swiperRef.current = swiper;
