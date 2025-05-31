@@ -1,7 +1,6 @@
 import "./globals.css";
 import { Metadata } from 'next'
-import { Toaster } from 'react-hot-toast';
-import { Inter } from 'next/font/google'; 
+import Script from "next/script"
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://gigwork.co.in'),
@@ -70,44 +69,60 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en">
-            <head>
+        <>
+            <html lang="en">
+                <head>
 
-                <meta property="og:image:width" content="1200" />
-                <meta property="og:image:height" content="630" />
-                <meta property="og:image:type" content="image/png" />
+                    <meta property="og:image:width" content="1200" />
+                    <meta property="og:image:height" content="630" />
+                    <meta property="og:image:type" content="image/png" />
 
-                <meta property="og:image:url" content="https://gigwork.co.in/assets/og-image.png" />
-                <meta property="og:image:secure_url" content="https://gigwork.co.in/assets/og-image.png" />
-                <meta property="og:image:alt" content="Gigwork - WhatsApp Business Integration Platform" />
-                
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{
-                        __html: JSON.stringify({
-                            "@context": "https://schema.org",
-                            "@type": "WebApplication",
-                            "name": "Gigwork",
-                            "applicationCategory": "BusinessApplication",
-                            "operatingSystem": "Web",
-                            "description": "Connect, communicate, and grow your business with WhatsApp integration on Gigwork",
-                            "aggregateRating": {
-                                "@type": "AggregateRating",
-                                "ratingValue": "4.9",
-                                "ratingCount": "1000"
-                            },
-                            "offers": {
-                                "@type": "Offer",
-                                "price": "0",
-                                "priceCurrency": "INR"
-                            }
-                        })
-                    }}
-                />
+                    <meta property="og:image:url" content="https://gigwork.co.in/assets/og-image.png" />
+                    <meta property="og:image:secure_url" content="https://gigwork.co.in/assets/og-image.png" />
+                    <meta property="og:image:alt" content="Gigwork - WhatsApp Business Integration Platform" />
+                    
+                    <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{
+                            __html: JSON.stringify({
+                                "@context": "https://schema.org",
+                                "@type": "WebApplication",
+                                "name": "Gigwork",
+                                "applicationCategory": "BusinessApplication",
+                                "operatingSystem": "Web",
+                                "description": "Connect, communicate, and grow your business with WhatsApp integration on Gigwork",
+                                "aggregateRating": {
+                                    "@type": "AggregateRating",
+                                    "ratingValue": "4.9",
+                                    "ratingCount": "1000"
+                                },
+                                "offers": {
+                                    "@type": "Offer",
+                                    "price": "0",
+                                    "priceCurrency": "INR"
+                                }
+                            })
+                        }}
+                    />
 
 
-            </head>
-            <body>{children}</body>
-        </html>
+                </head>
+                <body>{children}</body>
+            </html>
+
+            <Script
+                id="microsoft-clarity-init"
+                strategy="afterInteractive"
+                dangerouslySetInnerHTML={{
+                    __html: `
+                    (function(c,l,a,r,i,t,y){
+                        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+                    })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_MICROSOFT_CLARITY}");
+                    `,
+                }}
+            />
+        </>
     )
 }

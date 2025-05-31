@@ -278,7 +278,7 @@ export default function GigWorkLandingPage() {
                   href="/explore"
                   className="text-white hover:text-green-500 transition"
                 >
-                  explore
+                  Explore
                 </Link>
                 <Link
                   href="#partner"
