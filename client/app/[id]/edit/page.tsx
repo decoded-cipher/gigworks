@@ -17,7 +17,7 @@ import {
   Save,
   X,
 } from "lucide-react";
-
+import { jwtDecode } from "jwt-decode"; 
 import MediaGallery from "@/app/components/MediaGallery";
 import Cookies from "js-cookie";
 import OperatingHours from "@/app/components/OperatingHours";
@@ -72,6 +72,14 @@ interface BusinessProfile {
   gstin: string;
   id: string; // Add this field
   [key: string]: any; // Add index signature to allow dynamic access
+}
+
+interface JWTPayload {
+  exp?: number;
+  iat?: number;
+  sub?: string;
+  email?: string;
+  name?: string; // Add name property
 }
 
 interface BusinessData {
@@ -148,6 +156,14 @@ export default function EditBusinessPage() {
     try {
       setIsLoading(true);
       const response = await fetchBusinessesByslug(params.id as string);
+      const tokenInfo = handleJWTToken();
+
+      if (tokenInfo?.name !== response.data.user.name) {
+        console.error("Unauthorized access attempt detected");
+        router.push(`/${params.id}`);        
+        return;
+      }
+
       if (response.message === "Business fetched successfully") {
         setBusinessData(response.data);
       } else {
@@ -194,10 +210,54 @@ export default function EditBusinessPage() {
     return () => setIsMounted(false);
   }, []);
 
+  const handleJWTToken = () => {
+    try {
+      // Get token from cookie instead of localStorage
+      const token = Cookies.get("token"); // or whatever your cookie name is
+
+      if (!token) {
+        console.log("No JWT token found in cookies");
+        localStorage.clear();
+        return null;
+      }
+
+      // console.log("Raw JWT Token:", token);
+
+      const decodedToken = jwtDecode<JWTPayload>(token);
+      // console.log("Decoded JWT Payload:", decodedToken);
+
+      if (decodedToken.exp) {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const isExpired = decodedToken.exp < currentTime;
+
+        console.log(
+          "Token Expiration Status:",
+          isExpired ? "Expired" : "Valid"
+        );
+
+        if (isExpired) {
+          console.log("Token has expired");
+          // Cookies.remove("token");
+          localStorage.removeItem("userData");
+          localStorage.removeItem("userProfiles");
+          // Optionally remove expired token
+          Cookies.remove("token");
+          return null;
+        }
+      }
+
+      return decodedToken;
+    } catch (error) {
+      console.error("Error handling JWT token:", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const token = Cookies.get("token");
     const slug = params.id;
-    if (!token && slug) {
+
+    if (!token && slug ) {
       router.push(`/${slug}`); // Redirect to the page with the slug if no token
     }
   }, [router]);
@@ -308,6 +368,7 @@ const handleFieldChange = (field: string, value: any) => {
       return {
         ...prev,
         socials: {
+          ...(businessData?.profile.socials || {}),
           ...(prev.socials || {}),
           [fieldParts[1]]: value,
         },

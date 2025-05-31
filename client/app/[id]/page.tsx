@@ -1068,9 +1068,9 @@ Visit our business profile:`;
                   </div>
 
                   {/* Add a View on Google Maps link if coordinates are available */}
-                  {businessData?.profile.latitude &&
+                  {/* {businessData?.profile.latitude &&
                     businessData?.profile.longitude && (
-                      <div className="mt-2">
+                      <div className="mt-2 ">
                         <a
                           href={`${businessData.profile.location_url}`}
                           target="_blank"
@@ -1080,7 +1080,7 @@ Visit our business profile:`;
                           View on Google Maps →
                         </a>
                       </div>
-                    )}
+                    )} */}
                 </div>
               </div>
 
