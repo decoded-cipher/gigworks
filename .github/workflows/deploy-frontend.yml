@@ -36,10 +36,12 @@ jobs:
             echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL_PROD }}" >> .env
             echo "NEXT_PUBLIC_ASSET_BASE_URL=${{ secrets.NEXT_PUBLIC_ASSET_BASE_URL_PROD }}" >> .env
             echo "NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY_PROD }}" >> .env
+            echo "NEXT_PUBLIC_MICROSOFT_CLARITY=${{ secrets.NEXT_PUBLIC_MICROSOFT_CLARITY_PROD }}" >> .env
           else
             echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL_STAGE }}" >> .env
             echo "NEXT_PUBLIC_ASSET_BASE_URL=${{ secrets.NEXT_PUBLIC_ASSET_BASE_URL_STAGE }}" >> .env
             echo "NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY_STAGE }}" >> .env
+            echo "NEXT_PUBLIC_MICROSOFT_CLARITY=${{ secrets.NEXT_PUBLIC_MICROSOFT_CLARITY_STAGE }}" >> .env
           fi
         shell: bash
 
