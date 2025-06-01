@@ -276,18 +276,18 @@ export default function SignupPage() {
       const response = await createBusiness(payload);
       toast.success("Business created successfully!");
 
-      if (formData.paymentMethod === "cash") {
-      // For cash payment, redirect directly to business profile
-      router.push(`/${response.data.slug}`);
-      return;
-    }
-
       const paymentResponse = await getPaymentLink({
         profile_id: response?.data?.id,
         mode: formData.paymentMethod, // cash or phonepe
         type: "new",
       });
       console.log("Payment response:", paymentResponse);
+
+       if (formData.paymentMethod === "cash") {
+      // For cash payment, redirect directly to business profile
+      router.push(`/${response.data.slug}`);
+      return;
+    }
 
       const tokenUrl = paymentResponse?.data?.paymentUrl;
 
@@ -347,7 +347,7 @@ export default function SignupPage() {
   };
 
   const router = useRouter();
-                                                                    
+
   // const handleNext = () => {
   //   if (currentStep < 3) {
   //     setCurrentStep(currentStep + 1)
