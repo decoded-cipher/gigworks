@@ -16,10 +16,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
 }) => {
   // Define custom icon inline
   const customIcon = new L.Icon({
-    iconUrl: '/marker-icon.png',
-    iconRetinaUrl: '/marker-icon-2x.png',
-    shadowUrl: '/marker-shadow.png',
-    iconSize: [25, 41],
+    iconUrl: '/icon/marker-icon.png',
+    iconRetinaUrl: '/icon/marker-icon.png',
+    // shadowUrl: '/marker-shadow.png',
+    iconSize: [35, 40],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
