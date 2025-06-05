@@ -166,7 +166,7 @@ export default function GigWorkLandingPage() {
         <div className="mx-auto max-w-7xl px-4 py-4 ">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center">
+            <a href="/service" className="flex items-center">
               <Image
                 src={gigworks}
                 alt="GigWork Logo"
@@ -174,7 +174,7 @@ export default function GigWorkLandingPage() {
                 height={40}
                 className="w-28 md:w-40"
               />
-            </div>
+            </a>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-8">
