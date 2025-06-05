@@ -6,6 +6,7 @@ import Image from "next/image";
 import { fetchBusinessData } from "../api/index";
 import { CategorySkeleton } from "../components/categorySkelton";
 import ServiceSearchSection from "../components/ServiceSearchSection";
+import Router from "next/navigation";
 
 import {
   Home,
@@ -374,7 +375,7 @@ export default function HomePage() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center">
+          <a href="/" className="flex items-center">
             <Image
               src={gigworks}
               alt="GigWork Logo"
@@ -382,7 +383,7 @@ export default function HomePage() {
               height={40}
               className="w-28 md:w-40"
             />
-          </div>
+          </a>
           <div className=" space-x-4">
             {/* <button
               onClick={toggleLanguage}
@@ -531,7 +532,7 @@ export default function HomePage() {
             </div>
 
             {/* Navigation Buttons */}
-            <button
+            {/* <button
               onClick={() =>
                 setCurrentTestimonial((prev) =>
                   prev === 0 ? testimonials.length - 1 : prev - 1
@@ -553,7 +554,7 @@ export default function HomePage() {
               aria-label="Next testimonial"
             >
               <ChevronRight className="h-6 w-6" />
-            </button>
+            </button> */}
 
             {/* Indicator Dots */}
             <div className="flex justify-center space-x-2 mt-6">
@@ -659,7 +660,7 @@ export default function HomePage() {
       {/* Fixed WhatsApp Button */}
       <a
         href="https://wa.me/+918590012027"
-        className="fixed bottom-6 right-6 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 transition z-50 flex items-center justify-center"
+        className="fixed bottom-[3rem] sm:bottom-6 right-6 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 transition z-50 flex items-center justify-center"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
