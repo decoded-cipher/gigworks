@@ -4,22 +4,22 @@ import Script from "next/script"
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://gigwork.co.in'),
-    title: 'GigWork - Find Verified Professionals & Skilled Service Providers',
-    description: 'GigWork is a trusted directory platform that helps you discover verified professionals and skilled service providers across various fields. Easily find and connect with the right expert for your task — anytime, anywhere.',
-    keywords: 'Gigwork, WhatsApp business, Kerala business, customer communication, business growth, digital transformation, service providers, plumbers',
+    title: 'Gigwork - Find Verified Professionals & Skilled Service Providers',
+    description: 'Gigwork is a trusted directory platform that helps you discover verified professionals and skilled service providers across various fields. Easily find and connect with the right expert for your task — anytime, anywhere.',
+    keywords: 'Gigwork, WhatsApp business, Kerala business, customer communication, business growth, digital transformation, service providers, plumbers ,Gigwork,GigWork,Gig Work,GIGWORK,Gig-Work,gig.work,TheGigWork,MyGigWork,GoGigWork,GigWurx,GigWrk,GigWerk,G-WORK,GigzWork,GigHustle,QuickGigWork',
     openGraph: {
         type: 'website',
         locale: 'en_IN',
         url: 'https://gigwork.co.in',
         siteName: 'Gigwork',
-        title: 'GigWork - Find Verified Professionals & Skilled Service Providers',
+        title: 'Gigwork - Find Verified Professionals & Skilled Service Providers',
         description: 'Transform your business with WhatsApp integration. Connect with customers seamlessly on India\'s growing business platform.',
         images: [
             {
                 url: 'https://gigwork.co.in/assets/og-image.png',
                 width: 1200,
                 height: 630,
-                alt: 'GigWork - Find Verified Professionals & Skilled Service Providers',
+                alt: 'Gigwork - Find Verified Professionals & Skilled Service Providers',
             },
         ],
     },
