@@ -50,6 +50,7 @@ interface BusinessProfile {
   email: string;
   phone: string | null;
   address: string;
+  zip: string
   city: string;
   state: string;
   country: string;
@@ -833,12 +834,56 @@ const handleFieldChange = (field: string, value: any) => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Address
+                  Street
                 </label>
                 <input
                   type="text"
                   defaultValue={businessData.profile.address}
                   onChange={(e) => handleFieldChange("address", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  City
+                </label>
+                <input
+                  type="text"
+                  defaultValue={businessData.profile.city}
+                  onChange={(e) => handleFieldChange("city", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  State
+                </label>
+                <input
+                  type="text"
+                  defaultValue={businessData.profile.state}
+                  onChange={(e) => handleFieldChange("state", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Zip
+                </label>
+                <input
+                  type="text"
+                  defaultValue={businessData.profile.zip}
+                  onChange={(e) => handleFieldChange("zip", e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Country
+                </label>
+                <input
+                  type="text"
+                  defaultValue={businessData.profile.country}
+                  onChange={(e) => handleFieldChange("country", e.target.value)}
                   className="w-full p-2 border rounded-lg"
                 />
               </div>
