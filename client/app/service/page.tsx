@@ -19,6 +19,7 @@ import {
   Hammer,
   Users,
   Truck,
+  Car, // <-- Add this line
   Search,
   MessageCircle,
   MapPin,
@@ -255,13 +256,36 @@ export default function HomePage() {
         return <Users className="h-6 w-6 text-green-600" />;
       case "truck":
         return <Truck className="h-6 w-6 text-green-600" />;
+      case "car":
+        return <Car className="h-6 w-6 text-green-600" />; // Add this case
+      case "cross":
+        return <Cross className="h-6 w-6 text-green-600" />;
+      case "map":
+        return <MapPin className="h-6 w-6 text-green-600" />;
+      case "message":
+        return <MessageCircle className="h-6 w-6 text-green-600" />;
+      case "mail":
+        return <Mail className="h-6 w-6 text-green-600" />;
+      case "shopping":
+        return (
+          <svg
+            className="h-6 w-6 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <circle cx="9" cy="21" r="1" />
+            <circle cx="20" cy="21" r="1" />
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+          </svg>
+        );
       default:
         return <Home className="h-6 w-6 text-green-600" />;
     }
   };
-  const whatsapp = () => {  
+  const whatsapp = () => {
     window.open("https://wa.me/+918590012027", "_blank");
-  }
+  };
 
   // Helper function to render step icon
   const renderStepIcon = (iconName: string) => {
@@ -276,98 +300,30 @@ export default function HomePage() {
         return <Search className="h-10 w-10 text-green-600" />;
     }
   };
-  // Add this function to map category titles to appropriate icons
+  // Add this function to map category titles to appropriate icon keys
   // Update your getCategoryIcon function to handle specific category names
-  const getCategoryIcon = (categoryTitle: string) => {
-    // Check for exact category matches first
-    const exactMatchMap: Record<string, string> = {
-      "Sales & Retail": "briefcase",
-      Services: "users",
-      "Manufacturing & Production": "hammer",
-      "Education & Training": "book",
-      "Hospitality & Food Services": "users",
-      "Agriculture & Farming": "home",
-      "Health & Wellness": "heart",
-      Automotive: "truck",
-      "Real Estate & Property": "home",
-      "Media & Entertainment": "calendar",
-      "Technology & Innovation": "tool",
-      "Financial & Legal": "briefcase",
-      "Non-Profit & NGOs": "users",
-      Miscellaneous: "home",
-    };
-
-    // Check for exact match
-    if (exactMatchMap[categoryTitle]) {
-      return exactMatchMap[categoryTitle];
-    }
-
-    // If no exact match, fallback to keyword-based matching
+  const getCategoryIcon = (categoryTitle: string): string => {
     const title = categoryTitle.toLowerCase();
 
-    // Map common category names to icons
-    if (
-      title.includes("home") ||
-      title.includes("house") ||
-      title.includes("property") ||
-      title.includes("real estate")
-    )
-      return "home";
-    if (
-      title.includes("edu") ||
-      title.includes("school") ||
-      title.includes("tutor") ||
-      title.includes("training")
-    )
-      return "book";
-    if (
-      title.includes("repair") ||
-      title.includes("fix") ||
-      title.includes("manufactur") ||
-      title.includes("product")
-    )
-      return "hammer";
-    if (
-      title.includes("professional") ||
-      title.includes("consult") ||
-      title.includes("sales") ||
-      title.includes("retail") ||
-      title.includes("financial")
-    )
-      return "briefcase";
-    if (
-      title.includes("event") ||
-      title.includes("party") ||
-      title.includes("wedding") ||
-      title.includes("media") ||
-      title.includes("entertainment")
-    )
-      return "calendar";
-    if (
-      title.includes("health") ||
-      title.includes("medical") ||
-      title.includes("care") ||
-      title.includes("wellness")
-    )
-      return "heart";
-    if (
-      title.includes("beauty") ||
-      title.includes("salon") ||
-      title.includes("service") ||
-      title.includes("hosp") ||
-      title.includes("food") ||
-      title.includes("ngo")
-    )
-      return "users";
-    if (
-      title.includes("delivery") ||
-      title.includes("transport") ||
-      title.includes("courier") ||
-      title.includes("auto")
-    )
-      return "truck";
+    if (title.includes("farming") || title.includes("agri")) return "home";
+    if (title.includes("government") || title.includes("ngo")) return "users";
+    if (title.includes("money") || title.includes("legal")) return "briefcase";
+    if (title.includes("vehicle") || title.includes("dealership")) return "car"; // Use car icon
+    if (title.includes("business") || title.includes("office")) return "calendar";
+    if (title.includes("construction") || title.includes("property")) return "hammer";
+    if (title.includes("digital") || title.includes("creative")) return "tool";
+    if (title.includes("education") || title.includes("training")) return "book";
+    if (title.includes("food") || title.includes("hospitality")) return "heart";
+    if (title.includes("health") || title.includes("wellness")) return "cross";
+    if (title.includes("home") || title.includes("handy")) return "map";
+    if (title.includes("manufacturing") || title.includes("production")) return "hammer"; // Hammer for manufacturing
+    if (title.includes("media") || title.includes("entertainment")) return "message";
+    if (title.includes("miscellaneous")) return "mail";
+    if (title.includes("sales") || title.includes("retail")) return "shopping";
+    if (title.includes("technology") || title.includes("innovation")) return "tool";
+    if (title.includes("transport") || title.includes("moving")) return "truck";
 
-    // Default icon for categories that don't match any pattern
+    // Default icon
     return "home";
   };
   return (
