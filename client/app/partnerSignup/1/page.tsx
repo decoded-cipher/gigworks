@@ -270,6 +270,7 @@ const ProfileForm = () => {
                 onChange={handleInputChange}
                 placeholder="Enter your address"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 h-36"
+                required
               />
             </div>
 
@@ -283,6 +284,7 @@ const ProfileForm = () => {
                 value={formData.idProof}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                required
               >
                 <option value="">Select</option>
                 <option value="passport">Passport</option>
@@ -303,6 +305,7 @@ const ProfileForm = () => {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                 disabled={isUploading}
+                required
               />
               {isUploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>}
               <FilePreview path={formData.uploadId} label="ID Document" />
@@ -325,6 +328,7 @@ const ProfileForm = () => {
                   id="profileImage"
                   accept="image/*"
                   disabled={isUploading}
+                  required
                 />
                 <label
                   htmlFor="profileImage"
