@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown, Search, X } from "lucide-react";
 import { fetchServices, searchBusinesses } from "../api/index";
 
@@ -67,6 +67,7 @@ export const ServiceSearchSection = () => {
   } | null>(null);
   const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const ignoreNextServiceEffect = useRef(false);
 
   // Function to fetch locations from OpenStreetMap API (same as original)
   const fetchLocations = async (query: string): Promise<LocationResult[]> => {
@@ -103,6 +104,10 @@ export const ServiceSearchSection = () => {
   }, [locationSearchInput]);
 
   useEffect(() => {
+    if (ignoreNextServiceEffect.current) {
+      ignoreNextServiceEffect.current = false;
+      return; // Skip effect after manual selection
+    }
     if (searchText.trim().length < 2) {
       setServiceResults([]);
       setShowServices(false);
@@ -113,8 +118,6 @@ export const ServiceSearchSection = () => {
     const timer = setTimeout(async () => {
       try {
         const response = await fetchServices(searchText);
-        console.log("Service response:", response);
-        
         const results = response.data
           ? response.data.map((item: string) => ({ name: item }))
           : response.map((item: any) =>
@@ -124,7 +127,6 @@ export const ServiceSearchSection = () => {
         setServiceResults(results);
         setShowServices(true);
       } catch (error) {
-        console.error("Error fetching services:", error);
         setServiceResults([]);
       } finally {
         setIsLoading(false);
@@ -181,6 +183,33 @@ export const ServiceSearchSection = () => {
       } finally {
         setIsLoading(false);
       }
+    }
+  };
+
+  const handleServiceDropdownSelect = async (serviceName: string) => {
+    ignoreNextServiceEffect.current = true;
+    setSearchText(serviceName);
+    setShowServices(false);
+    try {
+      setIsLoading(true);
+      if (selectedLocation) {
+        const results = await searchBusinesses(serviceName, {
+          lat: selectedLocation.lat,
+          lon: selectedLocation.lon,
+        });
+        if (results?.data?.profiles) {
+          setSearchResults(results.data);
+          setShowModal(true);
+        } else {
+          setSearchResults({ message: "profile_not_found", profiles: [] });
+          setShowModal(true);
+        }
+      }
+    } catch (error: any) {
+      setSearchResults({ message: "profile_not_found", profiles: [] });
+      setShowModal(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -341,8 +370,7 @@ export const ServiceSearchSection = () => {
                       key={service.id || index}
                       className="px-2 py-1 hover:bg-green-50 rounded cursor-pointer text-gray-800"
                       onClick={() => {
-                        setSearchText(service.name);
-                        setShowServices(false);
+                        handleServiceDropdownSelect(service.name);
                       }}
                     >
                       {service.name}
