@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown, Search, X } from "lucide-react";
 import { fetchServices, searchBusinesses } from "../api/index";
 
@@ -71,6 +71,7 @@ export const SearchSection = () => {
   // Add new state for search results
   const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const ignoreNextServiceEffect = useRef(false); // Add this ref
 
   // Function to fetch locations from OpenStreetMap API
   const fetchLocations = async (query: string): Promise<LocationResult[]> => {
@@ -108,6 +109,10 @@ export const SearchSection = () => {
 
   // Debounce service search input
   useEffect(() => {
+    if (ignoreNextServiceEffect.current) {
+      ignoreNextServiceEffect.current = false;
+      return; // Skip effect after manual selection
+    }
     if (searchText.trim().length < 2) {
       setServiceResults([]);
       setShowServices(false);
@@ -118,9 +123,7 @@ export const SearchSection = () => {
     const timer = setTimeout(async () => {
       try {
         // Only pass the search text, not the location
-        console.log("Searching for services:", searchText);
         const response = await fetchServices(searchText);
-        console.log("Fetched service results:", response);
 
         // Transform the API response if it's in the format with a data property
         const results = response.data
@@ -132,7 +135,6 @@ export const SearchSection = () => {
         setServiceResults(results);
         setShowServices(true); // Show dropdown when results are ready
       } catch (error) {
-        console.error("Error fetching services:", error);
         setServiceResults([]);
       } finally {
         setIsLoading(false);
@@ -347,11 +349,32 @@ export const SearchSection = () => {
                     <div
                       key={service.id || index}
                       className="px-2 py-1 hover:bg-green-500/20 rounded cursor-pointer text-white"
-                      onClick={() => {
-                        // Update the input field with the selected service
+                      onClick={async () => {
+                        ignoreNextServiceEffect.current = true;
                         setSearchText(service.name);
-                        // Close the dropdown
                         setShowServices(false);
+                        try {
+                          setIsLoading(true);
+                          if (selectedLocation) {
+                            const results = await searchBusinesses(service.name, {
+                              lat: selectedLocation.lat,
+                              lon: selectedLocation.lon,
+                            });
+                            if (results?.data?.profiles) {
+                              setSearchResults(results.data);
+                              setShowModal(true);
+                            } else {
+                              setSearchResults({ message: "profile_not_found", profiles: [] });
+                              setShowModal(true);
+                            }
+                          }
+                        } catch (error: any) {
+                          // If API returns 404 or error, show modal with no results
+                          setSearchResults({ message: "profile_not_found", profiles: [] });
+                          setShowModal(true);
+                        } finally {
+                          setIsLoading(false);
+                        }
                       }}
                     >
                       {service.name}
@@ -387,7 +410,7 @@ export const SearchSection = () => {
             </div>
             
             <div className="p-4">
-              {searchResults.profiles.length > 0 ? (
+              {searchResults.profiles && searchResults.profiles.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {searchResults.profiles.map((profile, index) => (
                     <div 
