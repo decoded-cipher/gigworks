@@ -81,20 +81,16 @@ interface BusinessData {
 export const runtime = "edge";
 
 
-async function getBusinessData(slug: string): Promise<{ data: BusinessData | null; error: string | null }> {
+async function getBusinessData(slug: string): Promise<{ data: BusinessData } | null> {
   try {
     const response = await fetchBusinessesByslug(slug)
-    if (response.message === "Business fetched successfully") {
-      return { data: response.data, error: null }
-    } else {
-      return { data: null, error: "Failed to load business data" }
+    if (!response || !response.data || !response.data.profile) {
+      return null;
     }
-  } catch (err: any) {
-    if (err.status === 404) {
-      return { data: null, error: "pending" }
-    }
+    return { data: response.data };
+  } catch (err) {
     console.error("Error fetching business data:", err)
-    return { data: null, error: "Failed to load business data" }
+    return null;
   }
 }
 
@@ -297,20 +293,13 @@ export async function generateMetadata({
   const { id } = await params
 
   // Fetch business data
-  const { data: businessData } = await getBusinessData(id)
+  const result = await getBusinessData(id)
 
-  // Fallback metadata if no business data
-  if (!businessData) {
-    return {
-      title: "Business Profile | Gigwork",
-      description: "Business profile page on Gigwork - Find verified professionals and skilled service providers",
-      robots: {
-        index: false,
-        follow: false,
-      },
-    }
+  if (!result) {
+    notFound(); // triggers 404
   }
 
+  const { data: businessData } = result
   const { profile } = businessData
 
   // Clean description (remove HTML tags)
@@ -420,16 +409,13 @@ export default async function BusinessProfilePage({
   const { id } = await params
 
   // Fetch business data
-  const { data: businessData, error } = await getBusinessData(id)
+  const result = await getBusinessData(id)
 
-  // Handle different error states
-  if (error === "pending") {
-    return <PendingPage />
-  }
-
-  if (error || !businessData) {
+  if (!result) {
     notFound()
   }
+
+  const { data: businessData } = result
 
   // Get authentication data
   const { tokenData } = getTokenData()

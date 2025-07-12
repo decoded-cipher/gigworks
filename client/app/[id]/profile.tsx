@@ -8,6 +8,34 @@ import Cookies from "js-cookie"
 
 import ImageGrid from "@/app/components/imgsec"
 import { FooterSection } from "@/app/components/FooterSection"
+
+// Component to handle description rendering with hydration safety
+function BusinessDescription({ description }: { description: string }) {
+  const [isClient, setIsClient] = useState(false)
+  
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+  
+  // During server-side rendering and initial client render, show plain text
+  if (!isClient) {
+    return (
+      <div className="text-[#111111] text-md text-left font-medium leading-relaxed">
+        {description ? description.replace(/<[^>]*>/g, '') : "No description available"}
+      </div>
+    )
+  }
+  
+  // After hydration, show HTML content
+  return (
+    <div
+      className="text-[#111111] text-md text-left font-medium leading-relaxed"
+      dangerouslySetInnerHTML={{
+        __html: description || "No description available",
+      }}
+    />
+  )
+}
 import DynamicQRCode from "@/app/components/QrSection"
 import ScrollToTopButton from "@/app/components/ScrollToTop"
 import { ASSET_BASE_URL, UserLogout } from "@/app/api"
@@ -706,12 +734,7 @@ Visit our business profile:`
                 </div>
               </div>
               <div className="flex items-center justify-center">
-                <p
-                  className="text-[#111111] text-md text-left font-medium leading-relaxed "
-                  dangerouslySetInnerHTML={{
-                    __html: businessData?.profile.description || "No description available",
-                  }}
-                />
+                <BusinessDescription description={businessData?.profile.description || ""} />
               </div>
               {businessData?.profile.socials && Object.values(businessData.profile.socials).some((url) => url) && (
                 <div>
