@@ -11,22 +11,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 1,
     }));
 
-    return routes;
-    
+    // Add reference to profile sitemap
+    const profileSitemapRef = {
+        url: `${baseUrl}/profile-sitemap.xml`,
+        lastModified: new Date().toISOString(),
+        changeFrequency: "weekly" as const,
+        priority: 0.9,
+    };
 
-    // const profiles = await fetchProfileSlugs();
-
-    // const serviceRoutes = profiles.map((profile) => ({
-    //     url: `${baseUrl}/profile/${profile.slug}`,
-    //     lastModified: new Date().toISOString(),
-    //     changeFrequency: "weekly" as const,
-    //     priority: 0.7,
-    // }));
-
-    // return [...routes, ...serviceRoutes];
-
+    return [...routes, profileSitemapRef];
 }
-
-// async function fetchProfileSlugs() {
-//     return [];
-// }
