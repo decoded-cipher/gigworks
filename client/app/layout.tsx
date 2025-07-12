@@ -49,7 +49,6 @@ export const metadata: Metadata = {
     },
     authors: [{ name: 'DevMorphix', url: 'https://devmorphix.com' }],
     applicationName: 'Gigwork',
-    generator: 'Next.js',
     referrer: 'origin-when-cross-origin',
     creator: 'DevMorphix',
     publisher: 'Gigwork',
@@ -73,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <html lang="en">
                 <head>
 
-                    <meta property="og:image:width" content="1200" />
+                    {/* <meta property="og:image:width" content="1200" />
                     <meta property="og:image:height" content="630" />
                     <meta property="og:image:type" content="image/png" />
 
@@ -103,7 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                                 }
                             })
                         }}
-                    />
+                    /> */}
 
 
                 </head>
