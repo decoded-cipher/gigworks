@@ -308,12 +308,18 @@ router.get("/slug/check", async (c) => {
 
 router.get("/", async (c) => {
   try {
-    const category_id = c.req.query("category_id");
+    const category_id = c.req.query("category_id") || null;
     const page = Number(c.req.query("page")) || 1;
     const limit = Number(c.req.query("limit")) || 10;
     const search = c.req.query("search") || "";
+    
+    let category_name = c.req.query("category_name") || null;
 
-    let result = await getProfilesByCategory(category_id, page, limit, search);
+    if (category_name) {
+      category_name = category_name.replace(/-/g, " ").replace(/_/g, " ").replace(/\band\b/g, "&");
+    }
+
+    let result = await getProfilesByCategory(category_id, category_name, page, limit, search);
 
     if (!result) {
       return c.json(
@@ -332,6 +338,7 @@ router.get("/", async (c) => {
           meta: {
             params: {
               category_id: category_id,
+              category_name: category_name,
               page: page,
               limit: limit,
               search: search,
