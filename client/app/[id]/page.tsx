@@ -76,6 +76,11 @@ interface BusinessData {
   tags: any[]
 }
 
+
+// Only for Cloudflare Workers
+export const runtime = "edge";
+
+
 async function getBusinessData(slug: string): Promise<{ data: BusinessData | null; error: string | null }> {
   try {
     const response = await fetchBusinessesByslug(slug)
