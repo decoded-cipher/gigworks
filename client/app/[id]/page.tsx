@@ -289,105 +289,124 @@ export async function generateMetadata({
 }: {
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
-  // Get the business slug from params
-  const { id } = await params
+  try {
+    // Get the business slug from params
+    const { id } = await params
 
-  // Fetch business data
-  const result = await getBusinessData(id)
+    // Fetch business data
+    const result = await getBusinessData(id)
 
-  if (!result) {
-    notFound(); // triggers 404
-  }
-
-  const { data: businessData } = result
-  const { profile } = businessData
-
-  // Clean description (remove HTML tags)
-  const cleanDescription =
-    profile.description?.replace(/<[^>]*>/g, "").slice(0, 160) ||
-    `${profile.name} - ${businessData.subCategory} in ${profile.city}, ${profile.state}. Contact: +91${profile.phone || businessData.user.phone}`
-
-  // Generate keywords from business data
-  const keywords = [
-    profile.name,
-    businessData.subCategory,
-    businessData.category,
-    profile.city,
-    profile.state,
-    profile.country,
-    ...(profile.additional_services?.split(",").map((s) => s.trim()).filter(Boolean) || []),
-    "business directory",
-    "service provider",
-    "professional services",
-  ].join(", ")
-
-  return {
-    // Dynamic title with business name
-    title: `${profile.name} - ${businessData.subCategory} in ${profile.city}`,
-
-    // Dynamic description
-    description: cleanDescription,
-
-    // Dynamic keywords
-    keywords: keywords,
-
-    // Open Graph for social sharing
-    openGraph: {
-      title: `${profile.name} - ${businessData.subCategory}`,
-      description: cleanDescription,
-      type: "website",
-      locale: "en_IN",
-      url: `https://gigwork.co.in/${id}`,
-      siteName: "Gigwork",
-      images: [
-        {
-          url: profile.banner ? `${ASSET_BASE_URL}/${profile.banner}` : "https://gigwork.co.in/assets/media/15879.png",
-          width: 1200,
-          height: 630,
-          alt: `${profile.name} - Business Banner`,
+    if (!result) {
+      return {
+        title: "Business Not Found | Gigwork",
+        description: "The requested business profile could not be found.",
+        robots: {
+          index: false,
+          follow: false,
         },
-        {
-          url: profile.avatar
-            ? `${ASSET_BASE_URL}/${profile.avatar}`
-            : "https://gigwork.co.in/assets/media/defaultbusiness.png",
-          width: 400,
-          height: 400,
-          alt: `${profile.name} - Business Logo`,
-        },
-      ],
-    },
+      }
+    }
 
-    // Twitter Card
-    twitter: {
-      card: "summary_large_image",
-      title: `${profile.name} - ${businessData.subCategory}`,
+    const { data: businessData } = result
+    const { profile } = businessData
+
+    // Clean description (remove HTML tags)
+    const cleanDescription =
+      profile.description?.replace(/<[^>]*>/g, "").slice(0, 160) ||
+      `${profile.name} - ${businessData.subCategory} in ${profile.city}, ${profile.state}. Contact: +91${profile.phone || businessData.user.phone}`
+
+    // Generate keywords from business data
+    const keywords = [
+      profile.name,
+      businessData.subCategory,
+      businessData.category,
+      profile.city,
+      profile.state,
+      profile.country,
+      ...(profile.additional_services?.split(",").map((s) => s.trim()).filter(Boolean) || []),
+      "business directory",
+      "service provider",
+      "professional services",
+    ].join(", ")
+
+    return {
+      // Dynamic title with business name
+      title: `${profile.name} - ${businessData.subCategory} in ${profile.city}`,
+
+      // Dynamic description
       description: cleanDescription,
-      images: [profile.banner ? `${ASSET_BASE_URL}/${profile.banner}` : "https://gigwork.co.in/assets/media/15879.png"],
-    },
 
-    // Canonical URL
-    alternates: {
-      canonical: `https://gigwork.co.in/${id}`,
-    },
+      // Dynamic keywords
+      keywords: keywords,
 
-    // Robots directive
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
+      // Open Graph for social sharing
+      openGraph: {
+        title: `${profile.name} - ${businessData.subCategory}`,
+        description: cleanDescription,
+        type: "website",
+        locale: "en_IN",
+        url: `https://gigwork.co.in/${id}`,
+        siteName: "Gigwork",
+        images: [
+          {
+            url: profile.banner ? `${ASSET_BASE_URL}/${profile.banner}` : "https://gigwork.co.in/assets/media/15879.png",
+            width: 1200,
+            height: 630,
+            alt: `${profile.name} - Business Banner`,
+          },
+          {
+            url: profile.avatar
+              ? `${ASSET_BASE_URL}/${profile.avatar}`
+              : "https://gigwork.co.in/assets/media/defaultbusiness.png",
+            width: 400,
+            height: 400,
+            alt: `${profile.name} - Business Logo`,
+          },
+        ],
+      },
+
+      // Twitter Card
+      twitter: {
+        card: "summary_large_image",
+        title: `${profile.name} - ${businessData.subCategory}`,
+        description: cleanDescription,
+        images: [profile.banner ? `${ASSET_BASE_URL}/${profile.banner}` : "https://gigwork.co.in/assets/media/15879.png"],
+      },
+
+      // Canonical URL
+      alternates: {
+        canonical: `https://gigwork.co.in/${id}`,
+      },
+
+      // Robots directive
+      robots: {
         index: true,
         follow: true,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
       },
-    },
 
-    // Additional metadata
-    category: businessData.category,
-    authors: [{ name: profile.name }],
-    creator: profile.name,
-    publisher: "Gigwork",
+      // Additional metadata
+      category: businessData.category,
+      authors: [{ name: profile.name }],
+      creator: profile.name,
+      publisher: "Gigwork",
+    }
+  } catch (error) {
+    console.error("Error in generateMetadata:", error)
+    return {
+      title: "Business Profile | Gigwork",
+      description: "Business profile on Gigwork",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    }
   }
 }
 
@@ -405,37 +424,42 @@ export default async function BusinessProfilePage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  // Get the business slug
-  const { id } = await params
+  try {
+    // Get the business slug
+    const { id } = await params
 
-  // Fetch business data
-  const result = await getBusinessData(id)
+    // Fetch business data
+    const result = await getBusinessData(id)
 
-  if (!result) {
+    if (!result) {
+      notFound()
+    }
+
+    const { data: businessData } = result
+
+    // Get authentication data
+    const { tokenData } = getTokenData()
+    const isOwner = tokenData?.name === businessData.user?.name
+
+    // 🎯 GENERATE JSON-LD FOR THIS SPECIFIC BUSINESS
+    const jsonLd = generateJsonLd(businessData, id)
+
+    return (
+      <>
+        {/* 🎯 INJECT JSON-LD INTO PAGE HEAD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd, null, 2).replace(/</g, "\\u003c"),
+          }}
+        />
+
+        {/* 🎯 RENDER THE CLIENT COMPONENT WITH DATA */}
+        <BusinessProfileClient businessData={businessData} initialTokenData={tokenData} isOwner={isOwner} slug={id} />
+      </>
+    )
+  } catch (error) {
+    console.error("Error in BusinessProfilePage:", error)
     notFound()
   }
-
-  const { data: businessData } = result
-
-  // Get authentication data
-  const { tokenData } = getTokenData()
-  const isOwner = tokenData?.name === businessData.user.name
-
-  // 🎯 GENERATE JSON-LD FOR THIS SPECIFIC BUSINESS
-  const jsonLd = generateJsonLd(businessData, id)
-
-  return (
-    <>
-      {/* 🎯 INJECT JSON-LD INTO PAGE HEAD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd, null, 2).replace(/</g, "\\u003c"),
-        }}
-      />
-
-      {/* 🎯 RENDER THE CLIENT COMPONENT WITH DATA */}
-      <BusinessProfileClient businessData={businessData} initialTokenData={tokenData} isOwner={isOwner} slug={id} />
-    </>
-  )
 }
