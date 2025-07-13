@@ -4,7 +4,7 @@ import { cookies } from "next/headers"
 import dynamic from 'next/dynamic'
 
 import { jwtDecode } from "jwt-decode"
-import PendingPage from "../components/pending"
+import PendingPage from "@/app/components/pending"
 import { 
   fetchBusinessesByslug,
   ASSET_BASE_URL,
@@ -103,14 +103,14 @@ async function getBusinessData(slug: string): Promise<{ data: BusinessData } | n
 }
 
 function getTokenData(): { tokenData: JWTPayload | null; isOwner: boolean } {
-  const cookieStore = cookies()
-  const token = cookieStore.get("token")?.value
-
-  if (!token) {
-    return { tokenData: null, isOwner: false }
-  }
-
   try {
+    const cookieStore = cookies()
+    const token = cookieStore.get("token")?.value
+
+    if (!token) {
+      return { tokenData: null, isOwner: false }
+    }
+
     const decodedToken = jwtDecode<JWTPayload>(token)
 
     if (decodedToken.exp) {
@@ -438,8 +438,8 @@ export default async function BusinessProfilePage({ params }: {params: { id: str
     const { data: businessData } = result
 
     // Get authentication data
-    const { tokenData } = getTokenData()
-    const isOwner = tokenData?.name === businessData.user?.name
+    // const { tokenData } = getTokenData()
+    // const isOwner = tokenData?.name === businessData.user?.name
 
     // 🎯 GENERATE JSON-LD FOR THIS SPECIFIC BUSINESS
     const jsonLd = generateJsonLd(businessData, id)
@@ -455,7 +455,7 @@ export default async function BusinessProfilePage({ params }: {params: { id: str
         />
 
         {/* 🎯 RENDER THE CLIENT COMPONENT WITH DATA */}
-        <BusinessProfileClient businessData={businessData} initialTokenData={tokenData} isOwner={isOwner} slug={id} />
+        {/* <BusinessProfileClient businessData={businessData} initialTokenData={tokenData} isOwner={isOwner} slug={id} /> */}
       </>
     )
   } catch (error) {
