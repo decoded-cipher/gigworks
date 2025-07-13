@@ -300,17 +300,6 @@ export async function generateMetadata({ params }: { params: { id: string }}) {
     // Fetch business data
     const result = await getBusinessData(id)
 
-    if (!result) {
-      return {
-        title: "Business Not Found | Gigwork",
-        description: "The requested business profile could not be found.",
-        robots: {
-          index: false,
-          follow: false,
-        },
-      }
-    }
-
     const { data: businessData } = result
     const { profile } = businessData
 

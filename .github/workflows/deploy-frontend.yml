@@ -1,17 +1,12 @@
 name: Deploy Frontend
 
 on:
-  pull_request:
-    types:
-      - closed
-    branches:
-      - master
   workflow_dispatch:
     inputs:
       environment:
         description: "Select environment (STAGE or PROD)"
         required: true
-        default: "PROD"
+        default: "STAGE"
         type: choice
         options:
           - STAGE
