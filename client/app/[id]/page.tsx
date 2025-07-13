@@ -300,6 +300,10 @@ export async function generateMetadata({ params }: { params: { id: string }}) {
     // Fetch business data
     const result = await getBusinessData(id)
 
+    if (!result) {
+      notFound()
+    }
+
     const { data: businessData } = result
     const { profile } = businessData
 
