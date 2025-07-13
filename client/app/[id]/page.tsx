@@ -1,13 +1,16 @@
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { cookies } from "next/headers"
+import dynamic from 'next/dynamic'
+
 import { jwtDecode } from "jwt-decode"
-import BusinessProfileClient from "./profile"
 import PendingPage from "../components/pending"
 import { 
   fetchBusinessesByslug,
   ASSET_BASE_URL,
 } from "@/app/api"
-import type { Metadata } from "next"
+
+
 
 interface JWTPayload {
   exp?: number
@@ -80,9 +83,11 @@ interface BusinessData {
 // Only for Cloudflare Workers
 export const runtime = "edge";
 
-// This is a dynamic page, so we need to force dynamic rendering
-export const dynamic = "force-dynamic";
-
+// 🎯 DYNAMIC IMPORT FOR CLIENT COMPONENTS
+const BusinessProfileClient = dynamic(() => import("./profile"), {
+  loading: () => <PendingPage />,
+  ssr: true
+})
 
 async function getBusinessData(slug: string): Promise<{ data: BusinessData } | null> {
   try {
