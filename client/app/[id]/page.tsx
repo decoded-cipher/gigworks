@@ -80,6 +80,9 @@ interface BusinessData {
 // Only for Cloudflare Workers
 export const runtime = "edge";
 
+// This is a dynamic page, so we need to force dynamic rendering
+export const dynamic = "force-dynamic";
+
 
 async function getBusinessData(slug: string): Promise<{ data: BusinessData } | null> {
   try {
@@ -284,14 +287,10 @@ function generateJsonLd(businessData: BusinessData, slug: string) {
 }
 
 // 🎯 GENERATE METADATA FUNCTION
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { id: string }}) {
   try {
     // Get the business slug from params
-    const { id } = await params
+    const { id } = params
 
     // Fetch business data
     const result = await getBusinessData(id)
@@ -419,14 +418,10 @@ export async function generateMetadata({
 
 
 // 🎯 MAIN PAGE COMPONENT
-export default async function BusinessProfilePage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
+export default async function BusinessProfilePage({ params }: {params: { id: string }}) {
   try {
     // Get the business slug
-    const { id } = await params
+    const { id } = params
 
     // Fetch business data
     const result = await getBusinessData(id)
