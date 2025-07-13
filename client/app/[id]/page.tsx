@@ -86,7 +86,7 @@ export const runtime = "edge";
 // 🎯 DYNAMIC IMPORT FOR CLIENT COMPONENTS
 const BusinessProfileClient = dynamic(() => import("./profile"), {
   loading: () => <PendingPage />,
-  ssr: true
+  ssr: false
 })
 
 async function getBusinessData(slug: string): Promise<{ data: BusinessData } | null> {
