@@ -32,7 +32,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   const [isLoading, setIsLoading] = useState(true)
   
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async () => {      
       try {
         const categoriesResponse = await fetchBusinessData()
         const category = categoriesResponse.data.categories.find(
