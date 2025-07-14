@@ -153,7 +153,8 @@ export const updateProfile = async (id: string, data: Profile) => {
 
 // Get all profiles by category id with pagination
 export const getProfilesByCategory = async (
-  category_id: string,
+  category_id: any,
+  category_name: any,
   page: number,
   limit: number,
   search: string
@@ -161,27 +162,27 @@ export const getProfilesByCategory = async (
   return new Promise(async (resolve, reject) => {
     try {
       /*
-                SELECT 
-                    profile.name, 
-                    profile.slug, 
-                    profile.type, 
-                    profile.avatar, 
-                    profile.city 
-                FROM 
-                    profile 
-                    LEFT JOIN category ON category.id = profile.category_id 
-                WHERE 
-                    profile.category_id = category_id AND 
-                    profile.name LIKE %search% AND 
-                    profile.status = 1 AND 
-                    category.status = 1 
-                ORDER BY 
-                    profile.name ASC 
-                LIMIT 
-                    limit 
-                OFFSET 
-                    (page - 1) * limit
-            */
+        SELECT 
+            profile.name, 
+            profile.slug, 
+            profile.type, 
+            profile.avatar, 
+            profile.city 
+        FROM 
+            profile 
+            LEFT JOIN category ON category.id = profile.category_id 
+        WHERE 
+            profile.category_id = category_id AND 
+            profile.name LIKE %search% AND 
+            profile.status = 1 AND 
+            category.status = 1 
+        ORDER BY 
+            profile.name ASC 
+        LIMIT 
+            limit 
+        OFFSET 
+            (page - 1) * limit
+    */
 
       let results = await db
         .select({
@@ -195,15 +196,20 @@ export const getProfilesByCategory = async (
         .leftJoin(category, sql`${category.id} = ${profile.category_id}`)
         .where(
           sql`
-                        ${profile.category_id} = ${category_id} AND 
-                        ${profile.name} LIKE ${"%" + search + "%"} AND 
-                        ${profile.status} = 1 AND
-                        ${category.status} = 1
-                    `
+            ${category_id ? sql`${profile.category_id} = ${category_id}` : sql`TRUE`} AND 
+            ${category_name ? sql`${category.name} LIKE ${"%" + category_name + "%"}` : sql`TRUE`} AND
+            ${profile.name} LIKE ${"%" + search + "%"} AND 
+            ${profile.status} = 1 AND
+            ${category.status} = 1
+          `
         )
         .limit(limit)
         .offset((page - 1) * limit)
         .orderBy(profile.name, "ASC");
+
+        // ${category_name ? sql`${category.name} = ${category_name}` : sql`TRUE`} AND
+        // ${category_id ? sql`${profile.category_id} = ${category_id}` : sql`TRUE`} AND
+        // ${search ? sql`${profile.name} LIKE ${"%" + search + "%"}` : sql`TRUE`} AND
 
       resolve({
         data: results,
