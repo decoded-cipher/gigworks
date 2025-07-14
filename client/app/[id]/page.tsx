@@ -431,8 +431,8 @@ export default async function BusinessProfilePage({ params }: {params: { id: str
     const { data: businessData } = result
 
     // Get authentication data
-    // const { tokenData } = getTokenData()
-    // const isOwner = tokenData?.name === businessData.user?.name
+    const { tokenData } = getTokenData()
+    const isOwner = tokenData?.name === businessData.user?.name
 
     // 🎯 GENERATE JSON-LD FOR THIS SPECIFIC BUSINESS
     const jsonLd = generateJsonLd(businessData, id)
@@ -448,7 +448,7 @@ export default async function BusinessProfilePage({ params }: {params: { id: str
         />
 
         {/* 🎯 RENDER THE CLIENT COMPONENT WITH DATA */}
-        {/* <BusinessProfileClient businessData={businessData} initialTokenData={tokenData} isOwner={isOwner} slug={id} /> */}
+        <BusinessProfileClient businessData={businessData} initialTokenData={tokenData} isOwner={isOwner} slug={id} />
       </>
     )
   } catch (error) {

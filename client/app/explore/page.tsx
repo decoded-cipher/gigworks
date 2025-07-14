@@ -137,6 +137,14 @@ const getCategoryIcon = (categoryTitle: string) => {
   return "home";
 };
 
+
+function slugify(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9&]+/g, "_") // Replace non-alphanumeric with hyphens
+    
+}
+
   // Filter categories based on search term
   const filteredCategories = categories.filter((category) =>
     category?.title?.toLowerCase().includes(searchTerm.toLowerCase() || "")
