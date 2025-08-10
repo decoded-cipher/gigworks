@@ -515,38 +515,6 @@ export default async function BusinessProfilePage({ params }: {params: { id: str
       </>
     )
   } catch (error) {
-    console.error("Error in BusinessProfilePage:", error)
-    
-    // 🎯 FALLBACK UI FOR ERRORS
-    return (
-      <>
-        {/* 🎯 ERROR PAGE METADATA */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebPage",
-              "name": "Error - Business Profile Not Found",
-              "description": "The requested business profile could not be loaded",
-              "url": `https://gigwork.co.in/${params.id}`,
-            }),
-          }}
-        />
-        
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Something went wrong</h1>
-            <p className="text-gray-600 mb-4">We're having trouble loading this business profile.</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Try again
-            </button>
-          </div>
-        </div>
-      </>
-    )
+    notFound()
   }
 }
