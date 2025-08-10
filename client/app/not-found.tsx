@@ -1,9 +1,25 @@
+import { Metadata } from 'next';
+
 export const runtime = "edge";
+
+export const metadata: Metadata = {
+  title: 'Page Not Found - Gigwork',
+  description: 'The page you are looking for could not be found. Return to Gigwork to find verified professionals and skilled service providers.',
+  robots: {
+    index: false,
+    follow: false,
+  },
+  openGraph: {
+    title: 'Page Not Found - Gigwork',
+    description: 'The page you are looking for could not be found.',
+    type: 'website',
+    url: 'https://gigwork.co.in/404',
+  },
+};
 
 export default function NotFound() {
   return (
     <>
-      <title>404: This page could not be found.</title>
       <div style={styles.error}>
         <div>
           <style
@@ -16,6 +32,9 @@ export default function NotFound() {
           </h1>
           <div style={styles.desc}>
             <h2 style={styles.h2}>This page could not be found.</h2>
+            <p style={styles.p}>
+              <a href="/" style={styles.link}>Return to Gigwork Homepage</a>
+            </p>
           </div>
         </div>
       </div>
@@ -54,5 +73,15 @@ const styles = {
     fontWeight: 400,
     lineHeight: "49px",
     margin: 0,
+  },
+
+  p: {
+    marginTop: 20,
+    fontSize: 14,
+  },
+
+  link: {
+    color: '#00A651',
+    textDecoration: 'none',
   },
 } as const;

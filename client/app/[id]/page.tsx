@@ -80,9 +80,6 @@ interface BusinessData {
 }
 
 
-// Only for Cloudflare Workers
-export const runtime = "edge";
-
 // 🎯 DYNAMIC GENERATION WITH ISR FOR BETTER SEO AND PERFORMANCE
 export const revalidate = 3600; // Revalidate every hour for fresh content
 export const preferredRegion = 'auto' // Optimize for user's region
