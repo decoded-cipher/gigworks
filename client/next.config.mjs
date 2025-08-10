@@ -5,7 +5,6 @@ if (process.env.NODE_ENV === 'development') {
   await setupDevPlatform();
 }
 
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     serverRuntimeConfig: {
@@ -33,9 +32,28 @@ const nextConfig = {
             {
               key: 'Referrer-Policy',
               value: 'same-origin',
+            },
+            // Add proper content-type headers for better metadata handling
+            {
+              key: 'Content-Type',
+              value: 'text/html; charset=utf-8',
             }
           ],
         },
+        // Specific headers for business profile pages
+        {
+          source: '/:id*',
+          headers: [
+            {
+              key: 'Cache-Control',
+              value: 'public, max-age=3600, s-maxage=3600',
+            },
+            {
+              key: 'X-Robots-Tag',
+              value: 'index, follow',
+            }
+          ],
+        }
       ]
     },
     // async redirects() {
@@ -59,6 +77,11 @@ const nextConfig = {
         })
       }
       return config
+    },
+    // Ensure proper image optimization for social media
+    images: {
+      domains: ['gigwork.co.in'],
+      formats: ['image/webp', 'image/avif'],
     }
 }
   

@@ -1,3 +1,35 @@
 User-agent: *
 Allow: /
+
+# Sitemaps
 Sitemap: https://gigwork.co.in/sitemap.xml
+Sitemap: https://gigwork.co.in/profile-sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+
+# Allow business profile pages
+Allow: /*/
+Allow: /explore
+Allow: /service
+Allow: /signup
+Allow: /partnerSignup
+
+# Social media crawlers
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
