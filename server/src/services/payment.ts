@@ -25,8 +25,8 @@ export const initPayment = async (data, env: Env) => {
                 reject(new Error('Missing required environment variables'));
             }
             
-            // const AMOUNT = 1500 * 100;
-            const AMOUNT = 1500;
+            const AMOUNT = 1500 * 100;
+            // const AMOUNT = 1500;
             
             const REDIRECT_URL = `https://gigwork.co.in/payment/success`;
             const CALLBACK_URL = `https://api.gigwork.co.in/api/v1/payment/callback`;
