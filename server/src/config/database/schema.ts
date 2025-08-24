@@ -421,9 +421,9 @@ export const profileTag = sqliteTable('profile_tag', {
 export const testimonial = sqliteTable('testimonial', {
     id: text().primaryKey().$default(nanoid),
     profile_id: text().notNull().references(() => profile.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
-    user_id: text().notNull().references(() => user.id, {onDelete: 'CASCADE', onUpdate: 'CASCADE'}),
+    userDetails: text().notNull(),
     rating: integer().notNull(),
-    status: integer().default(1).notNull(),
+    status: integer().default(0).notNull(),     // 0 - inactive, 1 - active
     comment: text().notNull(),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull()
@@ -431,7 +431,6 @@ export const testimonial = sqliteTable('testimonial', {
     return {
         indexes: [
             { columns: ['profile_id'] },
-            { columns: ['user_id'] },
             { columns: ['rating'] }
         ],
         check: [

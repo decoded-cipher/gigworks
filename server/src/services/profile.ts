@@ -13,6 +13,7 @@ import {
   category,
   subCategory,
   subCategoryOption,
+  testimonial,
 } from "../config/database/schema";
 import { User, Profile, SubCategory } from "../config/database/interfaces";
 import { removeFields } from "../utils/helpers";
@@ -509,7 +510,7 @@ export const getProfileBySlug = async (slug: string) => {
         return;
       }
 
-      const [licenses, media, tags] = await Promise.all([
+      const [licenses, media, tags, testimonials] = await Promise.all([
         /*
           SELECT 
               license_type.name, 
@@ -560,9 +561,24 @@ export const getProfileBySlug = async (slug: string) => {
           .from(profileTag)
           .where(sql`${profileTag.profile_id} = ${profileResult.profile.id}`)
           .all(),
+
+        // SQL Query : SELECT * FROM testimonial WHERE profile_id = profileResult.profile.id
+        
+        db
+          .select({
+            userDetails: testimonial.userDetails,
+            rating: testimonial.rating,
+            comment: testimonial.comment
+          })
+          .from(testimonial)
+          .where(sql`
+            ${testimonial.profile_id} = ${profileResult.profile.id} AND 
+            ${testimonial.status} = 1
+          `)
+          .all(),
       ]);
 
-      let data = { ...profileResult, licenses, media, tags };
+      let data = { ...profileResult, licenses, media, tags, testimonials };
       data.profile.operating_hours = JSON.parse(data.profile.operating_hours);
       data.profile.socials = JSON.parse(data.profile.socials);
 
