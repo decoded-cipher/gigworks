@@ -71,7 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <>
             <html lang="en">
                 <head>
-
+                    
                     {/* <meta property="og:image:width" content="1200" />
                     <meta property="og:image:height" content="630" />
                     <meta property="og:image:type" content="image/png" />
@@ -104,12 +104,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         }}
                     /> */}
 
-
+                    {/* Additional meta tags for better compatibility */}
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+                    <meta name="format-detection" content="telephone=no" />
+                    
+                    {/* Preconnect to external domains for performance */}
+                    <link rel="preconnect" href="https://fonts.googleapis.com" />
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 </head>
                 <body>{children}</body>
             </html>
 
-            <Script
+            {/* <Script
                 id="microsoft-clarity-init"
                 strategy="afterInteractive"
                 dangerouslySetInnerHTML={{
@@ -121,7 +128,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_MICROSOFT_CLARITY}");
                     `,
                 }}
-            />
+            /> */}
         </>
     )
 }

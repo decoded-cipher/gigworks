@@ -80,13 +80,14 @@ interface BusinessData {
 }
 
 
-// Only for Cloudflare Workers
-export const runtime = "edge";
+// 🎯 DYNAMIC GENERATION WITH ISR FOR BETTER SEO AND PERFORMANCE
+export const revalidate = 3600; // Revalidate every hour for fresh content
+export const preferredRegion = 'auto' // Optimize for user's region
 
 // 🎯 DYNAMIC IMPORT FOR CLIENT COMPONENTS
 const BusinessProfileClient = dynamic(() => import("./profile"), {
   loading: () => <PendingPage />,
-  ssr: false
+  ssr: true // Enable SSR for better SEO
 })
 
 async function getBusinessData(slug: string): Promise<{ data: BusinessData } | null> {
@@ -265,6 +266,17 @@ function generateJsonLd(businessData: BusinessData, slug: string) {
       taxID: businessData.profile.gstin,
     }),
 
+    // Enhanced business information
+    ...(businessData.profile.type && {
+      additionalType: businessData.profile.type,
+    }),
+
+    // Business hours and availability
+    ...(businessData.profile.operating_hours && {
+      openingHoursSpecification: formatOperatingHoursForSchema(businessData.profile.operating_hours),
+    }),
+
+    // Aggregate rating (placeholder - can be replaced with real data)
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: "4.5",
@@ -312,7 +324,7 @@ export async function generateMetadata({ params }: { params: { id: string }}) {
       profile.description?.replace(/<[^>]*>/g, "").slice(0, 160) ||
       `${profile.name} - ${businessData.subCategory} in ${profile.city}, ${profile.state}. Contact: +91${profile.phone || businessData.user.phone}`
 
-    // Generate keywords from business data
+    // Generate comprehensive keywords from business data
     const keywords = [
       profile.name,
       businessData.subCategory,
@@ -324,6 +336,13 @@ export async function generateMetadata({ params }: { params: { id: string }}) {
       "business directory",
       "service provider",
       "professional services",
+      "local business",
+      "business near me",
+      `${businessData.subCategory} in ${profile.city}`,
+      `${profile.city} ${businessData.subCategory}`,
+      `${profile.state} business directory`,
+      "verified business",
+      "licensed professional",
     ].join(", ")
 
     return {
@@ -386,6 +405,22 @@ export async function generateMetadata({ params }: { params: { id: string }}) {
           "max-image-preview": "large",
           "max-snippet": -1,
         },
+        // Additional bot directives
+        bingbot: {
+          index: true,
+          follow: true,
+        },
+      },
+      
+      // Performance hints and additional metadata
+      other: {
+        "X-Robots-Tag": "index, follow",
+        "Cache-Control": "public, max-age=3600, s-maxage=3600",
+        "language": "en",
+        "geo.region": "IN",
+        "geo.placename": profile.city,
+        "geo.position": `${profile.latitude};${profile.longitude}`,
+        "ICBM": `${profile.latitude}, ${profile.longitude}`,
       },
 
       // Additional metadata
@@ -393,6 +428,12 @@ export async function generateMetadata({ params }: { params: { id: string }}) {
       authors: [{ name: profile.name }],
       creator: profile.name,
       publisher: "Gigwork",
+      
+      // Enhanced SEO metadata
+      verification: {
+        google: "your-google-verification-code", // Add your Google verification code
+        yandex: "your-yandex-verification-code", // Add your Yandex verification code
+      },
     }
   } catch (error) {
     console.error("Error in generateMetadata:", error)
@@ -446,13 +487,31 @@ export default async function BusinessProfilePage({ params }: {params: { id: str
             __html: JSON.stringify(jsonLd, null, 2).replace(/</g, "\\u003c"),
           }}
         />
+        
+        {/* 🎯 PERFORMANCE HINTS */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* 🎯 PRELOAD CRITICAL RESOURCES */}
+        {businessData.profile.avatar && (
+          <link 
+            rel="preload" 
+            href={`${ASSET_BASE_URL}/${businessData.profile.avatar}`} 
+            as="image" 
+            type="image/webp"
+          />
+        )}
 
         {/* 🎯 RENDER THE CLIENT COMPONENT WITH DATA */}
-        <BusinessProfileClient businessData={businessData} initialTokenData={tokenData} isOwner={isOwner} slug={id} />
+        <BusinessProfileClient 
+          businessData={businessData} 
+          initialTokenData={tokenData} 
+          isOwner={isOwner} 
+          slug={id} 
+        />
       </>
     )
   } catch (error) {
-    console.error("Error in BusinessProfilePage:", error)
     notFound()
   }
 }
