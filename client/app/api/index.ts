@@ -22,10 +22,10 @@ export const fetchBusinessData = async (params:any = {}) => {
   }
 };
 
-export const fetchBusinessesByCategory = async (categoryId: string) => {
+export const fetchBusinessesByCategory = async (category_name: string) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/api/v1/business?category_id=${categoryId}`
+      `${BASE_URL}/api/v1/business?category_name=${category_name}`
     );
     return response.data;
   } catch (error) {
