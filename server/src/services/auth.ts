@@ -6,106 +6,83 @@ import { db } from '../config/database/turso';
 import { tokenTable, user } from '../config/database/schema';
 import { User, Admin, TokenTable } from "../config/database/interfaces";
 
-import{ generateToken } from '../middleware/authentication';
-
 
 
 // Generate OTP and store it in KV store
-export const generateOTP = async (phone: string, env: Env): Promise<string> => {
+export const generateOTP = async (phone: string, env: any): Promise<string> => {
     return new Promise(async (resolve, reject) => {
+        const kv = env?.KV_STORE;
+        if (!kv || typeof kv.put !== 'function' || typeof kv.delete !== 'function') {
+            return reject("KV_STORE not available");
+        }
 
-        // Temporary : OTP will be the last 6 digits of the phone number
-        const otp = phone.slice(-6);
-        resolve(otp);
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // if (!env || !env.KV_STORE || typeof env.KV_STORE.put !== 'function' || typeof env.KV_STORE.delete !== 'function') {
-        //     return reject("KV_STORE not available");
-        // }
-
-        // const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-        // try {
-        //     const existingValue = await env.KV_STORE.get(phone);
-        //     if (existingValue) {
-        //         await env.KV_STORE.delete(phone);
-        //     }
+        try {
+            const existingValue = await kv.get(phone);
+            if (existingValue) {
+                await kv.delete(phone);
+            }
     
-        //     await env.KV_STORE.put(phone, JSON.stringify({
-        //         otp,
-        //         expires: Date.now() + 300000    // 5 minutes
-        //     }));
-
-        //     // list all keys for debugging
-        //     const keys = await env.KV_STORE.list();
-        //     console.log('Keys:', keys);
-
-        //     // list the value for debugging
-        //     const value = await env.KV_STORE.get(phone);
-        //     console.log('Value after put:', value);
+            await kv.put(phone, JSON.stringify({
+                otp,
+                expires: Date.now() + 300000    // 5 minutes
+            }), { expirationTtl: 300 });
     
-        //     resolve(otp);
-        // } catch (error) {
-        //     reject(error);
-        // }
+            resolve(otp);
+        } catch (error) {
+            reject(error);
+        }
     });
 };
 
 
 
 // Verify OTP from KV store
-export const verifyOTP = async (phone: string, otp: string, env: Env): Promise<boolean> => {
+export const verifyOTP = async (phone: string, otp: string, env: any): Promise<boolean> => {
     return new Promise(async (resolve, reject) => {
-
-        // Temporary : OTP will be the last 6 digits of the phone number
-        if (phone.slice(-6) === otp) {
-            return resolve(true);
-        } else {
-            return resolve(false);
+        const kv = env?.KV_STORE;
+        if (!kv || typeof kv.get !== 'function' || typeof kv.delete !== 'function') {
+            return reject("KV_STORE not available");
         }
 
-        // if (!env || !env.KV_STORE || typeof env.KV_STORE.get !== 'function' || typeof env.KV_STORE.delete !== 'function') {
-        //     return reject("KV_STORE not available");
-        // }
+        try {
+            const value = await kv.get(phone);
 
-        // try {
-        //     const value = await env.KV_STORE.get(phone);
-        //     console.log('Value in verifyOTP:', value);
+            if (!value) {
+                return resolve(false);
+            }
 
-        //     if (!value) {
-        //         return resolve(null);
-        //     }
+            const parsedValue = JSON.parse(value);
 
-        //     const parsedValue = JSON.parse(value);
-        //     console.log('Parsed value in verifyOTP:', parsedValue);
-
-        //     if (parsedValue.otp === otp && parsedValue.expires > Date.now()) {
-        //         await env.KV_STORE.delete(phone);
-        //         return resolve(true);
-        //     } else {
-        //         return resolve(false);
-        //     }
-        // } catch (error) {
-        //     reject(error);
-        // }
+            if (parsedValue.otp === otp && parsedValue.expires > Date.now()) {
+                await kv.delete(phone);
+                return resolve(true);
+            } else {
+                return resolve(false);
+            }
+        } catch (error) {
+            reject(error);
+        }
     });
 };
 
 
 
 // Create Token
-export const createAuthToken = async (user: User | Admin, env: Env, isAdmin: boolean = false): Promise<string> => {
+export const createAuthToken = async (user: User | Admin, env: any, isAdmin: boolean = false): Promise<string> => {
     return new Promise(async (resolve, reject) => {
         try {
 
             const token = jwt.sign({
                 id: user.id,
                 name: user.name,
-                phone: user.phone,
+                phone: isAdmin ? undefined : (user as User).phone,
                 role: user.role
             }, env.JWT_TOKEN_SECRET, { expiresIn: env.JWT_TOKEN_EXPIRY });
 
             const existingToken = await db
-                .select(tokenTable)
+                .select()
                 .from(tokenTable)
                 .where(sql`${isAdmin ? tokenTable.admin_id : tokenTable.user_id} = ${user.id}`);
             
@@ -138,7 +115,7 @@ export const createAuthToken = async (user: User | Admin, env: Env, isAdmin: boo
 
 
 // Verify Token
-export const verifyAuthToken = async (token: string, env: Env): Promise<any> => {
+export const verifyAuthToken = async (token: string, env: any): Promise<any> => {
     return new Promise(async (resolve, reject) => {
         try {
             const decoded = jwt.verify(token, env.JWT_TOKEN_SECRET);

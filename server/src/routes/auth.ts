@@ -6,8 +6,7 @@ import { generateOTP, verifyOTP, createAuthToken, deleteAuthToken } from '../ser
 import { getUserByPhone, createUser, updateUser } from '../services/user';
 import { getProfilesByUser } from '../services/profile';
 import { User } from '../config/database/interfaces';
-
-// import { sendMessage } from '../services/message';
+import { sendOtpToInterakt } from '../services/bot';
 
 
 
@@ -46,7 +45,13 @@ router.post('/register', async (c) => {
             user = await createUser({ phone, name, role } as User);
         }
 
-        // await sendMessage(phone, `Your OTP is ${otp}`);
+        // Send OTP via WhatsApp
+        try {
+            await sendOtpToInterakt(otp, phone, c.env as any);
+        } catch (error) {
+            console.error('Error sending OTP via WhatsApp:', error);
+        }
+
         return c.json({
             message: 'OTP sent successfully',
             otp
@@ -164,7 +169,13 @@ router.post('/login', async (c) => {
         }
 
         const otp = await generateOTP(phone, c.env);
-        // await sendMessage(phone, `Your OTP is ${otp}`);
+        
+        // Send OTP via WhatsApp
+        try {
+            await sendOtpToInterakt(otp, phone, c.env as any);
+        } catch (error) {
+            console.error('Error sending OTP via WhatsApp:', error);
+        }
 
         return c.json({
             message: 'OTP sent successfully',
