@@ -287,6 +287,9 @@ export default function HomePage() {
     window.open("https://wa.me/+918590012027", "_blank");
   };
 
+    function slugify(text: string) {
+    return text.toLowerCase().replace(/[^a-z0-9&]+/g, "-"); // Replace non-alphanumeric with hyphens
+  }
   // Helper function to render step icon
   const renderStepIcon = (iconName: string) => {
     switch (iconName) {
@@ -406,7 +409,7 @@ export default function HomePage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
               {fetchedCategories.map((category, index) => (
                 <Link
-                  href={`/category/${category.id}`}
+                  href={`/category/${slugify(category.title)}`}
                   key={index}
                   className="flex flex-col items-center space-y-4 bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition"
                 >
