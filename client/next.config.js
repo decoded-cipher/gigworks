@@ -3,7 +3,7 @@
 const nextConfig = {
   output: 'standalone',
   compiler: {
-    removeConsole: true,
+    removeConsole: false,
   },
   images: {
     unoptimized: true,
