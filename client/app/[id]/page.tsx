@@ -10,7 +10,7 @@ import {
   ASSET_BASE_URL,
 } from "@/app/api"
 
-
+export const runtime = 'edge';
 
 interface JWTPayload {
   exp?: number
