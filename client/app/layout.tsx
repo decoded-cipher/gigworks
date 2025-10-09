@@ -112,12 +112,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     {/* Preconnect to external domains for performance */}
                     <link rel="preconnect" href="https://fonts.googleapis.com" />
                     <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                    <Script
+                         src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"
+                         strategy="afterInteractive"
+                    />
+                    <Script
+                    id="google-analytics"
+                    strategy="afterInteractive"
+                    dangerouslySetInnerHTML={{
+                      __html: `
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', 'G-6NN85ZCGLN', {
+                          page_path: window.location.pathname,
+                        });
+                      `,
+                     }}
+                    />
+
                 </head>
                 <body>{children}</body>
             </html>
 
             {/* <Script
-                id="microsoft-clarity-init"
+                id="microsoft-clarit y-init"
                 strategy="afterInteractive"
                 dangerouslySetInnerHTML={{
                     __html: `
