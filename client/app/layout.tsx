@@ -135,7 +135,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <body>{children}</body>
             </html>
 
-            {/* <Script
+            <Script
                 id="microsoft-clarit y-init"
                 strategy="afterInteractive"
                 dangerouslySetInnerHTML={{
@@ -147,7 +147,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_MICROSOFT_CLARITY}");
                     `,
                 }}
-            /> */}
+            />
         </>
     )
 }
