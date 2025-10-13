@@ -72,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <html lang="en">
                 <head>
                     
-                    {/* <meta property="og:image:width" content="1200" />
+                    <meta property="og:image:width" content="1200" />
                     <meta property="og:image:height" content="630" />
                     <meta property="og:image:type" content="image/png" />
 
@@ -102,7 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                                 }
                             })
                         }}
-                    /> */}
+                    />
 
                     {/* Additional meta tags for better compatibility */}
                     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

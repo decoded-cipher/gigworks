@@ -157,34 +157,26 @@ interface BusinessProfile {
 
 export const uploadToPresignedUrl = async (presignedUrl: string, file: File) => {
   try {
-    // console.log('Uploading to:', presignedUrl);
-    // console.log('File details:', {
-    //   name: file.name,
-    //   type: file.type,
-    //   size: file.size
-    // });
-
-    const response = await axios.put(presignedUrl, file, {
+    const response = await fetch(presignedUrl, {
+      method: "PUT",
+      mode: "cors",
       headers: {
-        'Content-Type': file.type,
+        "Content-Type": file.type,
       },
+      body: file,
     });
 
-    
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.statusText}`);
+    }
+
     return true;
   } catch (error) {
-    console.error('Error uploading file:', {
-      error,
-      url: presignedUrl.split('?')[0],
-      fileInfo: {
-        name: file.name,
-        type: file.type,
-        size: file.size
-      }
-    });
+    console.error("Error uploading file:", error);
     throw error;
   }
 };
+
 
 
 
