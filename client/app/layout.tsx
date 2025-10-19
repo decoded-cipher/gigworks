@@ -72,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <html lang="en">
                 <head>
                     
-                    {/* <meta property="og:image:width" content="1200" />
+                    <meta property="og:image:width" content="1200" />
                     <meta property="og:image:height" content="630" />
                     <meta property="og:image:type" content="image/png" />
 
@@ -102,7 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                                 }
                             })
                         }}
-                    /> */}
+                    />
 
                     {/* Additional meta tags for better compatibility */}
                     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -112,12 +112,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     {/* Preconnect to external domains for performance */}
                     <link rel="preconnect" href="https://fonts.googleapis.com" />
                     <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                    <Script
+                         src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"
+                         strategy="afterInteractive"
+                    />
+                    <Script
+                    id="google-analytics"
+                    strategy="afterInteractive"
+                    dangerouslySetInnerHTML={{
+                      __html: `
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', 'G-6NN85ZCGLN', {
+                          page_path: window.location.pathname,
+                        });
+                      `,
+                     }}
+                    />
+
                 </head>
                 <body>{children}</body>
             </html>
 
-            {/* <Script
-                id="microsoft-clarity-init"
+            <Script
+                id="microsoft-clarit y-init"
                 strategy="afterInteractive"
                 dangerouslySetInnerHTML={{
                     __html: `
@@ -128,7 +147,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_MICROSOFT_CLARITY}");
                     `,
                 }}
-            /> */}
+            />
         </>
     )
 }
